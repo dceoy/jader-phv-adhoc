@@ -1,0 +1,25 @@
+model
+{
+  for (i in 1:N) {
+    Y[i] ~ dbin(q[i], 1)
+    logit(q[i]) <- beta1 + beta2 * F[i] + rr[i] + rd[j] + rq[l])
+  }
+  beta1 ~ dnorm(0, 1.0E-4)
+  beta2 ~ dnorm(0, 1.0E-4)
+  beta3 ~ dnorm(0, 1.0E-4)
+  beta4 ~ dnorm(0, 1.0E-4)
+  beta5 ~ dnorm(0, 1.0E-4)
+  for (i in 1:N.report) {
+    rr[i] ~ dnorm(0, tau[1])
+  }
+  for (j in 1:N.drug) {
+    rd[j] ~ dnorm(0, tau[2])
+  }
+  for (l in 1:N.quarter) {
+    rq[l] ~ dnorm(0, tau[4])
+  }
+  for (m in 1:N.tau) {
+    tau[m] <- 1.0 / (s[m] * s[m])
+    s[m] ~ dunif(0, 1.0E+4)
+  }
+}
