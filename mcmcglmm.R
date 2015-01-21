@@ -27,13 +27,6 @@ sql_base <- 'SELECT
                suspected,
                dpp4_inhibitor,
                glp1_agonist,
-               sglt2_inhibitor +
-               alpha_glucosidase_inhibitor +
-               biguanide +
-               meglitinide +
-               sulfonylurea +
-               thiazolidinedione AS oral_hypoglycemic_drug,
-               insulin,
                age,
                sex
              FROM
@@ -102,7 +95,7 @@ sql_ccmt <- 'SELECT DISTINCT
                drug
              WHERE
                name NOT IN (
-                 SELECT DISTINCT drug FROM d_class
+                 SELECT DISTINCT drug FROM d_class WHERE class IN ("dpp4_inhibitor", "glp1_agonist")
                ) AND case_id IN (
                  SELECT case_id FROM base_dt
                );'
@@ -145,33 +138,33 @@ fex <- function(t) {
   return(p_or)
 }
 
-dt_sgnl <- dt_ct22 %>%
-             mutate(ror_ll95 = exp(log(a * d / c / b) - 1.96 * sqrt(1 / a + 1 / b + 1 / c + 1 / d))) %>%
-             filter(ror_ll95 > 1) %>%
+#dt_sgnl <- dt_ct22 %>%
+#             mutate(ror_ll95 = exp(log(a * d / c / b) - 1.96 * sqrt(1 / a + 1 / b + 1 / c + 1 / d))) %>%
+#             filter(ror_ll95 > 1) %>%
+#             select(drug, hlt_code)
+
+cl <- makeCluster(4, type = "MPI")
+
+dt_sgnl <- cl %>%
+             parApply(select(dt_ct22, a:d), 1, fex) %>%
+             t() %>%
+             cbind(dt_ct22) %>%
+             filter(p_val < 0.05, f_or > 1) %>%
              select(drug, hlt_code)
 
-#cl <- makeCluster(4, type = "MPI")
-#
-#dt_sgnl <- cl %>%
-#             parApply(select(dt_ct22, a:d), 1, fex) %>%
-#             t() %>%
-#             cbind(dt_ct22) %>%
-#             filter(p_val < 0.05, f_or > 1) %>%
-#             select(drug, hlt_code)
-#
-#stopCluster(cl)
+stopCluster(cl)
 
 registerDoSNOW(makeCluster(4, type = 'SOCK'))
 pkgs = c('data.table', 'plyr', 'dplyr', 'Matrix', 'coda', 'ape', 'MCMCglmm')
 
-cat('', file = 'out.txt')
+#cat('', file = 'out.txt')
 
 
 hlt_codes <- c('10021001',
                '10033646',
                '10033632',
                '10033633')
-hlt_codes <- c('10033633')
+hlt_codes <- c('10033632')
 
 # -- 10021001 低血糖状態ＮＥＣ  Hypoglycaemic conditions NEC
 # -- 10033646 急性および慢性膵炎  Acute and chronic pancreatitis
@@ -179,7 +172,6 @@ hlt_codes <- c('10033633')
 # -- 10033633 悪性膵新生物（膵島細胞腫瘍およびカルチノイドを除く）  Pancreatic neoplasms malignant (excl islet cell and carcinoid)
 
 
-#foreach (code = hlt_codes, .packages = pkgs) %dopar% {
 foreach (code = hlt_codes, .packages = pkgs) %do% {
   hlt <- dt_hlts %>% filter(hlt_code == code)
   hist <- dt_hist %>% filter(hlt_code == code)
@@ -200,15 +192,13 @@ foreach (code = hlt_codes, .packages = pkgs) %do% {
 
   e <- try(posterior <- MCMCglmm(fixed = event ~ dpp4_inhibitor +
                                                  glp1_agonist +
-                                                 oral_hypoglycemic_drug +
-                                                 insulin +
                                                  concomit +
-                                                 preexist +
+#                                                preexist +
                                                  age +
                                                  sex,
                                  random = ~ suspected,
                                  family = 'categorical', data = dt,
-                                 nitt = 300000, burnin = 100000),
+                                 nitt = 3000000, burnin = 1000000),
            silent = FALSE)
 
   print(summary(posterior))
