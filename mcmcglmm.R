@@ -60,20 +60,6 @@ sql_hlts <- 'SELECT DISTINCT
              GROUP BY
                a.hlt_code;'
 
-sql_hist <- 'SELECT DISTINCT
-               case_id,
-               hlt_code
-             FROM
-               hist h
-             INNER JOIN
-               pt_j p ON p.pt_kanji == h.disease
-             INNER JOIN
-               hlt_pt hp ON hp.pt_code == p.pt_code
-             WHERE
-               case_id IN (
-                 SELECT case_id FROM base_dt
-               );'
-
 sql_reac <- 'SELECT DISTINCT
                case_id,
                hlt_code
@@ -126,7 +112,6 @@ sql_ct22 <- 'SELECT
 
 dt_base <- tbl_dt(data.table(dbGetQuery(con, sql_base)))
 dt_hlts <- tbl_dt(data.table(dbGetQuery(con, sql_hlts)))
-dt_hist <- tbl_dt(data.table(dbGetQuery(con, sql_hist)))
 dt_reac <- tbl_dt(data.table(dbGetQuery(con, sql_reac)))
 dt_ccmt <- tbl_dt(data.table(dbGetQuery(con, sql_ccmt)))
 dt_ct22 <- tbl_dt(data.table(dbGetQuery(con, sql_ct22)))
@@ -144,21 +129,16 @@ fex <- function(t) {
 #             select(drug, hlt_code)
 
 cl <- makeCluster(4, type = "MPI")
-
 dt_sgnl <- cl %>%
              parApply(select(dt_ct22, a:d), 1, fex) %>%
              t() %>%
              cbind(dt_ct22) %>%
              filter(p_val < 0.05, f_or > 1) %>%
              select(drug, hlt_code)
-
 stopCluster(cl)
 
 registerDoSNOW(makeCluster(4, type = 'SOCK'))
 pkgs = c('data.table', 'plyr', 'dplyr', 'Matrix', 'coda', 'ape', 'MCMCglmm')
-
-#cat('', file = 'out.txt')
-
 
 hlt_codes <- c('10021001',
                '10033646',
@@ -170,10 +150,11 @@ hlt_codes <- c('10021001',
 # -- 10033632 膵新生物  Pancreatic neoplasms
 # -- 10033633 悪性膵新生物（膵島細胞腫瘍およびカルチノイドを除く）  Pancreatic neoplasms malignant (excl islet cell and carcinoid)
 
+out_path <- paste('output/glmm_', gsub('[ :]', '-', Sys.time()), '.txt', sep = '')
+cat('mcmcglmm\n', file = out_path)
 
 foreach (code = hlt_codes, .packages = pkgs) %dopar% {
   hlt <- dt_hlts %>% filter(hlt_code == code)
-  hist <- dt_hist %>% filter(hlt_code == code)
   reac <- dt_reac %>% filter(hlt_code == code)
   sgnl <- dt_sgnl %>% filter(hlt_code == code)
   ccmt <- dt_ccmt %>%
@@ -184,35 +165,35 @@ foreach (code = hlt_codes, .packages = pkgs) %dopar% {
   dt <- dt_base %>%
           left_join(ccmt, by = 'case_id') %>%
           mutate(concomit = ifelse(is.na(concomit), 0, concomit)) %>%
-          mutate(preexist = ifelse(case_id %in% hist$case_id, 1, 0)) %>%
           mutate(event = ifelse(case_id %in% reac$case_id, 1, 0))
 
-  print(t(hlt))
-
-  e <- try(posterior <- MCMCglmm(fixed = event ~ dpp4_inhibitor +
-                                                 glp1_agonist +
-                                                 concomit +
-#                                                preexist +
-                                                 age +
-                                                 sex,
-                                 random = ~ suspected,
-                                 family = 'categorical', data = dt,
-                                 nitt = 10000000, burnin = 2000000),
+  e <- try(p <- MCMCglmm(fixed = event ~ dpp4_inhibitor +
+                                         glp1_agonist +
+                                         concomit +
+                                         age +
+                                         sex,
+                         random = ~ suspected,
+                         family = 'categorical', data = dt,
+                         nitt = 30000000, burnin = 10000000),
            silent = FALSE)
 
-  print(summary(posterior))
-  plot(posterior)
+  if (class(e) != 'try-error') {
+    pdf(paste('img/hlt', code, '.pdf', sep = ''))
+      plot(p)
+    dev.off()
 
-# if (class(e) != 'try-error') {
-#   s <- summary(posterior, quantiles = c(0.025, 0.5, 0.975))
-#   p <- data.frame(s$quantiles)
-#   p <- p %>% exp()
-
-#   print(summary(posterior, quantiles = c(0.025, 0.5, 0.975)))
-
-#   cat('\n\n', file = 'out.txt', append = TRUE)
-#   cat(paste(hlt, ' ', sep = ''), file = 'out.txt', append = TRUE)
-#   cat('\n\n', file = 'out.txt', append = TRUE)
-#   write.table(p, file = 'out.txt', sep = '\t', append = TRUE)
-# }
+    sink(file = out_path, append = TRUE)
+      cat('\n\n\n')
+      print(t(hlt))
+      cat('\n')
+      print(summary(p))
+    sink()
+  } else {
+    sink(file = out_path, append = TRUE)
+      cat('\n\n\n')
+      print(t(hlt))
+      cat('\n')
+      warning()
+    sink()
+  }
 }
