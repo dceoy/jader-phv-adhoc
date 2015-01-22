@@ -164,7 +164,6 @@ hlt_codes <- c('10021001',
                '10033646',
                '10033632',
                '10033633')
-hlt_codes <- c('10033632')
 
 # -- 10021001 低血糖状態ＮＥＣ  Hypoglycaemic conditions NEC
 # -- 10033646 急性および慢性膵炎  Acute and chronic pancreatitis
@@ -172,7 +171,7 @@ hlt_codes <- c('10033632')
 # -- 10033633 悪性膵新生物（膵島細胞腫瘍およびカルチノイドを除く）  Pancreatic neoplasms malignant (excl islet cell and carcinoid)
 
 
-foreach (code = hlt_codes, .packages = pkgs) %do% {
+foreach (code = hlt_codes, .packages = pkgs) %dopar% {
   hlt <- dt_hlts %>% filter(hlt_code == code)
   hist <- dt_hist %>% filter(hlt_code == code)
   reac <- dt_reac %>% filter(hlt_code == code)
@@ -198,7 +197,7 @@ foreach (code = hlt_codes, .packages = pkgs) %do% {
                                                  sex,
                                  random = ~ suspected,
                                  family = 'categorical', data = dt,
-                                 nitt = 3000000, burnin = 1000000),
+                                 nitt = 10000000, burnin = 2000000),
            silent = FALSE)
 
   print(summary(posterior))

@@ -1,6 +1,6 @@
 *.sqlite3
 *.sql.gz
-*.pdf
 img/
 repos/
+output/
 legacy/
