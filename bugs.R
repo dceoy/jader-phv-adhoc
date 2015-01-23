@@ -11,7 +11,7 @@ r['CRAN'] <- 'http://cran.us.r-project.org'
 options(repos = r)
 rm(r)
 
-ps <- c('RSQLite', 'plyr', 'dplyr', 'data.table', 'snow', 'Rmpi', 'foreach', 'doSNOW', 'R2OpenBUGS')
+ps <- c('RSQLite', 'plyr', 'dplyr', 'data.table', 'snow', 'Rmpi', 'foreach', 'doSNOW', 'R2OpenBUGS', 'lattice')
 names(ps) <- ps
 sapply(ps, pload)
 
@@ -27,13 +27,6 @@ sql_base <- 'SELECT
                suspected,
                dpp4_inhibitor,
                glp1_agonist,
-               sglt2_inhibitor +
-               alpha_glucosidase_inhibitor +
-               biguanide +
-               meglitinide +
-               sulfonylurea +
-               thiazolidinedione AS oral_hypoglycemic_drug,
-               insulin,
                age,
                sex
              FROM
@@ -67,20 +60,6 @@ sql_hlts <- 'SELECT DISTINCT
              GROUP BY
                a.hlt_code;'
 
-sql_hist <- 'SELECT DISTINCT
-               case_id,
-               hlt_code
-             FROM
-               hist h
-             INNER JOIN
-               pt_j p ON p.pt_kanji == h.disease
-             INNER JOIN
-               hlt_pt hp ON hp.pt_code == p.pt_code
-             WHERE
-               case_id IN (
-                 SELECT case_id FROM base_dt
-               );'
-
 sql_reac <- 'SELECT DISTINCT
                case_id,
                hlt_code
@@ -102,7 +81,7 @@ sql_ccmt <- 'SELECT DISTINCT
                drug
              WHERE
                name NOT IN (
-                 SELECT DISTINCT drug FROM d_class
+                 SELECT DISTINCT drug FROM d_class WHERE class IN ("dpp4_inhibitor", "glp1_agonist")
                ) AND case_id IN (
                  SELECT case_id FROM base_dt
                );'
@@ -133,7 +112,6 @@ sql_ct22 <- 'SELECT
 
 dt_base <- tbl_dt(data.table(dbGetQuery(con, sql_base)))
 dt_hlts <- tbl_dt(data.table(dbGetQuery(con, sql_hlts)))
-dt_hist <- tbl_dt(data.table(dbGetQuery(con, sql_hist)))
 dt_reac <- tbl_dt(data.table(dbGetQuery(con, sql_reac)))
 dt_ccmt <- tbl_dt(data.table(dbGetQuery(con, sql_ccmt)))
 dt_ct22 <- tbl_dt(data.table(dbGetQuery(con, sql_ct22)))
@@ -151,40 +129,49 @@ dt_sgnl <- dt_ct22 %>%
              select(drug, hlt_code)
 
 #cl <- makeCluster(4, type = "MPI")
-#
 #dt_sgnl <- cl %>%
 #             parApply(select(dt_ct22, a:d), 1, fex) %>%
 #             t() %>%
 #             cbind(dt_ct22) %>%
 #             filter(p_val < 0.05, f_or > 1) %>%
 #             select(drug, hlt_code)
-#
 #stopCluster(cl)
 
+
 registerDoSNOW(makeCluster(4, type = 'SOCK'))
-pkgs = c('data.table', 'plyr', 'dplyr', 'MASS', 'boot', 'coda', 'R2OpenBUGS')
+pkgs = c('data.table', 'plyr', 'dplyr', 'MASS', 'boot', 'coda', 'R2OpenBUGS', 'lattice')
 
-cat('', file = 'out.txt')
+model <- function() {
+  for (i in 1:N) {
+    y[i] ~ dbern(p[i])
+#   rr[i] ~ dnorm(0, tau[1])
+    rr[i] ~ dnorm(0, tau)
+#   logit(p[i]) <- b0 + b1 * x1[i] + b2 * x2[i] + b3 * x3[i] + b4 * x4[i] + b5 * x5[i] + rr[i] + rs[si[i]]
+    logit(p[i]) <- b0 + b1 * x1[i] + rr[i]
+  }
+  sigma ~ dunif(0, 1.0E+4)
+  tau <- pow(sigma, -2)
+# b0 ~ dnorm(0, 1.0E-4) # intercept
+# b1 ~ dnorm(0, 1.0E-4) # dpp4_inihibitor
+# b2 ~ dnorm(0, 1.0E-4) # glp1_agonist
+# b3 ~ dnorm(0, 1.0E-4) # concomit
+# b4 ~ dnorm(0, 1.0E-4) # age
+# b5 ~ dnorm(0, 1.0E-4) # sex
+# for (j in 1:N.suspected) {
+#   rs[j] ~ dnorm(0, tau[2])
+# }
+# for (m in 1:2) {
+#   sigma[m] ~ dunif(0, 1.0E+4)
+#   tau[m] <- pow(sigma[m], -2)
+# }
+}
+model_file <- file.path(tempdir(), 'model.txt')
+write.model(model, model_file)
 
-
-hlt_codes <- c('10021001',
-               '10033646',
-               '10033632',
-               '10033633')
-
-# -- 10021001 低血糖状態ＮＥＣ  Hypoglycaemic conditions NEC
-# -- 10033646 急性および慢性膵炎  Acute and chronic pancreatitis
-# -- 10033632 膵新生物  Pancreatic neoplasms
-# -- 10033633 悪性膵新生物（膵島細胞腫瘍およびカルチノイドを除く）  Pancreatic neoplasms malignant (excl islet cell and carcinoid)
-
-
-model.file <- file.path(getwd(), "model.bugs") 
-write.model(model, model.file)
-
+hlt_codes <- c('10033632')  # 10033632  膵新生物  Pancreatic neoplasms
 
 foreach (code = hlt_codes, .packages = pkgs) %do% {
   hlt <- dt_hlts %>% filter(hlt_code == code)
-  hist <- dt_hist %>% filter(hlt_code == code)
   reac <- dt_reac %>% filter(hlt_code == code)
   sgnl <- dt_sgnl %>% filter(hlt_code == code)
   ccmt <- dt_ccmt %>%
@@ -195,70 +182,38 @@ foreach (code = hlt_codes, .packages = pkgs) %do% {
   dt <- dt_base %>%
           left_join(ccmt, by = 'case_id') %>%
           mutate(concomit = ifelse(is.na(concomit), 0, concomit)) %>%
-          mutate(preexist = ifelse(case_id %in% hist$case_id, 1, 0)) %>%
-          mutate(event = ifelse(case_id %in% reac$case_id, 1, 0)) %>%
-          mutate(suspected = )
+          mutate(event = ifelse(case_id %in% reac$case_id, 1, 0))
+
+  y <- dt %>% select(event) %>% as.vector()
+  x1 <- dt %>% select(dpp4_inhibitor) %>% as.vector()
+  x2 <- dt %>% select(glp1_agonist) %>% as.vector()
+  x3 <- dt %>% select(concomit) %>% as.vector()
+  x4 <- dt %>% select(age) %>% as.vector()
+  x5 <- dt %>% select(sex) %>% as.vector()
+  N <- dt %>% nrow() %>% as.numeric()
+  N.suspected <- dt %>% distinct(suspected) %>% nrow() %>% as.numeric()
+  s_tab <- dt %>% distinct(suspected) %>% mutate(s_id = 1:N.suspected) %>% select(suspected, s_id)
+  si <- dt %>% inner_join(s_tab, by = 'suspected') %>% select(s_id) %>% as.vector()
 
 
-  data <- list("N", "y")
-  params <- c("q")
-  inits <- function() { list(q = 0.5) }
-  out <- bugs(data, inits, params, model.file, n.iter = 10000)
+  #data <- list('y', 'x1', 'x2', 'x3', 'x4', 'x5', 'N', 'N.suspected', 'si')
+  data <- list('y', 'x1', 'N')
 
+# params <- c('p', 'b0', 'b1', 'b2', 'b3', 'b4', 'b5', 'rr', 'rs', 'sigma')
+  params <- c('p', 'b0', 'b1', 'rr', 'sigma')
 
+# inits <- function() {
+#   list(b0 = 0,
+#        b1 = 0,
+#        b2 = 0,
+#        b3 = 0,
+#        b4 = 0,
+#        b5 = 0,
+#        sigma = 1)
+# }
 
+  sim <- bugs(data, inits = NULL, params, model_file, n.iter = 1000)
 
-
-
-
-
-
-
-
-
-  e <- try(posterior <- MCMClogit(event ~ dpp4_inhibitor +
-                                          glp1_agonist +
-                                          sglt2_inhibitor +
-                                          sulfonylurea +
-                                          meglitinide +
-                                          alpha_glucosidase_inhibitor +
-                                          biguanide +
-                                          thiazolidinedione +
-                                          insulin +
-                                          concomit +
-                                          preexist +
-                                          age +
-                                          sex,
-                                  data = dt, burnin = 500, mcmc = 5000),
-           silent = FALSE)
-
-  if (class(e) != 'try-error') {
-    s <- summary(posterior, quantiles = c(0.025, 0.5, 0.975))
-    p <- data.frame(s$quantiles)
-    p <- p %>% exp()
-
-#   s$hlt <- hlt
-    print(summary(posterior, quantiles = c(0.025, 0.5, 0.975)))
-
-    cat('\n\n', file = 'out.txt', append = TRUE)
-    cat(paste(hlt, ' ', sep = ''), file = 'out.txt', append = TRUE)
-    cat('\n\n', file = 'out.txt', append = TRUE)
-    write.table(p, file = 'out.txt', sep = '\t', append = TRUE)
-
-#   lr <- glm(event ~ dpp4_inhibitor +
-#                     glp1_agonist +
-#                     sglt2_inhibitor +
-#                     sulfonylurea +
-#                     meglitinide +
-#                     alpha_glucosidase_inhibitor +
-#                     biguanide +
-#                     thiazolidinedione +
-#                     insulin +
-#                     concomit +
-#                     preexist +
-#                     age +
-#                     sex,
-#             data = dt, family = binomial)
-#   print(lr)
-  }
+  print(sim)
+  plot(sim)
 }
