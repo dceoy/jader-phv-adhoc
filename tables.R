@@ -12,14 +12,13 @@
 # Preset PATH as 'db'
 
 
-require('RSQLite')
-require('dplyr')
-require('data.table')
+dt_pkgs <- c('RSQLite', 'dplyr', 'data.table', 'snow')
+sapply(dt_pkgs, function(p) require(p, character.only = TRUE))
 
-db <- 'mj.sqlite3'
-driver <- dbDriver('SQLite')
-con <- dbConnect(driver, db)
+if (! 'cl' %in% objects()) cl <- makeCluster(4, type = 'SOCK')
+if (! 'db' %in% objects()) db <- 'mj.sqlite3'
 
+con <- dbConnect(dbDriver('SQLite'), db)
 
 sql_base <- 'SELECT
                b.case_id AS case_id,
@@ -129,5 +128,24 @@ dt_hist <- tbl_dt(data.table(dbGetQuery(con, sql_hist)))
 dt_reac <- tbl_dt(data.table(dbGetQuery(con, sql_reac)))
 dt_ccmt <- tbl_dt(data.table(dbGetQuery(con, sql_ccmt)))
 dt_ct22 <- tbl_dt(data.table(dbGetQuery(con, sql_ct22)))
+
+#dt_sgnl <- dt_ct22 %>%
+#             mutate(ror_ll95 = exp(log(a * d / c / b) - 1.96 * sqrt(1 / a + 1 / b + 1 / c + 1 / d))) %>%
+#             filter(ror_ll95 > 1) %>%
+#             select(drug, hlt_code)
+
+fex <- function(t) {
+  f <- fisher.test(matrix(t, nrow = 2), alternative = 'two.sided', conf.level = 0.95)
+  p_or <- append(c(f$p.value, f$estimate), f$conf.int)
+  names(p_or) <- c('p_val', 'f_or', 'f_ll95', 'f_ul95')
+  return(p_or)
+}
+
+dt_sgnl <- cl %>%
+             parApply(select(dt_ct22, a:d), 1, fex) %>%
+             t() %>%
+             cbind(dt_ct22) %>%
+             filter(p_val < 0.05, f_or > 1) %>%
+             select(drug, hlt_code)
 
 tables()
