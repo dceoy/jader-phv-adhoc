@@ -141,8 +141,9 @@ fex <- function(t) {
   return(p_or)
 }
 
-dt_sgnl <- cl %>%
-             parApply(select(dt_ct22, a:d), 1, fex) %>%
+dt_sgnl <- dt_ct22 %>%
+             select(a:d) %>%
+             parApply(cl, ., 1, fex) %>%
              t() %>%
              cbind(dt_ct22) %>%
              filter(p_val < 0.05, f_or > 1) %>%
