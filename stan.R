@@ -30,6 +30,9 @@ registerDoSNOW(cl)
 db <- 'mj.sqlite3'
 source('tables.R')
 
+out_path <- paste('output/stan_', gsub('[ :]', '-', Sys.time()), '.txt', sep = '')
+cat('stan\n', file = out_path)
+
 hlt_codes <- c('10033632')  # 10033632  膵新生物  Pancreatic neoplasms
 
 st_model <- stan_model(file = 'ae.stan')
@@ -63,11 +66,15 @@ foreach (code = hlt_codes, .packages = pkgs) %do% {
 
 # stanfit <- sampling(object = st_model, data = ae_dat, iter = 1000, chains = 4)
   sflist <- foreach(i = 1:4, .packages = 'rstan') %dopar% {
-              sampling(object = st_model, data = ae_dat, iter = 1000, chains = 1, chain_id = i, refresh = -1)
+              sampling(object = st_model, data = ae_dat, iter = 100000, chains = 1, chain_id = i, refresh = -1)
             }
   stanfit <- sflist2stanfit(sflist)
 
   traceplot(stanfit)
-  print(stanfit)
-  write(stanfit, file = 'output/stanfit.txt')
+  sink(file = out_path, append = TRUE)
+    cat('\n\n\n')
+    print(t(hlt))
+    cat('\n')
+    print(stanfit)
+  sink()
 }
