@@ -20,11 +20,11 @@ r['CRAN'] <- 'http://cran.us.r-project.org'
 options(repos = r)
 rm(r)
 
-pkgs <- c('RSQLite', 'dplyr', 'data.table', 'snow', 'foreach', 'doSNOW', 'rstan')
+pkgs <- c('RSQLite', 'dplyr', 'data.table', 'snow', 'foreach', 'doSNOW', 'parallel', 'rstan')
 sapply(pkgs, pload)
 
 select <- dplyr::select
-cl <- makeCluster(4, type = 'SOCK')
+cl <- makeCluster(detectCores(), type = 'SOCK')
 registerDoSNOW(cl)
 .Last <- function() stopCluster(cl)
 db <- 'mj.sqlite3'
@@ -37,7 +37,7 @@ hlt_codes <- c('10033632')  # 10033632  膵新生物  Pancreatic neoplasms
 
 st_model <- stan_model(file = 'ae.stan')
 
-foreach (code = hlt_codes, .packages = pkgs) %do% {
+foreach (code = hlt_codes) %do% {
   hlt <- dt_hlts %>% filter(hlt_code == code)
   reac <- dt_reac %>% filter(hlt_code == code)
   sgnl <- dt_sgnl %>% filter(hlt_code == code)
