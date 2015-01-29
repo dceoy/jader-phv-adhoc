@@ -41,6 +41,8 @@ source('tables.R')
 
 hlt_codes <- c('10033632')  # 10033632  膵新生物  Pancreatic neoplasms
 
+st_model <- stan_model(file = 'ae.stan')
+
 foreach (code = hlt_codes, .packages = pkgs) %do% {
   hlt <- dt_hlts %>% filter(hlt_code == code)
   reac <- dt_reac %>% filter(hlt_code == code)
@@ -56,8 +58,7 @@ foreach (code = hlt_codes, .packages = pkgs) %do% {
           mutate(event = ifelse(case_id %in% reac$case_id, 1, 0)) %>%
           select(event, dpp4_inhibitor, glp1_agonist, concomit, age, sex)
 
-  ae_dat <- list(
-                 N = dt %>% nrow(),
+  ae_dat <- list(N = dt %>% nrow(),
                  M = dt %>% ncol() - 1,
                  y = dt %>% .$event,
                  x = dt %>% select(- event)
@@ -65,8 +66,12 @@ foreach (code = hlt_codes, .packages = pkgs) %do% {
 #                sigma = c(15, 10, 16, 11,  9, 11, 10, 18)
                  )
 
-  stanfit <- stan(file = 'ae.stan', data = ae_dat, iter = 1000, chains = 4)
-# fit <- stan(model_code = stan_code, data = ae_dat, iter = 1000, chains = 4)
+# stanfit <- sampling(object = st_model, data = ae_dat, iter = 1000, chains = 4)
+  sflist <- foreach(i = 1:4, .packages = 'rstan') %dopar% {
+              sampling(object = st_model, data = ae_dat, iter = 1000, chains = 1, chain_id = i, refresh = -1)
+#             stan(st_model, data = ae_dat, iter = 1000, chains = 1, chain_id = i, refresh = -1)
+            }
+  stanfit <- sflist2stanfit(sflist)
 
   traceplot(stanfit)
 # y <- dt %>% select(event) %>% as.vector()
