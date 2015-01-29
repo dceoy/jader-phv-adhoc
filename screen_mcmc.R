@@ -20,7 +20,7 @@ r['CRAN'] <- 'http://cran.us.r-project.org'
 options(repos = r)
 rm(r)
 
-pkgs <- c('RSQLite', 'plyr', 'dplyr', 'data.table', 'snow', 'foreach', 'doSNOW', 'MASS', 'coda', 'MCMCpack')
+pkgs <- c('RSQLite', 'dplyr', 'data.table', 'snow', 'foreach', 'doSNOW', 'MASS', 'coda', 'MCMCpack')
 sapply(pkgs, pload)
 
 select <- dplyr::select

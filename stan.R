@@ -20,7 +20,7 @@ r['CRAN'] <- 'http://cran.us.r-project.org'
 options(repos = r)
 rm(r)
 
-pkgs <- c('RSQLite', 'plyr', 'dplyr', 'data.table', 'snow', 'foreach', 'doSNOW', 'rstan')
+pkgs <- c('RSQLite', 'dplyr', 'data.table', 'snow', 'foreach', 'doSNOW', 'rstan')
 sapply(pkgs, pload)
 
 select <- dplyr::select
@@ -28,16 +28,7 @@ cl <- makeCluster(4, type = 'SOCK')
 registerDoSNOW(cl)
 .Last <- function() stopCluster(cl)
 db <- 'mj.sqlite3'
-
 source('tables.R')
-#      NAME       NROW NCOL MB
-# [1,] dt_base   6,442    6  1
-# [2,] dt_ccmt  52,238    2  2
-# [3,] dt_ct22 317,022    6  9
-# [4,] dt_hist  30,776    2  1
-# [5,] dt_hlts     706    4  1
-# [6,] dt_reac  13,345    2  1
-# [7,] dt_sgnl  69,059    2  2
 
 hlt_codes <- c('10033632')  # 10033632  膵新生物  Pancreatic neoplasms
 
@@ -56,50 +47,27 @@ foreach (code = hlt_codes, .packages = pkgs) %do% {
           left_join(ccmt, by = 'case_id') %>%
           mutate(concomit = ifelse(is.na(concomit), 0, concomit)) %>%
           mutate(event = ifelse(case_id %in% reac$case_id, 1, 0)) %>%
-          select(event, dpp4_inhibitor, glp1_agonist, concomit, age, sex)
+          select(event, dpp4_inhibitor, glp1_agonist, concomit, age, sex, suspected)
 
   ae_dat <- list(N = dt %>% nrow(),
-                 M = dt %>% ncol() - 1,
+                 M = 5,
+                 L = dt %>% distinct(suspected) %>% nrow(),
                  y = dt %>% .$event,
-                 x = dt %>% select(- event)
-#                N.suspected = dt %>% distinct(suspected) %>% nrow(),
-#                sigma = c(15, 10, 16, 11,  9, 11, 10, 18)
-                 )
+                 x = dt %>% select(dpp4_inhibitor, glp1_agonist, concomit, age, sex),
+                 g = dt %>%
+                       distinct(suspected) %>%
+                       mutate(s_id = 1:nrow(.)) %>%
+                       select(suspected, s_id) %>%
+                       inner_join(dt, by = 'suspected') %>%
+                       .$s_id)
 
 # stanfit <- sampling(object = st_model, data = ae_dat, iter = 1000, chains = 4)
   sflist <- foreach(i = 1:4, .packages = 'rstan') %dopar% {
               sampling(object = st_model, data = ae_dat, iter = 1000, chains = 1, chain_id = i, refresh = -1)
-#             stan(st_model, data = ae_dat, iter = 1000, chains = 1, chain_id = i, refresh = -1)
             }
   stanfit <- sflist2stanfit(sflist)
 
   traceplot(stanfit)
-# y <- dt %>% select(event) %>% as.vector()
-# x1 <- dt %>% select(dpp4_inhibitor) %>% as.vector()
-# x2 <- dt %>% select(glp1_agonist) %>% as.vector()
-# x3 <- dt %>% select(concomit) %>% as.vector()
-# x4 <- dt %>% select(age) %>% as.vector()
-# x5 <- dt %>% select(sex) %>% as.vector()
-# N <- dt %>% nrow() %>% as.numeric()
-# N.suspected <- dt %>% distinct(suspected) %>% nrow() %>% as.numeric()
-# s_tab <- dt %>% distinct(suspected) %>% mutate(s_id = 1:N.suspected) %>% select(suspected, s_id)
-# si <- dt %>% inner_join(s_tab, by = 'suspected') %>% select(s_id) %>% as.vector()
-
-# data <- list('y', 'x1', 'x2', 'x3', 'x4', 'x5', 'N', 'N.suspected', 'si')
-# params <- c('p', 'b0', 'b1', 'b2', 'b3', 'b4', 'b5', 'rr', 'rs', 'sigma')
-
-# inits <- function() {
-#   list(b0 = 0,
-#        b1 = 0,
-#        b2 = 0,
-#        b3 = 0,
-#        b4 = 0,
-#        b5 = 0,
-#        sigma = 1)
-# }
-
-# sim <- bugs(data, inits = NULL, params, model_file, n.iter = 1000)
-
-# print(sim)
-# plot(sim)
+  print(stanfit)
+  write(stanfit, file = 'output/stanfit.txt')
 }
