@@ -1,4 +1,4 @@
-# coding: utf-8
+#!/usr/bin/env R
 #
 #                event
 #              +       -
@@ -66,7 +66,7 @@ foreach (code = hlt_codes) %do% {
 
 # stanfit <- sampling(object = st_model, data = ae_dat, iter = 1000, chains = 4)
   sflist <- foreach(i = 1:4, .packages = 'rstan') %dopar% {
-              sampling(object = st_model, data = ae_dat, iter = 100000, chains = 1, chain_id = i, refresh = -1)
+              sampling(object = st_model, data = ae_dat, iter = 2000, chains = 1, chain_id = i, refresh = -1)
             }
   stanfit <- sflist2stanfit(sflist)
 

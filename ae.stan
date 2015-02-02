@@ -8,11 +8,11 @@ data {
 }
 parameters {
     real alpha;
-    real rr[N];
-    real rs[L];
     vector[M] beta;
     real sigma_r;
     real sigma_s;
+    real rr[N];
+    real rs[L];
 }
 model {
 //  alpha ~ normal(0, 1.0e+2);
