@@ -58,19 +58,19 @@ sql_hlts <- 'SELECT DISTINCT
              GROUP BY
                a.hlt_code;'
 
-sql_hist <- 'SELECT DISTINCT
-               case_id,
-               hlt_code
-             FROM
-               hist h
-             INNER JOIN
-               pt_j p ON p.pt_kanji == h.disease
-             INNER JOIN
-               hlt_pt hp ON hp.pt_code == p.pt_code
-             WHERE
-               case_id IN (
-                 SELECT case_id FROM base_dt
-               );'
+#sql_hist <- 'SELECT DISTINCT
+#               case_id,
+#               hlt_code
+#             FROM
+#               hist h
+#             INNER JOIN
+#               pt_j p ON p.pt_kanji == h.disease
+#             INNER JOIN
+#               hlt_pt hp ON hp.pt_code == p.pt_code
+#             WHERE
+#               case_id IN (
+#                 SELECT case_id FROM base_dt
+#               );'
 
 sql_reac <- 'SELECT DISTINCT
                case_id,
@@ -124,7 +124,7 @@ sql_ct22 <- 'SELECT
 
 dt_base <- tbl_dt(data.table(dbGetQuery(con, sql_base)))
 dt_hlts <- tbl_dt(data.table(dbGetQuery(con, sql_hlts)))
-dt_hist <- tbl_dt(data.table(dbGetQuery(con, sql_hist)))
+#dt_hist <- tbl_dt(data.table(dbGetQuery(con, sql_hist)))
 dt_reac <- tbl_dt(data.table(dbGetQuery(con, sql_reac)))
 dt_ccmt <- tbl_dt(data.table(dbGetQuery(con, sql_ccmt)))
 dt_ct22 <- tbl_dt(data.table(dbGetQuery(con, sql_ct22)))

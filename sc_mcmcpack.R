@@ -74,6 +74,8 @@ foreach (code = dt_hlts$hlt_code, .packages = pkgs) %dopar% {
       cat('\n')
       s <- summary(p, quantiles = c(0.025, 0.5, 0.975))
       print(s)
+      cat('\nRaftery and Lewis\'s diagnostic\n')
+      print(raftery.diag(p))
       cat('\nOdds Ratio\n')
       print(exp(s$quantiles))
     sink()
