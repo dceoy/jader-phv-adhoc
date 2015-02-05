@@ -28,23 +28,14 @@ cl <- makeCluster(detectCores(), type = 'SOCK')
 registerDoSNOW(cl)
 .Last <- function() stopCluster(cl)
 db <- 'mj.sqlite3'
+source('sc_tables.R')
 
-source('tables.R')
-#      NAME       NROW NCOL MB
-# [1,] dt_base   6,442    6  1
-# [2,] dt_ccmt  52,238    2  2
-# [3,] dt_ct22 317,022    6  9
-# [4,] dt_hist  30,776    2  1
-# [5,] dt_hlts     706    4  1
-# [6,] dt_reac  13,345    2  1
-# [7,] dt_sgnl  69,059    2  2
 
-out_path <- paste('output/test_glm_', gsub('[ :]', '-', Sys.time()), '.txt', sep = '')
+out_path <- paste('output/sc_glm_', gsub('[ :]', '-', Sys.time()), '.txt', sep = '')
 cat('glm\n', file = out_path)
 
 foreach (code = dt_hlts$hlt_code, .packages = pkgs) %dopar% {
   hlt <- dt_hlts %>% filter(hlt_code == code)
-  hist <- dt_hist %>% filter(hlt_code == code)
   reac <- dt_reac %>% filter(hlt_code == code)
   sgnl <- dt_sgnl %>% filter(hlt_code == code)
   ccmt <- dt_ccmt %>%
@@ -55,34 +46,32 @@ foreach (code = dt_hlts$hlt_code, .packages = pkgs) %dopar% {
   dt <- dt_base %>%
           left_join(ccmt, by = 'case_id') %>%
           mutate(concomit = ifelse(is.na(concomit), 0, concomit)) %>%
-          mutate(preexist = ifelse(case_id %in% hist$case_id, 1, 0)) %>%
-          mutate(event = ifelse(case_id %in% reac$case_id, 1, 0))
+          mutate(event = as.integer(ifelse(case_id %in% reac$case_id, 1, 0)))
 
-  e <- try(p <- glm(event ~ dpp4_inhibitor +
-                            glp1_agonist +
-                            concomit +
-                            preexist +
-                            age +
-                            sex,
-                    data = dt, family = binomial),
+  e <- try(fit <- glm(event ~ incretin +
+                              concomit +
+                              age +
+                              sex,
+                      data = dt, family = binomial),
            silent = FALSE)
 
-  if (class(e) != 'try-error') {
-    sink(file = out_path, append = TRUE)
+  sink(file = out_path, append = TRUE)
+    if (class(e) != 'try-error') {
+      s <- summary(fit)
+      ci <- confint(fit, level = 0.95)
+      ors <- exp(cbind(s$coefficients[,1], ci[,1:2]))
+      colnames(ors) <- c('OR', 'LL95', 'UL95')
       cat('\n\n\n')
       print(t(hlt))
       cat('\n')
-      s <- summary(p)
       print(s)
-#     cat('\nOdds Ratio\n')
-#     print(exp(s$quantiles))
-    sink()
-  } else {
-    sink(file = out_path, append = TRUE)
+      cat('\nOdds Ratio\n')
+      print(ors)
+    } else {
       cat('\n\n\n')
       print(t(hlt))
       cat('\nERROR\n\n')
       warning()
-    sink()
-  }
+    }
+  sink()
 }

@@ -28,9 +28,9 @@ INSERT INTO ade10 (drug, pt_kanji, pt_code, hlt_code, case_id, drug_start_date, 
     onset_date AS event_onset_date
   FROM
     drug d
-  LEFT OUTER JOIN
+  INNER JOIN
     reac r ON d.case_id == r.case_id
-  LEFT OUTER JOIN
+  INNER JOIN
     pt_j p ON p.pt_kanji == r.event
   INNER JOIN
     hlt_pt hp ON hp.pt_code == p.pt_code
