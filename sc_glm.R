@@ -31,8 +31,10 @@ db <- 'mj.sqlite3'
 source('sc_tables.R')
 
 
-out_path <- paste('output/sc_glm_', gsub('[ :]', '-', Sys.time()), '.txt', sep = '')
-cat('glm\n', file = out_path)
+stdout_path <- paste('output/sc_glm_', gsub('[ :]', '-', Sys.time()), '.txt', sep = '')
+signal_path <- 'output/sc_glm_signal.txt'
+cat('glm\n', file = stdout_path)
+cat('glm\n', file = signal_path)
 
 foreach (code = dt_hlts$hlt_code, .packages = pkgs) %dopar% {
   hlt <- dt_hlts %>% filter(hlt_code == code)
@@ -48,30 +50,33 @@ foreach (code = dt_hlts$hlt_code, .packages = pkgs) %dopar% {
           mutate(concomit = ifelse(is.na(concomit), 0, concomit)) %>%
           mutate(event = as.integer(ifelse(case_id %in% reac$case_id, 1, 0)))
 
-  e <- try(fit <- glm(event ~ incretin +
-                              concomit +
-                              age +
-                              sex,
-                      data = dt, family = binomial),
-           silent = FALSE)
+  fit <- glm(event ~ incretin +
+                     concomit +
+                     age +
+                     sex,
+             data = dt, family = binomial)
 
-  sink(file = out_path, append = TRUE)
-    if (class(e) != 'try-error') {
-      s <- summary(fit)
-      ci <- confint(fit, level = 0.99)
-      ors <- exp(cbind(s$coefficients[,1], ci[,1:2]))
-      colnames(ors) <- c('OR', 'LL99', 'UL99')
-      p <- list(event = t(hlt),
-                summary = s,
-                odds_ratio = ors)
-      cat('\n\n\n')
-      print(p)
-    } else {
-      p <- list(event = t(hlt),
-                summary = 'ERROR')
-      cat('\n\n\n')
-      print(p)
-      warning()
-    }
+  s <- summary(fit)
+  ci <- confint(fit, level = 0.99)
+  ors <- exp(cbind(s$coefficients[,1], ci[,1:2]))
+  colnames(ors) <- c('OR', 'LL', 'UL')
+  p <- list(event = t(hlt),
+            summary = s,
+            odds_ratio = ors)
+
+  sink(file = stdout_path, append = TRUE)
+    cat('\n\n\n')
+    print(p)
   sink()
+  if (ors[2,2] > 1) {
+    p <- list(p,
+              incretin_or = paste('HLT', hlt$hlt_code[1], ';', ors[2,1], '[', ors[2,2], '-', ors[2,3], ']'),
+              count = hlt$case_count,
+              hlt = paste(hlt$hlt_name, hlt$hlt_kanji))
+
+    sink(file = signal_path, append = TRUE)
+      cat('\n\n\n')
+      print(p)
+    sink()
+  }
 }
