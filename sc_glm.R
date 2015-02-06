@@ -58,19 +58,19 @@ foreach (code = dt_hlts$hlt_code, .packages = pkgs) %dopar% {
   sink(file = out_path, append = TRUE)
     if (class(e) != 'try-error') {
       s <- summary(fit)
-      ci <- confint(fit, level = 0.95)
+      ci <- confint(fit, level = 0.99)
       ors <- exp(cbind(s$coefficients[,1], ci[,1:2]))
-      colnames(ors) <- c('OR', 'LL95', 'UL95')
+      colnames(ors) <- c('OR', 'LL99', 'UL99')
+      p <- list(event = t(hlt),
+                summary = s,
+                odds_ratio = ors)
       cat('\n\n\n')
-      print(t(hlt))
-      cat('\n')
-      print(s)
-      cat('\nOdds Ratio\n')
-      print(ors)
+      print(p)
     } else {
+      p <- list(event = t(hlt),
+                summary = 'ERROR')
       cat('\n\n\n')
-      print(t(hlt))
-      cat('\nERROR\n\n')
+      print(p)
       warning()
     }
   sink()
