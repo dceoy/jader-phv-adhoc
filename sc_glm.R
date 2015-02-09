@@ -27,20 +27,29 @@ select <- dplyr::select
 cl <- makeCluster(detectCores(), type = 'SOCK')
 registerDoSNOW(cl)
 .Last <- function() stopCluster(cl)
-db <- 'mj.sqlite3'
-source('sc_tables.R')
 
+db <- 'mj.sqlite3'
+source('sc_tbl.R')
+#      NAME       NROW NCOL MB COLS                                   KEY
+# [1,] dt_base 165,779    5 14 case_id,suspected,age,sex,incretin
+# [2,] dt_ccmt 850,878    2 23 case_id,drug
+# [3,] dt_hist 427,258    2 12 case_id,hlt_code
+# [4,] dt_hlts     703    4  1 hlt_code,hlt_name,hlt_kanji,case_count
+# [5,] dt_reac  12,570    2  1 case_id,hlt_code
+# [6,] dt_sgnl  70,930    2  2 drug,hlt_code
+# Total: 53MB
 
 stdout_path <- paste('output/sc_glm_', gsub('[ :]', '-', Sys.time()), '.txt', sep = '')
 signal_path <- 'output/sc_glm_signal.txt'
-or_csv_path <- 'output/sc_glm_orci.csv'
+csv_path <- 'output/sc_glm_orci.csv'
 cat('glm\n', file = stdout_path)
 cat('glm signal\n', file = signal_path)
-dt_orci <- data.table()
+cat('', file = csv_path)
 
 foreach (code = dt_hlts$hlt_code, .packages = pkgs) %dopar% {
   hlt <- dt_hlts %>% filter(hlt_code == code)
   reac <- dt_reac %>% filter(hlt_code == code)
+  hist <- dt_hist %>% filter(hlt_code == code)
   sgnl <- dt_sgnl %>% filter(hlt_code == code)
   ccmt <- dt_ccmt %>%
             filter(drug %in% sgnl$drug) %>%
@@ -49,11 +58,14 @@ foreach (code = dt_hlts$hlt_code, .packages = pkgs) %dopar% {
 
   dt <- dt_base %>%
           left_join(ccmt, by = 'case_id') %>%
-          mutate(concomit = ifelse(is.na(concomit), 0, concomit)) %>%
-          mutate(event = as.integer(ifelse(case_id %in% reac$case_id, 1, 0)))
+          mutate(concomit = as.integer(ifelse(is.na(concomit), 0, concomit))) %>%
+          mutate(preexist = as.integer(ifelse(case_id %in% hist$case_id, 1, 0))) %>%
+          mutate(event = as.integer(ifelse(case_id %in% reac$case_id, 1, 0))) %>%
+          select(event, incretin, concomit, preexist, age, sex)
 
   fit <- glm(event ~ incretin +
                      concomit +
+                     preexist +
                      age +
                      sex,
              data = dt, family = binomial)
@@ -62,27 +74,23 @@ foreach (code = dt_hlts$hlt_code, .packages = pkgs) %dopar% {
   ci <- confint(fit, level = 0.99)
   ors <- exp(cbind(s$coefficients[,1], ci[,1:2]))
   colnames(ors) <- c('OR', 'LL', 'UL')
-  p <- list(event = t(hlt),
-            summary = s,
-            odds_ratio = ors)
+  out <- list(event = t(hlt),
+              summary = s,
+              odds_ratio = ors,
+              hlt = hlt,
+              incretin_or = paste('HLT', hlt$hlt_code, ';', ors[2,1], '[', ors[2,2], '-', ors[2,3], ']'))
 
   sink(file = stdout_path, append = TRUE)
     cat('\n\n\n')
-    print(p)
+    print(out)
   sink()
-  if (ors[2,2] > 1) {
-    p <- list(p,
-              incretin_or = paste('HLT', hlt$hlt_code, ';', ors[2,1], '[', ors[2,2], '-', ors[2,3], ']'),
-              count = hlt$case_count,
-              hlt = paste(hlt$hlt_name, hlt$hlt_kanji))
 
+  if (ors[2,2] > 1) {
     sink(file = signal_path, append = TRUE)
       cat('\n\n\n')
-      print(p)
+      print(out)
     sink()
 
-    dt_orci <- dt_orci %>% rbind(c(ors[2,], c(hlt)))
+    write.table(matrix(c(ors[2,], hlt), nrow = 1), file = csv_path, append = TRUE, sep = ',', row.names = FALSE, col.names = FALSE)
   }
 }
-
-write.csv(dt_orci, file = or_csv_path, row.names = FALSE)
