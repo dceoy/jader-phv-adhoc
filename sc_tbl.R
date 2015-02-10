@@ -133,8 +133,14 @@ dt_hist <- tbl_dt(data.table(dbGetQuery(con, sql_hist)))
 dt_ccmt <- tbl_dt(data.table(dbGetQuery(con, sql_ccmt)))
 dt_sgnl <- tbl_dt(data.table(dbGetQuery(con, sql_sgnl)))
 
-dt_reac <- dt_reac %>% filter(case_id %in% filter(dt_base, incretin == 1)$case_id)
-dt_hlts <- dt_hlts %>% filter(hlt_code %in% unique(dt_reac$hlt_code))
+dt_hlts <- dt_base %>%
+             filter(incretin == 1) %>%
+             inner_join(dt_reac, by = 'case_id') %>%
+             distinct(hlt_code) %>%
+             select(hlt_code) %>%
+             inner_join(dt_hlts, by = 'hlt_code')
+
+dt_reac <- dt_reac %>% filter(case_id %in% dt_base$case_id, hlt_code %in% dt_hlts$hlt_code)
 dt_hist <- dt_hist %>% filter(case_id %in% dt_base$case_id, hlt_code %in% dt_hlts$hlt_code)
 dt_ccmt <- dt_ccmt %>% filter(case_id %in% dt_base$case_id)
 
@@ -168,7 +174,7 @@ tables()
 # [1,] dt_base 165,779    5 14 case_id,suspected,age,sex,incretin
 # [2,] dt_ccmt 850,878    2 23 case_id,drug
 # [3,] dt_hist 427,258    2 12 case_id,hlt_code
-# [4,] dt_hlts     703    4  1 hlt_code,hlt_name,hlt_kanji,case_count
-# [5,] dt_reac  12,570    2  1 case_id,hlt_code
+# [4,] dt_hlts     703    4  1 hlt_code,hlt_name,hlt_kanji,case_count hlt_code
+# [5,] dt_reac 367,474    2 13 case_id,hlt_code
 # [6,] dt_sgnl  70,930    2  2 drug,hlt_code
-# Total: 53MB
+# Total: 65MB
