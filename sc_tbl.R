@@ -9,7 +9,7 @@
 #          +-------+-------+
 #            a + c   b + d
 #
-# Preset PATH as 'db'
+# Preset DATABASE PATH as 'db'
 
 
 dt_pkgs <- c('RSQLite', 'dplyr', 'data.table', 'snow')
@@ -30,7 +30,15 @@ sql_base <- 'SELECT
                CASE
                  WHEN sex == "女性" THEN 0
                  WHEN sex == "男性" THEN 1
-               END AS sex
+               END AS sex,
+               CASE
+                 WHEN d.case_id IN (
+                   SELECT DISTINCT case_id FROM drug WHERE name IN (
+                     SELECT DISTINCT drug FROM d_class WHERE class IN ("dpp4_inhibitor", "glp1_agonist")
+                   )
+                 ) THEN 1
+                 ELSE 0
+               END AS incretin
              FROM
                demo d
              INNER JOIN
@@ -49,15 +57,6 @@ sql_base <- 'SELECT
               d.case_id IN (
                 SELECT DISTINCT case_id FROM ade10
               );'
-
-sql_clss <- 'SELECT
-               case_id,
-               a.drug AS drug,
-               class
-             FROM
-               ade10 a
-             INNER JOIN
-               d_class c ON a.drug == c.drug;'
 
 sql_hlts <- 'SELECT DISTINCT
                a.hlt_code AS hlt_code,
@@ -79,13 +78,31 @@ sql_reac <- 'SELECT DISTINCT
              FROM
                ade10;'
 
+sql_hist <- 'SELECT DISTINCT
+               case_id,
+               hlt_code
+             FROM
+               hist h
+             INNER JOIN
+               pt_j p ON p.pt_kanji == h.disease
+             INNER JOIN
+               hlt_pt hp ON hp.pt_code == p.pt_code
+             WHERE
+               case_id IN (
+                 SELECT DISTINCT case_id FROM ade10
+               );'
+
 sql_ccmt <- 'SELECT DISTINCT
                case_id,
                drug
              FROM
-               ade10;'
+               ade10
+             WHERE
+               drug NOT IN (
+                 SELECT DISTINCT drug FROM d_class WHERE class IN ("dpp4_inhibitor", "glp1_agonist")
+               );'
 
-sql_ct22 <- 'SELECT
+sql_sgnl <- 'SELECT
                t123.drug AS drug,
                t123.hlt_code AS hlt_code,
                a,
@@ -110,22 +127,21 @@ sql_ct22 <- 'SELECT
                a != 0 AND b != 0 AND c != 0 AND d != 0;'
 
 dt_base <- tbl_dt(data.table(dbGetQuery(con, sql_base)))
-dt_clss <- tbl_dt(data.table(dbGetQuery(con, sql_clss)))
 dt_hlts <- tbl_dt(data.table(dbGetQuery(con, sql_hlts)))
 dt_reac <- tbl_dt(data.table(dbGetQuery(con, sql_reac)))
+dt_hist <- tbl_dt(data.table(dbGetQuery(con, sql_hist)))
 dt_ccmt <- tbl_dt(data.table(dbGetQuery(con, sql_ccmt)))
-dt_ct22 <- tbl_dt(data.table(dbGetQuery(con, sql_ct22)))
+dt_sgnl <- tbl_dt(data.table(dbGetQuery(con, sql_sgnl)))
 
-incr <- dt_clss %>% filter(class %in% c('dpp4_inhibitor', 'glp1_agonist'))
+dt_reac <- dt_reac %>% filter(case_id %in% filter(dt_base, incretin == 1)$case_id)
+dt_hlts <- dt_hlts %>% filter(hlt_code %in% unique(dt_reac$hlt_code))
+dt_hist <- dt_hist %>% filter(case_id %in% dt_base$case_id, hlt_code %in% dt_hlts$hlt_code)
+dt_ccmt <- dt_ccmt %>% filter(case_id %in% dt_base$case_id)
+
 dt_base <- dt_base %>%
              mutate(age = as.integer(age)) %>%
-             mutate(incretin = as.integer(ifelse(case_id %in% unique(incr$case_id), 1, 0)))
-dt_ccmt <- dt_ccmt %>% filter(! drug %in% unique(incr$drug))
-
-#dt_sgnl <- dt_ct22 %>%
-#             mutate(ror_ll95 = exp(log(a * d / c / b) - 1.96 * sqrt(1 / a + 1 / b + 1 / c + 1 / d))) %>%
-#             filter(ror_ll95 > 1) %>%
-#             select(drug, hlt_code)
+             mutate(sex = as.integer(sex)) %>%
+             mutate(incretin = as.integer(incretin))
 
 fex <- function(t) {
   f <- fisher.test(matrix(t, nrow = 2), alternative = 'two.sided', conf.level = 0.95)
@@ -134,12 +150,25 @@ fex <- function(t) {
   return(p_or)
 }
 
-dt_sgnl <- dt_ct22 %>%
+dt_sgnl <- dt_sgnl %>%
              select(a:d) %>%
              parApply(cl, ., 1, fex) %>%
              t() %>%
-             cbind(dt_ct22) %>%
+             cbind(dt_sgnl) %>%
              filter(p_val < 0.05, f_or > 1) %>%
              select(drug, hlt_code)
 
+#dt_sgnl <- dt_sgnl %>%
+#             mutate(ror_ll95 = exp(log(a * d / c / b) - 1.96 * sqrt(1 / a + 1 / b + 1 / c + 1 / d))) %>%
+#             filter(ror_ll95 > 1) %>%
+#             select(drug, hlt_code)
+
 tables()
+#      NAME       NROW NCOL MB COLS                                   KEY
+# [1,] dt_base 165,779    5 14 case_id,suspected,age,sex,incretin
+# [2,] dt_ccmt 850,878    2 23 case_id,drug
+# [3,] dt_hist 427,258    2 12 case_id,hlt_code
+# [4,] dt_hlts     703    4  1 hlt_code,hlt_name,hlt_kanji,case_count
+# [5,] dt_reac  12,570    2  1 case_id,hlt_code
+# [6,] dt_sgnl  70,930    2  2 drug,hlt_code
+# Total: 53MB
