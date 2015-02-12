@@ -30,14 +30,14 @@ registerDoSNOW(cl)
 
 db <- 'mj.sqlite3'
 source('sc_tbl.R')
-#      NAME       NROW NCOL MB COLS                                   KEY
-# [1,] dt_base 165,779    5 14 case_id,suspected,age,sex,incretin
+#      NAME       NROW NCOL MB COLS                                       KEY
+# [1,] dt_base 165,779    6 15 case_id,suspected,quarter,age,sex,incretin
 # [2,] dt_ccmt 850,878    2 23 case_id,drug
 # [3,] dt_hist 427,258    2 12 case_id,hlt_code
-# [4,] dt_hlts     703    4  1 hlt_code,hlt_name,hlt_kanji,case_count hlt_code
+# [4,] dt_hlts     703    4  1 hlt_code,hlt_name,hlt_kanji,case_count     hlt_code
 # [5,] dt_reac 367,474    2 13 case_id,hlt_code
 # [6,] dt_sgnl  70,930    2  2 drug,hlt_code
-# Total: 65MB
+# Total: 66MB
 
 stdout_path <- paste('output/sc_glm_', gsub('[ :]', '-', Sys.time()), '.txt', sep = '')
 signal_path <- 'output/sc_glm_signal.txt'

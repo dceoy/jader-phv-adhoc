@@ -23,6 +23,7 @@ con <- dbConnect(dbDriver('SQLite'), db)
 sql_base <- 'SELECT
                d.case_id AS case_id,
                suspected,
+               quarter,
                CASE
                  WHEN age == "10歳未満" THEN 0
                  WHEN age LIKE "%歳代" THEN REPLACE(age, "歳代", "")
@@ -193,11 +194,11 @@ dt_sgnl <- dt_sgnl %>%
 #             select(drug, hlt_code)
 
 tables()
-#      NAME      NROW NCOL MB COLS                                                  KEY
-# [1,] dt_base  6,897    6  1 case_id,suspected,age,sex,dpp4_inhibitor,glp1_agonist
+#      NAME      NROW NCOL MB COLS                                                          KEY
+# [1,] dt_base  6,897    7  1 case_id,suspected,quarter,age,sex,dpp4_inhibitor,glp1_agonist
 # [2,] dt_ccmt 55,700    2  2 case_id,drug
 # [3,] dt_hist 29,492    2  1 case_id,hlt_code
-# [4,] dt_hlts    628    4  1 hlt_code,hlt_name,hlt_kanji,case_count                hlt_code
+# [4,] dt_hlts    628    4  1 hlt_code,hlt_name,hlt_kanji,case_count                        hlt_code
 # [5,] dt_reac 14,157    2  1 case_id,hlt_code
 # [6,] dt_sgnl 70,930    2  2 drug,hlt_code
 # Total: 8MB
