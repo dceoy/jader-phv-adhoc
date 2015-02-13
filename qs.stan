@@ -17,11 +17,16 @@ parameters {
     real rq[K];
 }
 model {
-//  alpha ~ normal(0, 1.0e+2);
-//  beta ~ normal(0, 1.0e+2);
-//  sigma ~ uniform(0, 1.0e+4);
+  alpha ~ normal(0, 100);
+  beta ~ normal(0, 100);
+  sigma_s ~ uniform(0, 10000);
+  sigma_q ~ uniform(0, 10000);
   rs ~ normal(0, sigma_s);
-  rq ~ normal(0, sigma_q);
+  for (j in 1:K)
+    if (j < 3)
+      rq[j] ~ normal(0, sigma_q);
+    else
+      rq[j] ~ normal(2 * rq[j - 1] - rq[j - 2], sigma_q);
   for (i in 1:N)
-    y[i] ~ bernoulli(inv_logit(alpha + dot_product(x[i], beta) + rs[d[i]] + rq[t[i]]));
+    y[i] ~ bernoulli_logit(alpha + dot_product(x[i], beta) + rs[d[i]] + rq[t[i]]);
 }

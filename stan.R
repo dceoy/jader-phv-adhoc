@@ -28,8 +28,8 @@ cl <- makeCluster(detectCores(), type = 'SOCK')
 registerDoSNOW(cl)
 .Last <- function() stopCluster(cl)
 
-db <- 'mj.sqlite3'
-source('dm_tbl.R')
+#db <- 'mj.sqlite3'
+#source('dm_tbl.R')
 #      NAME      NROW NCOL MB COLS                                                          KEY
 # [1,] dt_base  6,897    7  1 case_id,suspected,quarter,age,sex,dpp4_inhibitor,glp1_agonist
 # [2,] dt_ccmt 55,700    2  2 case_id,drug
@@ -38,11 +38,12 @@ source('dm_tbl.R')
 # [5,] dt_reac 14,157    2  1 case_id,hlt_code
 # [6,] dt_sgnl 70,930    2  2 drug,hlt_code
 # Total: 8MB
+load('output/dm_tbl.Rdata')
 
 out_path <- paste('output/stan_', gsub('[ :]', '-', Sys.time()), '.txt', sep = '')
 cat('stan\n', file = out_path)
 
-hlt_codes <- c('10033646')  # "Acute and chronic pancreatitis"  "急性および慢性膵炎"  1007
+hlt_codes <- c(10027692)
 # hlt_codes <- c(10007217, 10008616, 10012655, 10012981, 10017933, 10017988, 10018009, 10020638, 10021001, 10024948, 10027416, 10027692, 10029511, 10029976, 10033646, 10033632, 10033633, 10035098, 10039075, 10039078, 10040768, 10046512, 10052736, 10052738, 10052770)
 
 st_model <- stan_model(file = 'qs.stan')
@@ -89,11 +90,11 @@ foreach (code = hlt_codes) %do% {
             }
   stanfit <- sflist2stanfit(sflist)
 
-  pdf(paste('img/plot_hlt_', hlt$hlt_code, '.pdf', sep = ''))
+  pdf(paste('img/plot_', hlt$hlt_code, '.pdf', sep = ''))
     plot(stanfit)
   dev.off()
 
-  pdf(paste('img/traceplot_hlt_', hlt$hlt_code, '.pdf', sep = ''))
+  pdf(paste('img/traceplot_', hlt$hlt_code, '.pdf', sep = ''))
     traceplot(stanfit)
   dev.off()
 
@@ -104,4 +105,4 @@ foreach (code = hlt_codes) %do% {
   sink()
 }
 
-save.image('output/result.Rdata')
+# save.image('output/stan.Rdata')

@@ -179,3 +179,5 @@ tables()
 # [5,] dt_reac 367,474    2 13 case_id,hlt_code
 # [6,] dt_sgnl  70,930    2  2 drug,hlt_code
 # Total: 66MB
+
+save.image('output/sc_tbl.Rdata')
