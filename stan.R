@@ -20,7 +20,7 @@ r['CRAN'] <- 'http://cran.us.r-project.org'
 options(repos = r)
 rm(r)
 
-pkgs <- c('RSQLite', 'plyr', 'dplyr', 'data.table', 'snow', 'foreach', 'doSNOW', 'parallel', 'ggplot2', 'reshape2', 'rstan')
+pkgs <- c('RSQLite', 'plyr', 'dplyr', 'tidyr', 'data.table', 'snow', 'foreach', 'doSNOW', 'parallel', 'ggplot2', 'rstan')
 sapply(pkgs, pload)
 
 select <- dplyr::select
@@ -28,8 +28,12 @@ cl <- makeCluster(detectCores(), type = 'SOCK')
 registerDoSNOW(cl)
 .Last <- function() stopCluster(cl)
 
-#db <- 'mj.sqlite3'
-#source('dm_tbl.R')
+if (file.exists(data_path <- 'output/dm_tbl.Rdata')) {
+  load(data_path)
+} else {
+  db <- 'mj.sqlite3'
+  source('dm_tbl.R')
+}
 #      NAME      NROW NCOL MB COLS                                                          KEY
 # [1,] dt_base  6,897    7  1 case_id,suspected,quarter,age,sex,dpp4_inhibitor,glp1_agonist
 # [2,] dt_ccmt 55,700    2  2 case_id,drug
@@ -38,12 +42,11 @@ registerDoSNOW(cl)
 # [5,] dt_reac 14,157    2  1 case_id,hlt_code
 # [6,] dt_sgnl 70,930    2  2 drug,hlt_code
 # Total: 8MB
-load('output/dm_tbl.Rdata')
 
-out_path <- paste('output/stan_', gsub('[ :]', '-', Sys.time()), '.txt', sep = '')
+out_path <- 'output/stan_log.txt'
 cat('stan\n', file = out_path)
 
-hlt_codes <- c(10027692)
+hlt_codes <- c(10021001)
 # hlt_codes <- c(10007217, 10008616, 10012655, 10012981, 10017933, 10017988, 10018009, 10020638, 10021001, 10024948, 10027416, 10027692, 10029511, 10029976, 10033646, 10033632, 10033633, 10035098, 10039075, 10039078, 10040768, 10046512, 10052736, 10052738, 10052770)
 
 st_model <- stan_model(file = 'qs.stan')
@@ -103,6 +106,29 @@ foreach (code = hlt_codes) %do% {
     cat('\n\n\n')
     print(out)
   sink()
+
+  la <- extract(stanfit, permuted = TRUE)
+  N <- dt %>% nrow()
+  N_mc <- length(la$alpha)
+
+  bs <- tbl_dt(data.table(la$beta))
+  colnames(bs) <- c('dpp', 'glp', 'ccm', 'pre', 'age', 'sex')
+  bs_g <- bs %>% gather(param, value)
+  bs_gq <- bs_g %>%
+             gather(param, value) %>%
+             group_by(param) %>%
+             summarize(value = median(value),
+                       ymax = quantile(value, prob = 0.975),
+                       ymin = quantile(value, prob = 0.025))
+  bs_g <- bs_gq %>% inner_join(bs_g, by = 'param')
+  colnames(bs_g) <- c('param', 'value', 'median', 'ymax', 'ymin')
+
+  p <- ggplot(bs_g, aes(x = param, y = value, group = param, ymax = ymax, ymin = ymin, color = param)) +
+         geom_violin(trim = FALSE, fill = '#5B423D', linetype = 'blank', alpha = I(1/3)) +
+         geom_pointrange(data = bs_gq, size = 0.75) +
+         labs(x = '', y = '') +
+         theme(axis.text.x = element_text(size = 14), axis.text.y = element_text(size = 14))
+  ggsave(file = 'img/violin.svg', plot = p)
 }
 
 # save.image('output/stan.Rdata')
