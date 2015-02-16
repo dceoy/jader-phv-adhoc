@@ -46,10 +46,9 @@ if (file.exists(data_path <- 'output/dm_tbl.Rdata')) {
 out_path <- 'output/stan_log.txt'
 cat('stan\n', file = out_path)
 
-hlt_codes <- c(10021001)
-# hlt_codes <- c(10007217, 10008616, 10012655, 10012981, 10017933, 10017988, 10018009, 10020638, 10021001, 10024948, 10027416, 10027692, 10029511, 10029976, 10033646, 10033632, 10033633, 10035098, 10039075, 10039078, 10040768, 10046512, 10052736, 10052738, 10052770)
+hlt_codes <- c(10046512, 10027692, 10018009, 10033633, 10033632, 10012981, 10040768, 10039078, 10039075, 10033646)
 
-st_model <- stan_model(file = 'qs.stan')
+st_model <- stan_model(file = 'car.stan')
 
 foreach (code = hlt_codes) %do% {
   hlt <- dt_hlts %>% filter(hlt_code == code)
@@ -88,16 +87,20 @@ foreach (code = hlt_codes) %do% {
                        .$q_id)
 
 # stanfit <- sampling(object = st_model, data = ae_dat, iter = 1000, chains = 4)
-  sflist <- foreach(i = 1:4, .packages = 'rstan') %dopar% {
+  sflist <- foreach(i = 1:8, .packages = 'rstan') %dopar% {
               sampling(object = st_model, data = ae_dat, iter = 1000, chains = 1, chain_id = i, refresh = -1)
             }
   stanfit <- sflist2stanfit(sflist)
 
-  pdf(paste('img/plot_', hlt$hlt_code, '.pdf', sep = ''))
+  plot_path <- paste('img/plot_', hlt$hlt_code, '.pdf', sep = '')
+  traceplot_path <- paste('img/traceplot_', hlt$hlt_code, '.pdf', sep = '')
+  violin_path <- paste('img/violin_', hlt$hlt_code, '.svg', sep = '')
+
+  pdf(plot_path)
     plot(stanfit)
   dev.off()
 
-  pdf(paste('img/traceplot_', hlt$hlt_code, '.pdf', sep = ''))
+  pdf(traceplot_path)
     traceplot(stanfit)
   dev.off()
 
@@ -128,7 +131,7 @@ foreach (code = hlt_codes) %do% {
          geom_pointrange(data = bs_gq, size = 0.75) +
          labs(x = '', y = '') +
          theme(axis.text.x = element_text(size = 14), axis.text.y = element_text(size = 14))
-  ggsave(file = 'img/violin.svg', plot = p)
+  ggsave(file = violin_path, plot = p)
 }
 
 # save.image('output/stan.Rdata')
