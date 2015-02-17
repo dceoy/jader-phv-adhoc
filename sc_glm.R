@@ -28,8 +28,12 @@ cl <- makeCluster(detectCores(), type = 'SOCK')
 registerDoSNOW(cl)
 .Last <- function() stopCluster(cl)
 
-db <- 'mj.sqlite3'
-source('sc_tbl.R')
+if (file.exists(data_path <- 'output/sc_tbl.Rdata')) {
+  load(data_path)
+} else {
+  db <- 'mj.sqlite3'
+  source('sc_tbl.R')
+}
 #      NAME       NROW NCOL MB COLS                                       KEY
 # [1,] dt_base 165,779    6 15 case_id,suspected,quarter,age,sex,incretin
 # [2,] dt_ccmt 850,878    2 23 case_id,drug
@@ -80,13 +84,13 @@ foreach (code = dt_hlts$hlt_code, .packages = pkgs) %dopar% {
               hlt = hlt,
               incretin_or = paste('HLT', hlt$hlt_code, ';', ors[2,1], '[', ors[2,2], '-', ors[2,3], ']'))
 
-  sink(file = stdout_path, append = TRUE)
+  sink(stdout_path, append = TRUE)
     cat('\n\n\n')
     print(out)
   sink()
 
   if (ors[2,2] > 1) {
-    sink(file = signal_path, append = TRUE)
+    sink(signal_path, append = TRUE)
       cat('\n\n\n')
       print(out)
     sink()
