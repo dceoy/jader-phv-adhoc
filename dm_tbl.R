@@ -174,9 +174,9 @@ dt_base <- dt_base %>%
              mutate(glp1_agonist = as.integer(glp1_agonist))
 
 fex <- function(t) {
-  f <- fisher.test(matrix(t, nrow = 2), alternative = 'two.sided', conf.level = 0.95)
+  f <- fisher.test(matrix(t, nrow = 2), alternative = 'two.sided', conf.level = 0.99)
   p_or <- append(c(f$p.value, f$estimate), f$conf.int)
-  names(p_or) <- c('p_val', 'f_or', 'f_ll95', 'f_ul95')
+  names(p_or) <- c('p_val', 'or_mle', 'or_ll', 'or_ul')
   return(p_or)
 }
 
@@ -185,13 +185,8 @@ dt_sgnl <- dt_sgnl %>%
              parApply(cl, ., 1, fex) %>%
              t() %>%
              cbind(dt_sgnl) %>%
-             filter(p_val < 0.05, f_or > 1) %>%
+             filter(p_val < 0.01, or_mle > 1) %>%
              select(drug, hlt_code)
-
-#dt_sgnl <- dt_sgnl %>%
-#             mutate(ror_ll95 = exp(log(a * d / c / b) - 1.96 * sqrt(1 / a + 1 / b + 1 / c + 1 / d))) %>%
-#             filter(ror_ll95 > 1) %>%
-#             select(drug, hlt_code)
 
 tables()
 #      NAME      NROW NCOL MB COLS                                                          KEY
@@ -200,7 +195,7 @@ tables()
 # [3,] dt_hist 29,492    2  1 case_id,hlt_code
 # [4,] dt_hlts    628    4  1 hlt_code,hlt_name,hlt_kanji,case_count                        hlt_code
 # [5,] dt_reac 14,157    2  1 case_id,hlt_code
-# [6,] dt_sgnl 70,930    2  2 drug,hlt_code
-# Total: 8MB
+# [6,] dt_sgnl 40,010    2  1 drug,hlt_code
+# Total: 7MB
 
 save.image('output/dm_tbl.Rdata')

@@ -40,14 +40,12 @@ if (file.exists(data_path <- 'output/sc_tbl.Rdata')) {
 # [3,] dt_hist 427,258    2 12 case_id,hlt_code
 # [4,] dt_hlts     703    4  1 hlt_code,hlt_name,hlt_kanji,case_count     hlt_code
 # [5,] dt_reac 367,474    2 13 case_id,hlt_code
-# [6,] dt_sgnl  70,930    2  2 drug,hlt_code
-# Total: 66MB
+# [6,] dt_sgnl  40,010    2  1 drug,hlt_code
+# Total: 65MB
 
-stdout_path <- paste('output/sc_glm_', gsub('[ :]', '-', Sys.time()), '.txt', sep = '')
-signal_path <- 'output/sc_glm_signal.txt'
+stdout_path <- 'output/sc_glm_log.txt'
 csv_path <- 'output/sc_glm_orci.csv'
 cat('glm\n', file = stdout_path)
-cat('glm signal\n', file = signal_path)
 cat('', file = csv_path)
 
 foreach (code = dt_hlts$hlt_code, .packages = pkgs) %dopar% {
@@ -89,12 +87,7 @@ foreach (code = dt_hlts$hlt_code, .packages = pkgs) %dopar% {
     print(out)
   sink()
 
-  if (ors[2,2] > 1) {
-    sink(signal_path, append = TRUE)
-      cat('\n\n\n')
-      print(out)
-    sink()
-
-    write.table(matrix(c(ors[2,], hlt), nrow = 1), file = csv_path, append = TRUE, sep = ',', row.names = FALSE, col.names = FALSE)
-  }
+  if (ors[2,2] > 1) write.table(matrix(c(ors[2,], hlt), nrow = 1),
+                                file = csv_path, append = TRUE,
+                                sep = ',', row.names = FALSE, col.names = FALSE)
 }
