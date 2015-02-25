@@ -40,13 +40,13 @@ if (file.exists(data_path <- 'output/dm_tbl.Rdata')) {
 # [3,] dt_hist 29,492    2  1 case_id,hlt_code
 # [4,] dt_hlts    628    4  1 hlt_code,hlt_name,hlt_kanji,case_count                        hlt_code
 # [5,] dt_reac 14,157    2  1 case_id,hlt_code
-# [6,] dt_sgnl 70,930    2  2 drug,hlt_code
-# Total: 8MB
+# [6,] dt_sgnl 40,010    2  1 drug,hlt_code
+# Total: 7MB
 
 out_path <- 'output/stan_log.txt'
 cat('stan\n', file = out_path)
 
-hlt_codes <- c(10046512, 10027692, 10018009, 10033633, 10033632, 10012981, 10040768, 10039078, 10039075, 10033646)
+hlt_codes <- c(10018009)
 
 st_model <- stan_model(file = 'car.stan')
 
@@ -59,6 +59,7 @@ foreach (code = hlt_codes) %do% {
             filter(drug %in% sgnl$drug) %>%
             group_by(case_id) %>%
             summarize(concomit = n())
+  hlt <- hlt %>% mutate(case_count = nrow(reac))
 
   dt <- dt_base %>%
           left_join(ccmt, by = 'case_id') %>%
@@ -134,4 +135,4 @@ foreach (code = hlt_codes) %do% {
   ggsave(file = violin_path, plot = p)
 }
 
-# save.image('output/stan.Rdata')
+save.image('output/stan.Rdata')

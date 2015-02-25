@@ -40,13 +40,15 @@ if (file.exists(data_path <- 'output/dm_tbl.Rdata')) {
 # [3,] dt_hist 29,492    2  1 case_id,hlt_code
 # [4,] dt_hlts    628    4  1 hlt_code,hlt_name,hlt_kanji,case_count                        hlt_code
 # [5,] dt_reac 14,157    2  1 case_id,hlt_code
-# [6,] dt_sgnl 70,930    2  2 drug,hlt_code
-# Total: 8MB
+# [6,] dt_sgnl 40,010    2  1 drug,hlt_code
+# Total: 7MB
 
-out_path <- 'output/stan_log.txt'
+out_path <- 'output/dm_stan_log.txt'
+csv_path <- 'output/dm_stan_orci.csv'
 cat('stan\n', file = out_path)
+cat('', file = csv_path)
 
-hlt_codes <- c(10046512, 10027692, 10018009, 10033633, 10033632, 10012981, 10040768, 10039078, 10039075, 10033646)
+hlt_codes <- c(10027692, 10033646, 10035098, 10033632, 10033633, 10044657, 10021001, 10039078, 10039075, 10024948, 10043409, 10017988, 10018009, 10012981, 10012655, 10052738, 10029976, 10008616, 10003818, 10007217, 10027416, 10025614, 10020638, 10017933, 10052770, 10040768, 10029511)
 
 st_model <- stan_model(model_code = 'data {
                                        int<lower=0> N;
@@ -74,18 +76,20 @@ foreach (code = hlt_codes) %do% {
             filter(drug %in% sgnl$drug) %>%
             group_by(case_id) %>%
             summarize(concomit = n())
+  hlt <- hlt %>% mutate(case_count = nrow(reac))
 
   dt <- dt_base %>%
           left_join(ccmt, by = 'case_id') %>%
           mutate(concomit = as.integer(ifelse(is.na(concomit), 0, concomit))) %>%
           mutate(preexist = as.integer(ifelse(case_id %in% hist$case_id, 1, 0))) %>%
           mutate(event = as.integer(ifelse(case_id %in% reac$case_id, 1, 0))) %>%
-          select(event, dpp4_inhibitor, glp1_agonist, concomit, preexist, age, sex)
+          mutate(incretin = as.integer(ifelse(dpp4_inhibitor + glp1_agonist > 0, 1, 0))) %>%
+          select(event, incretin, concomit, preexist, age, sex)
 
   ae_dat <- list(N = dt %>% nrow(),
-                 M = 6,
+                 M = 5,
                  y = dt$event,
-                 x = dt %>% select(dpp4_inhibitor, glp1_agonist, concomit, preexist, age, sex))
+                 x = dt %>% select(incretin, concomit, preexist, age, sex))
 
 # stanfit <- sampling(object = st_model, data = ae_dat, iter = 1000, chains = 4)
   sflist <- foreach(i = 1:8, .packages = 'rstan') %dopar% {
@@ -116,7 +120,7 @@ foreach (code = hlt_codes) %do% {
   N_mc <- length(la$alpha)
 
   bs <- tbl_dt(data.table(la$beta))
-  colnames(bs) <- c('dpp', 'glp', 'ccm', 'pre', 'age', 'sex')
+  colnames(bs) <- c('icr', 'ccm', 'pre', 'age', 'sex')
   bs_g <- bs %>% gather(param, value)
   bs_gq <- bs_g %>%
              gather(param, value) %>%
@@ -136,6 +140,11 @@ foreach (code = hlt_codes) %do% {
   svg(violin_path, width = 12, height = 8)
     print(p)
   dev.off()
+
+  orci <- quantile(exp(bs$icr), c(0.5, 0.005, 0.995))
+  if (orci[2] > 1) {
+    write.table(matrix(c(orci, hlt), nrow = 1), file = csv_path, append = TRUE, sep = ',', row.names = FALSE, col.names = FALSE)
+  }
 }
 
 # save.image('output/stan.Rdata')

@@ -40,15 +40,15 @@ if (file.exists(data_path <- 'output/dm_tbl.Rdata')) {
 # [3,] dt_hist 29,492    2  1 case_id,hlt_code
 # [4,] dt_hlts    628    4  1 hlt_code,hlt_name,hlt_kanji,case_count                        hlt_code
 # [5,] dt_reac 14,157    2  1 case_id,hlt_code
-# [6,] dt_sgnl 70,930    2  2 drug,hlt_code
-# Total: 8MB
+# [6,] dt_sgnl 40,010    2  1 drug,hlt_code
+# Total: 7MB
 
 stdout_path <- 'output/dm_glm_log.txt'
 csv_path <- 'output/dm_glm_orci.csv'
 cat('glm\n', file = stdout_path)
 cat('', file = csv_path)
 
-hlt_codes <- c(10007217, 10008616, 10012655, 10012981, 10017933, 10017988, 10018009, 10020638, 10021001, 10024948, 10027416, 10027692, 10029511, 10029976, 10033646, 10033632, 10033633, 10035098, 10039075, 10039078, 10040768, 10046512, 10052736, 10052738, 10052770)
+hlt_codes <- c(10027692, 10033646, 10035098, 10033632, 10033633, 10044657, 10021001, 10039078, 10039075, 10024948, 10043409, 10017988, 10018009, 10012981, 10012655, 10052738, 10029976, 10008616, 10003818, 10007217, 10027416, 10025614, 10020638, 10017933, 10052770, 10040768, 10029511)
 
 foreach (code = hlt_codes, .packages = pkgs) %dopar% {
   hlt <- dt_hlts %>% filter(hlt_code == code)
@@ -59,16 +59,17 @@ foreach (code = hlt_codes, .packages = pkgs) %dopar% {
             filter(drug %in% sgnl$drug) %>%
             group_by(case_id) %>%
             summarize(concomit = n())
+  hlt <- hlt %>% mutate(case_count = nrow(reac))
 
   dt <- dt_base %>%
           left_join(ccmt, by = 'case_id') %>%
           mutate(concomit = as.integer(ifelse(is.na(concomit), 0, concomit))) %>%
           mutate(preexist = as.integer(ifelse(case_id %in% hist$case_id, 1, 0))) %>%
           mutate(event = as.integer(ifelse(case_id %in% reac$case_id, 1, 0))) %>%
-          select(event, dpp4_inhibitor, glp1_agonist, concomit, preexist, age, sex)
+          mutate(incretin = as.integer(ifelse(dpp4_inhibitor + glp1_agonist > 0, 1, 0))) %>%
+          select(event, incretin, concomit, preexist, age, sex)
 
-  fit <- glm(event ~ dpp4_inhibitor +
-                     glp1_agonist +
+  fit <- glm(event ~ incretin +
                      concomit +
                      preexist +
                      age +
