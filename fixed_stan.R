@@ -109,12 +109,6 @@ foreach (code = hlt_codes) %do% {
     traceplot(stanfit)
   dev.off()
 
-  out <- list(event = t(hlt), stanfit = stanfit)
-  sink(out_path, append = TRUE)
-    cat('\n\n\n')
-    print(out)
-  sink()
-
   la <- extract(stanfit, permuted = TRUE)
   N <- dt %>% nrow()
   N_mc <- length(la$alpha)
@@ -141,10 +135,18 @@ foreach (code = hlt_codes) %do% {
     print(p)
   dev.off()
 
-  orci <- quantile(exp(bs$icr), c(0.5, 0.005, 0.995))
-  if (orci[2] > 1) {
-    write.table(matrix(c(orci, hlt), nrow = 1), file = csv_path, append = TRUE, sep = ',', row.names = FALSE, col.names = FALSE)
+  ors <- bs %>%
+           apply(2, function(b) quantile(b, c(0.5, 0.005, 0.995))) %>%
+           t() %>%
+           exp()
+
+  out <- list(event = t(hlt), stanfit = stanfit, odds_ratio = ors)
+  sink(out_path, append = TRUE)
+    cat('\n\n\n')
+    print(out)
+  sink()
+
+  if (ors[1,2] > 1) {
+    write.table(matrix(c(ors[1,], hlt), nrow = 1), file = csv_path, append = TRUE, sep = ',', row.names = FALSE, col.names = FALSE)
   }
 }
-
-# save.image('output/stan.Rdata')

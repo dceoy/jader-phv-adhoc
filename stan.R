@@ -46,7 +46,7 @@ if (file.exists(data_path <- 'output/dm_tbl.Rdata')) {
 out_path <- 'output/stan_log.txt'
 cat('stan\n', file = out_path)
 
-hlt_codes <- c(10018009)
+hlt_codes <- c(10033632)
 
 st_model <- stan_model(file = 'car.stan')
 
@@ -96,6 +96,7 @@ foreach (code = hlt_codes) %do% {
   plot_path <- paste('img/plot_', hlt$hlt_code, '.pdf', sep = '')
   traceplot_path <- paste('img/traceplot_', hlt$hlt_code, '.pdf', sep = '')
   violin_path <- paste('img/violin_', hlt$hlt_code, '.svg', sep = '')
+  rdata_path <- paste('img/stan_', hlt$hlt_code, '.Rdata', sep = '')
 
   pdf(plot_path)
     plot(stanfit)
@@ -104,12 +105,6 @@ foreach (code = hlt_codes) %do% {
   pdf(traceplot_path)
     traceplot(stanfit)
   dev.off()
-
-  out <- list(event = t(hlt), stanfit = stanfit)
-  sink(file = out_path, append = TRUE)
-    cat('\n\n\n')
-    print(out)
-  sink()
 
   la <- extract(stanfit, permuted = TRUE)
   N <- dt %>% nrow()
@@ -132,7 +127,21 @@ foreach (code = hlt_codes) %do% {
          geom_pointrange(data = bs_gq, size = 0.75) +
          labs(x = '', y = '') +
          theme(axis.text.x = element_text(size = 14), axis.text.y = element_text(size = 14))
-  ggsave(file = violin_path, plot = p)
-}
 
-save.image('output/stan.Rdata')
+  svg(violin_path, width = 12, height = 8)
+    print(p)
+  dev.off()
+
+  ors <- bs %>%
+           apply(2, function(b) quantile(b, c(0.5, 0.005, 0.025, 0.975, 0.995))) %>%
+           t() %>%
+           exp()
+
+  out <- list(event = t(hlt), stanfit = stanfit, odds_ratio = ors)
+  sink(out_path, append = TRUE)
+    cat('\n\n\n')
+    print(out)
+  sink()
+
+  save.image(rdata_path)
+}
