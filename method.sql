@@ -41,7 +41,9 @@ INSERT INTO ade10 (drug, pt_kanji, pt_code, hlt_code, case_id, drug_start_date, 
       FROM
         demo
       WHERE
-        quarter == '2009・第四' OR quarter LIKE '201%'
+        age LIKE "%0歳%" AND
+        sex IN ("男性", "女性") AND
+        (quarter == '2009・第四' OR quarter LIKE '201%')
     );
 
 

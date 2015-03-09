@@ -61,8 +61,6 @@ sql_base <- 'SELECT
                    sn == 1
                ) s ON s.case_id == d.case_id
              WHERE
-               age LIKE "%0歳%" AND
-               sex IN ("男性", "女性") AND
                d.case_id IN (
                  SELECT DISTINCT
                    case_id
