@@ -193,7 +193,7 @@ tables()
 # [3,] dt_hist 29,492    2  1 case_id,hlt_code
 # [4,] dt_hlts    628    4  1 hlt_code,hlt_name,hlt_kanji,case_count                        hlt_code
 # [5,] dt_reac 14,157    2  1 case_id,hlt_code
-# [6,] dt_sgnl 40,010    2  1 drug,hlt_code
+# [6,] dt_sgnl 38,346    2  1 drug,hlt_code
 # Total: 7MB
 
 save.image('output/dm_tbl.Rdata')
