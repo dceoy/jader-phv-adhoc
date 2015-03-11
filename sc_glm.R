@@ -40,7 +40,7 @@ if (file.exists(data_path <- 'output/sc_tbl.Rdata')) {
 # [3,] dt_hist 427,258    2 12 case_id,hlt_code
 # [4,] dt_hlts     703    4  1 hlt_code,hlt_name,hlt_kanji,case_count     hlt_code
 # [5,] dt_reac 367,474    2 13 case_id,hlt_code
-# [6,] dt_sgnl  40,010    2  1 drug,hlt_code
+# [6,] dt_sgnl  38,346    2  1 drug,hlt_code
 # Total: 65MB
 
 stdout_path <- 'output/sc_glm_log.txt'

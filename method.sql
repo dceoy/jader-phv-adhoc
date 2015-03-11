@@ -1,10 +1,5 @@
 -- 1. Extraction of Drug-Event Combinations from 2009q4 to 2013q2 (Jan 2010 - Sep 2013)
 
-/*
-SELECT DISTINCT case_id FROM demo WHERE quarter == '2009・第四' OR quarter LIKE '201%' AND quarter != '2013・第四';
--- 147065
-*/
-
 CREATE TABLE ade10 (
   drug VARCHAR(120),
   pt_kanji VARCHAR(120),
@@ -240,26 +235,19 @@ SGLT-2 Inhibitors
 
 
 /*
-http://chart.apis.google.com/chart?cht=v&chd=t:52,100,44,31,13,5,3&chs=300x200&chdl=Incretin%20Based%20Drug|Oral%20Hypoglycemic%20Drug|insulin&chtt=Venn%20Diagram&chco=D3BADB,BAEAF8,FAC5DF
-*/
-
-
-/*
 SELECT COUNT(DISTINCT case_id) FROM ade10;
--- 170528
-SELECT COUNT(DISTINCT case_id) FROM ade10 WHERE drug IN (
-  SELECT DISTINCT drug FROM d_class
-);
--- 15315
+-- 165779
+SELECT COUNT(DISTINCT case_id) FROM ade10 WHERE drug IN (SELECT DISTINCT drug FROM d_class);
+-- 15499
 SELECT class, COUNT(DISTINCT case_id) AS c FROM ade10 INNER JOIN d_class ON ade10.drug == d_class.drug GROUP BY class;
--- alpha_glucosidase_inhibitor     3626
--- biguanide       2587
--- dpp4_inhibitor  5524
--- glp1_agonist    392
--- insulin 4418
--- meglitinide     1046
--- sglt2_inhibitor 202
--- sulfonylurea    5649
--- thiazolidinedione       2202
+-- alpha_glucosidase_inhibitor     3709
+-- biguanide                       2717
+-- dpp4_inhibitor                  5826
+-- glp1_agonist                    388
+-- insulin                         4471
+-- meglitinide                     1070
+-- sglt2_inhibitor                 319
+-- sulfonylurea                    5720
+-- thiazolidinedione               2157
 */
 

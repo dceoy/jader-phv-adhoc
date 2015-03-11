@@ -40,13 +40,22 @@ if (file.exists(data_path <- 'output/dm_tbl.Rdata')) {
 # [3,] dt_hist 29,492    2  1 case_id,hlt_code
 # [4,] dt_hlts    628    4  1 hlt_code,hlt_name,hlt_kanji,case_count                        hlt_code
 # [5,] dt_reac 14,157    2  1 case_id,hlt_code
-# [6,] dt_sgnl 40,010    2  1 drug,hlt_code
+# [6,] dt_sgnl 38,346    2  1 drug,hlt_code
 # Total: 7MB
 
-out_path <- 'output/stan_log.txt'
+out_path <- 'output/dm_stan_log.txt'
 cat('stan\n', file = out_path)
 
-hlt_codes <- c(10033632)
+hlt_codes <- c(10033632, # 膵新生物
+               10033633, # 悪性膵新生物（膵島細胞腫瘍およびカルチノイドを除く）
+               10033646, # 急性および慢性膵炎
+               10039078, # リウマチ性関節症
+               10039075, # 関節リウマチおよびその関連疾患
+               10018009, # 消化管狭窄および閉塞ＮＥＣ
+               10025614, # 悪性腸管新生物
+               10012981, # 消化酵素
+               10008616, # 胆嚢炎および胆石症
+               10040768) # 骨格筋および心筋検査
 
 st_model <- stan_model(file = 'car.stan')
 
@@ -70,16 +79,9 @@ foreach (code = hlt_codes) %do% {
 
   ae_dat <- list(N = dt %>% nrow(),
                  M = 6,
-                 L = dt %>% distinct(suspected) %>% nrow(),
-                 K = dt %>% distinct(quarter) %>% nrow(),
+                 L = dt %>% distinct(quarter) %>% nrow(),
                  y = dt$event,
                  x = dt %>% select(dpp4_inhibitor, glp1_agonist, concomit, preexist, age, sex),
-                 d = dt %>%
-                       distinct(suspected) %>%
-                       mutate(s_id = 1:nrow(.)) %>%
-                       select(suspected, s_id) %>%
-                       inner_join(dt, by = 'suspected') %>%
-                       .$s_id,
                  t = dt %>%
                        distinct(quarter) %>%
                        mutate(q_id = 1:nrow(.)) %>%
@@ -87,7 +89,6 @@ foreach (code = hlt_codes) %do% {
                        inner_join(dt, by = 'quarter') %>%
                        .$q_id)
 
-# stanfit <- sampling(object = st_model, data = ae_dat, iter = 1000, chains = 4)
   sflist <- foreach(i = 1:8, .packages = 'rstan') %dopar% {
               sampling(object = st_model, data = ae_dat, iter = 1000, chains = 1, chain_id = i, refresh = -1)
             }
@@ -96,7 +97,7 @@ foreach (code = hlt_codes) %do% {
   plot_path <- paste('img/plot_', hlt$hlt_code, '.pdf', sep = '')
   traceplot_path <- paste('img/traceplot_', hlt$hlt_code, '.pdf', sep = '')
   violin_path <- paste('img/violin_', hlt$hlt_code, '.svg', sep = '')
-  rdata_path <- paste('img/stan_', hlt$hlt_code, '.Rdata', sep = '')
+  rdata_path <- paste('output/stan_', hlt$hlt_code, '.Rdata', sep = '')
 
   pdf(plot_path)
     plot(stanfit)
