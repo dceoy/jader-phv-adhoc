@@ -48,7 +48,32 @@ csv_path <- 'output/dm_glm_orci.csv'
 cat('glm\n', file = stdout_path)
 cat('', file = csv_path)
 
-hlt_codes <- c(10027692, 10033646, 10033632, 10035098, 10033633, 10044657, 10021001, 10039078, 10039075, 10024948, 10017988, 10018009, 10052738, 10012981, 10012655, 10043409, 10029976, 10008616, 10025614, 10007217, 10003818, 10027416, 10017933, 10020638, 10052770, 10040768, 10029511)
+hlt_codes <- c(
+               10008424, # Chemical injuries
+               10028004, # Motor neurone diseases
+               10027692, # Pancreatic disorders NEC
+               10033646, # Acute and chronic pancreatitis
+               10033632, # Pancreatic neoplasms
+               10035098, # Pituitary neoplasms
+               10033633, # Pancreatic neoplasms malignant (excl islet cell and carcinoid)
+               10001438, # Affect alterations NEC
+               10017989, # Gastrointestinal neoplasms benign NEC
+               10014714, # Endocrine neoplasms NEC
+               10044657, # Triglyceride analyses
+               10017950, # Gastrointestinal dyskinetic disorders
+               10021001, # Hypoglycaemic conditions NEC
+               10039078, # Rheumatoid arthropathies
+               10039075, # Rheumatoid arthritis and associated conditions
+               10024948, # Lower gastrointestinal neoplasms benign
+               10017988, # Benign neoplasms gastrointestinal (excl oral cavity)
+               10018009, # Gastrointestinal stenosis and obstruction NEC
+               10052738, # Skin autoimmune disorders NEC
+               10012981, # Digestive enzymes
+               10012655, # Diabetic complications NEC
+               10043409, # Therapeutic and nontherapeutic responses
+               10029976, # Obstructive bile duct disorders (excl neoplasms)
+               10008616  # Cholecystitis and cholelithiasis
+               )
 
 foreach (code = hlt_codes, .packages = pkgs) %dopar% {
   hlt <- dt_hlts %>% filter(hlt_code == code)
@@ -69,29 +94,45 @@ foreach (code = hlt_codes, .packages = pkgs) %dopar% {
           mutate(incretin = as.integer(ifelse(dpp4_inhibitor + glp1_agonist > 0, 1, 0))) %>%
           select(event, incretin, concomit, preexist, age, sex)
 
-  fit <- glm(event ~ incretin +
-                     concomit +
-                     preexist +
-                     age +
-                     sex,
-             data = dt, family = binomial)
+  lr <- glm(event ~ incretin +
+                    concomit +
+                    preexist +
+                    age +
+                    sex,
+            data = dt, family = binomial)
 
-  s <- summary(fit)
-  ci <- confint(fit, level = 0.99)
-  ors <- exp(cbind(s$coefficients[,1], ci[,1:2]))
-  colnames(ors) <- c('OR', 'LL', 'UL')
+  s <- summary(lr)
+
+  alpha <- 0.01
+  ce <- s$coefficient
+
+  qn <- qnorm(1 - alpha / 2, 0, 1)
+  or_wald <- exp(cbind(ce[,1],
+                       ce[,1] - qn * ce[,2],
+                       ce[,1] + qn * ce[,2]))
+  colnames(or_wald) <- c('OR', 'LL', 'UL')
+
   out <- list(event = t(hlt),
               summary = s,
-              odds_ratio = ors,
-              hlt = hlt,
-              incretin_or = paste('HLT', hlt$hlt_code, ';', ors[2,1], '[', ors[2,2], '-', ors[2,3], ']'))
+              or_wald_ci = or_wald,
+              hlt = hlt)
 
-  sink(file = stdout_path, append = TRUE)
+  if (ce[2,1] > 1 && ce[2,4] < alpha) {
+    plci <- confint(lr, level = 1 - alpha)
+    or_pl <- exp(cbind(ce[,1], plci[,1:2]))
+    colnames(or_pl) <- c('OR', 'LL', 'UL')
+
+    write.table(matrix(c(or_pl[2,], hlt), nrow = 1),
+                file = csv_path, append = TRUE,
+                sep = ',', row.names = FALSE, col.names = FALSE)
+
+    out <- list(out,
+                or_profile_likelihood_ci = or_pl,
+                incretin_or = paste('HLT', hlt$hlt_code, ';', or_wald[2,1], '[', or_wald[2,2], '-', or_wald[2,3], ']'))
+  }
+
+  sink(stdout_path, append = TRUE)
     cat('\n\n\n')
     print(out)
   sink()
-
-  if (ors[2,2] > 1) {
-    write.table(matrix(c(ors[2,], hlt), nrow = 1), file = csv_path, append = TRUE, sep = ',', row.names = FALSE, col.names = FALSE)
-  }
 }
