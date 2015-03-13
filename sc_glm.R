@@ -75,31 +75,28 @@ foreach (code = dt_hlts$hlt_code, .packages = pkgs) %dopar% {
   s <- summary(lr)
 
   alpha <- 0.01
-  ce <- s$coefficient
-
   qn <- qnorm(1 - alpha / 2, 0, 1)
-  or_wald <- exp(cbind(ce[,1],
-                       ce[,1] - qn * ce[,2],
-                       ce[,1] + qn * ce[,2]))
-  colnames(or_wald) <- c('OR', 'LL', 'UL')
+  ce <- s$coefficient
+  or_wald <- exp(data.table(OR = ce[,1],
+                            LL = ce[,1] - qn * ce[,2],
+                            UL = ce[,1] + qn * ce[,2]))
 
   out <- list(event = t(hlt),
               summary = s,
               or_wald_ci = or_wald,
               hlt = hlt)
 
-  if (ce[2,1] > 1 && ce[2,4] < alpha) {
-    plci <- confint(lr, level = 1 - alpha)
-    or_pl <- exp(cbind(ce[,1], plci[,1:2]))
-    colnames(or_pl) <- c('OR', 'LL', 'UL')
-
-    write.table(matrix(c(or_pl[2,], hlt), nrow = 1),
+  if (or_wald[2,2] > 1) {
+    write.table(matrix(c(or_wald[2,], hlt), nrow = 1),
                 file = csv_path, append = TRUE,
                 sep = ',', row.names = FALSE, col.names = FALSE)
 
-    out <- list(out,
-                or_profile_likelihood_ci = or_pl,
-                incretin_or = paste('HLT', hlt$hlt_code, ';', or_wald[2,1], '[', or_wald[2,2], '-', or_wald[2,3], ']'))
+    plci <- confint(lr, level = 1 - alpha)
+    or_pl <- exp(data.table(OR = ce[,1],
+                            LL = plci[,1],
+                            UL = plci[,2]))
+
+    out <- list(out, or_profile_likelihood_ci = or_pl)
   }
 
   sink(stdout_path, append = TRUE)

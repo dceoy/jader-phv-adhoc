@@ -173,7 +173,7 @@ dt_base <- dt_base %>%
 
 fex <- function(t) {
   f <- fisher.test(matrix(t, nrow = 2), alternative = 'two.sided', conf.level = 0.99)
-  p_or <- append(c(f$p.value, f$estimate), f$conf.int)
+  p_or <- c(f$p.value, f$estimate, f$conf.int)
   names(p_or) <- c('p_val', 'or_mle', 'or_ll', 'or_ul')
   return(p_or)
 }
