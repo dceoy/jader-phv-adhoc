@@ -46,16 +46,15 @@ if (file.exists(data_path <- 'output/dm_tbl.Rdata')) {
 out_path <- 'output/dm_stan_log.txt'
 cat('stan\n', file = out_path)
 
-hlt_codes <- c(10033632, # 膵新生物
-               10033633, # 悪性膵新生物（膵島細胞腫瘍およびカルチノイドを除く）
-               10033646, # 急性および慢性膵炎
-               10039078, # リウマチ性関節症
-               10039075, # 関節リウマチおよびその関連疾患
-               10018009, # 消化管狭窄および閉塞ＮＥＣ
-               10025614, # 悪性腸管新生物
-               10012981, # 消化酵素
-               10008616, # 胆嚢炎および胆石症
-               10040768) # 骨格筋および心筋検査
+hlt_codes <- c(
+               10033632, # Pancreatic neoplasms
+               10033633, # Pancreatic neoplasms malignant (excl islet cell and carcinoid)
+               10033646, # Acute and chronic pancreatitis
+               10018009, # Gastrointestinal stenosis and obstruction NEC
+               10052736, # Non-mechanical ileus
+               10025614, # Malignant intestinal neoplasms
+               10008616  # Cholecystitis and cholelithiasis
+               )
 
 st_model <- stan_model(file = 'car.stan')
 
@@ -107,23 +106,25 @@ foreach (code = hlt_codes) %do% {
     traceplot(stanfit)
   dev.off()
 
+  alpha <- 0.01
+
   la <- extract(stanfit, permuted = TRUE)
   N <- dt %>% nrow()
   N_mc <- length(la$alpha)
 
   bs <- tbl_dt(data.table(la$beta))
-  colnames(bs) <- c('dpp', 'glp', 'ccm', 'pre', 'age', 'sex')
-  bs_g <- bs %>% gather(param, value)
+  bs <- bs %>% setnames(c('dpp4i', 'glp1a', 'ccm', 'pre', 'age', 'sex'))
+  bs_g <- bs %>%
+            select(dpp4i, glp1a) %>%
+            gather(param, value)
   bs_gq <- bs_g %>%
-             gather(param, value) %>%
              group_by(param) %>%
-             summarize(value = median(value),
-                       ymax = quantile(value, prob = 0.975),
-                       ymin = quantile(value, prob = 0.025))
-  bs_g <- bs_gq %>% inner_join(bs_g, by = 'param')
-  colnames(bs_g) <- c('param', 'value', 'median', 'ymax', 'ymin')
+             summarize(ymed = median(value),
+                       ymin = quantile(value, prob = alpha / 2),
+                       ymax = quantile(value, prob = 1 - alpha / 2))
+  bs_g <- bs_g %>% inner_join(bs_gq, by = 'param')
 
-  p <- ggplot(bs_g, aes(x = param, y = value, group = param, ymax = ymax, ymin = ymin, color = param)) +
+  p <- ggplot(bs_g, aes(x = param, y = ymed, group = param, ymax = ymax, ymin = ymin, color = param)) +
          geom_violin(trim = FALSE, fill = '#5B423D', linetype = 'blank', alpha = I(1/3)) +
          geom_pointrange(data = bs_gq, size = 0.75) +
          labs(x = '', y = '') +
@@ -134,11 +135,12 @@ foreach (code = hlt_codes) %do% {
   dev.off()
 
   ors <- bs %>%
-           apply(2, function(b) quantile(b, c(0.5, 0.005, 0.025, 0.975, 0.995))) %>%
+           apply(2, function(b) quantile(b, c(0.5, alpha / 2, 1 - alpha / 2))) %>%
            t() %>%
            exp()
 
   out <- list(event = t(hlt), stanfit = stanfit, odds_ratio = ors)
+
   sink(out_path, append = TRUE)
     cat('\n\n\n')
     print(out)
