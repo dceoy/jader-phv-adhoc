@@ -1,4 +1,4 @@
-# coding: utf-8
+#!/usr/bin/env R
 #
 #                event
 #              +       -
@@ -10,7 +10,6 @@
 #            a + c   b + d
 #
 # Preset DATABASE PATH as 'db'
-
 
 dt_pkgs <- c('RSQLite', 'dplyr', 'data.table', 'snow')
 sapply(dt_pkgs, function(p) require(p, character.only = TRUE))

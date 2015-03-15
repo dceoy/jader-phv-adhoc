@@ -1,4 +1,4 @@
-# coding: utf-8
+#!/usr/bin/env R
 #
 #                event
 #              +       -
@@ -10,7 +10,6 @@
 #            a + c   b + d
 #
 # Preset DATABASE PATH as 'db'
-
 
 dt_pkgs <- c('RSQLite', 'dplyr', 'data.table', 'snow')
 sapply(dt_pkgs, function(p) require(p, character.only = TRUE))
@@ -164,6 +163,7 @@ dt_hlts <- dt_base %>%
 dt_reac <- dt_reac %>% filter(case_id %in% dt_base$case_id, hlt_code %in% dt_hlts$hlt_code)
 dt_hist <- dt_hist %>% filter(case_id %in% dt_base$case_id, hlt_code %in% dt_hlts$hlt_code)
 dt_ccmt <- dt_ccmt %>% filter(case_id %in% dt_base$case_id)
+dt_sgnl <- dt_sgnl %>% filter(drug %in% unique(dt_ccmt$drug), hlt_code %in% dt_hlts$hlt_code)
 
 dt_base <- dt_base %>%
              mutate(age = as.integer(age)) %>%
@@ -193,7 +193,7 @@ tables()
 # [3,] dt_hist 29,492    2  1 case_id,hlt_code
 # [4,] dt_hlts    628    4  1 hlt_code,hlt_name,hlt_kanji,case_count                        hlt_code
 # [5,] dt_reac 14,157    2  1 case_id,hlt_code
-# [6,] dt_sgnl 38,346    2  1 drug,hlt_code
+# [6,] dt_sgnl 26,815    2  1 drug,hlt_code
 # Total: 7MB
 
 save.image('output/dm_tbl.Rdata')
