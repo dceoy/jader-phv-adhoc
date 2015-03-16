@@ -1,14 +1,4 @@
 #!/usr/bin/env R
-#
-#                event
-#              +       -
-#          +-------+-------+
-#        + |   a   |   b   | a + b
-#  drug    +-------+-------+
-#        - |   c   |   d   | c + d
-#          +-------+-------+
-#            a + c   b + d
-
 
 pload <- function(p) {
   if (! p %in% installed.packages()[,1]) install.packages(p, dependencies = TRUE)
@@ -20,7 +10,7 @@ r['CRAN'] <- 'http://cran.us.r-project.org'
 options(repos = r)
 rm(r)
 
-pkgs <- c('RSQLite', 'plyr', 'dplyr', 'tidyr', 'data.table', 'snow', 'foreach', 'doSNOW', 'parallel', 'ggplot2', 'rstan')
+pkgs <- c('RSQLite', 'plyr', 'dplyr', 'tidyr', 'data.table', 'snow', 'foreach', 'doSNOW', 'parallel', 'yaml', 'ggplot2', 'rstan')
 sapply(pkgs, pload)
 
 select <- dplyr::select
@@ -34,27 +24,11 @@ if (file.exists(data_path <- 'output/dm_tbl.Rdata')) {
   db <- 'mj.sqlite3'
   source('dm_tbl.R')
 }
-#      NAME      NROW NCOL MB COLS                                                          KEY
-# [1,] dt_base  6,897    7  1 case_id,suspected,quarter,age,sex,dpp4_inhibitor,glp1_agonist
-# [2,] dt_ccmt 55,700    2  2 case_id,drug
-# [3,] dt_hist 29,492    2  1 case_id,hlt_code
-# [4,] dt_hlts    628    4  1 hlt_code,hlt_name,hlt_kanji,case_count                        hlt_code
-# [5,] dt_reac 14,157    2  1 case_id,hlt_code
-# [6,] dt_sgnl 38,346    2  1 drug,hlt_code
-# Total: 7MB
 
-out_path <- 'output/dm_stan_log.txt'
-cat('stan\n', file = out_path)
+out_path <- 'output/stan_log.txt'
+cat('', file = out_path)
 
-hlt_codes <- c(
-               10033632, # Pancreatic neoplasms
-               10033633, # Pancreatic neoplasms malignant (excl islet cell and carcinoid)
-               10033646, # Acute and chronic pancreatitis
-               10018009, # Gastrointestinal stenosis and obstruction NEC
-               10052736, # Non-mechanical ileus
-               10025614, # Malignant intestinal neoplasms
-               10008616  # Cholecystitis and cholelithiasis
-               )
+hlt_codes <- yaml.load_file('hlts.yml')$stan
 
 st_model <- stan_model(file = 'car.stan')
 
@@ -134,15 +108,16 @@ foreach (code = hlt_codes) %do% {
     print(p)
   dev.off()
 
-  ors <- bs %>%
-           apply(2, function(b) quantile(b, c(0.5, alpha / 2, 1 - alpha / 2))) %>%
-           t() %>%
-           exp()
+  orci <- bs %>%
+            apply(2, function(b) quantile(b, c(0.5, alpha / 2, 1 - alpha / 2))) %>%
+            t() %>%
+            exp()
 
-  out <- list(event = t(hlt), stanfit = stanfit, odds_ratio = ors)
+  out <- list(event = t(hlt), stanfit = stanfit, odds_ratio = orci, dpp4i = '', glp1a = '')
+  if (orci[1,2] > 1) out$dpp4i <- 'significant'
+  if (orci[2,2] > 1) out$glp1a <- 'significant'
 
   sink(out_path, append = TRUE)
-    cat('\n\n\n')
     print(out)
   sink()
 
