@@ -225,10 +225,11 @@ SGLT-2 Inhibitors
     dapagliflozin   ダパグリフロジン
     tofogliflozin   トホグリフロジン
     luseogliflozin  ルセオグリフロジン
+    canagliflozin   カナグリフロジン
 
--- イプラグリフロジン　L-プロリン
 -- イプラグリフロジン　Ｌ−プロリン
 -- ダパグリフロジンプロピレングリコール水和物
 -- トホグリフロジン水和物
 -- ルセオグリフロジン水和物
+-- カナグリフロジン水和物
 */

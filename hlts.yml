@@ -7,41 +7,44 @@ glm:
   - 10033633  # Pancreatic neoplasms malignant (excl islet cell and carcinoid)
   - 10027692  # Pancreatic disorders NEC
   - 10018009  # Gastrointestinal stenosis and obstruction NEC
+  - 10012655  # Diabetic complications NEC
   - 10039078  # Rheumatoid arthropathies
   - 10039075  # Rheumatoid arthritis and associated conditions
-  - 10008616  # Cholecystitis and cholelithiasis
-  - 10012655  # Diabetic complications NEC
+  - 10017989  # Gastrointestinal neoplasms benign NEC
   - 10012981  # Digestive enzymes
-  - 10044657  # Triglyceride analyses
-  - 10052738  # Skin autoimmune disorders NEC
-  - 10017988  # Benign neoplasms gastrointestinal (excl oral cavity)
+  - 10008616  # Cholecystitis and cholelithiasis
   - 10007217  # Carbohydrate tolerance analyses (incl diabetes)
+  - 10017988  # Benign neoplasms gastrointestinal (excl oral cavity)
   - 10027416  # Metabolic acidoses (excl diabetic acidoses)
-  - 10035098  # Pituitary neoplasms
-  - 10024948  # Lower gastrointestinal neoplasms benign
-  - 10025614  # Malignant intestinal neoplasms
+  - 10052738  # Skin autoimmune disorders NEC
   - 10020638  # Hyperglycaemic conditions NEC
+  - 10035098  # Pituitary neoplasms
   - 10008424  # Chemical injuries
-  - 10043409  # Therapeutic and nontherapeutic responses
-  - 10029976  # Obstructive bile duct disorders (excl neoplasms)
+  - 10011774  # Cystic pancreatic disorders
   - 10052770  # Coma states
-  - 10017933  # Gastrointestinal atonic and hypomotility disorders NEC
-  - 10003818  # Endocrine autoimmune disorders
+  - 10024948  # Lower gastrointestinal neoplasms benign
+  - 10043409  # Therapeutic and nontherapeutic responses
   - 10040768  # Skeletal and cardiac muscle analyses
+  - 10029976  # Obstructive bile duct disorders (excl neoplasms)
+  - 10003818  # Endocrine autoimmune disorders
+  - 10017933  # Gastrointestinal atonic and hypomotility disorders NEC
+  - 10025614  # Malignant intestinal neoplasms
   - 10001438  # Affect alterations NEC
-  - 10017950  # Gastrointestinal dyskinetic disorders
+  - 10052736  # Non-mechanical ileus
   - 10029511  # Non-site specific injuries NEC
   - 10014714  # Endocrine neoplasms NEC
-  - 10052736  # Non-mechanical ileus
+  - 10017950  # Gastrointestinal dyskinetic disorders
+  - 10044657  # Triglyceride analyses
   - 10028004  # Motor neurone diseases
-  - 10017989  # Gastrointestinal neoplasms benign NEC
-  - 10003284  # Arthropathies NEC
+  - 10024973  # Lower respiratory tract neoplasms
 
 stan:
   - 10033646  # Acute and chronic pancreatitis
   - 10018009  # Gastrointestinal stenosis and obstruction NEC
   - 10033632  # Pancreatic neoplasms
   - 10033633  # Pancreatic neoplasms malignant (excl islet cell and carcinoid)
-  - 10052736  # Non-mechanical ileus
+  - 10024973  # Lower respiratory tract neoplasms
   - 10008616  # Cholecystitis and cholelithiasis
+  - 10052736  # Non-mechanical ileus
+  - 10040768  # Skeletal and cardiac muscle analyses
   - 10025614  # Malignant intestinal neoplasms
