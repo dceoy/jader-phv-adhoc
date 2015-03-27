@@ -51,10 +51,10 @@ foreach (code = hlt_codes) %do% {
           select(event, dpp4_inhibitor, glp1_agonist, concomit, preexist, age, sex, quarter)
 
   ae_dat <- list(N = dt %>% nrow(),
-                 M = 6,
+                 M = 5,
                  L = dt %>% distinct(quarter) %>% nrow(),
                  y = dt$event,
-                 x = dt %>% select(dpp4_inhibitor, glp1_agonist, concomit, preexist, age, sex),
+                 x = dt %>% select(dpp4_inhibitor, glp1_agonist, concomit, age, sex),
                  t = dt %>%
                        distinct(quarter) %>%
                        mutate(q_id = 1:nrow(.)) %>%
@@ -87,7 +87,7 @@ foreach (code = hlt_codes) %do% {
 
   bs <- tbl_dt(data.table(la$beta))
   ors <- bs %>%
-           setnames(c('dpp4i', 'glp1a', 'ccm', 'pre', 'age', 'sex')) %>%
+           setnames(c('dpp4i', 'glp1a', 'ccm', 'age', 'sex')) %>%
            exp()
   or_g <- ors %>%
             select(dpp4i, glp1a) %>%

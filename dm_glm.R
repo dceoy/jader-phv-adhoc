@@ -53,7 +53,7 @@ foreach (code = hlt_codes, .packages = pkgs) %dopar% {
 
   lr <- glm(event ~ incretin +
                     concomit +
-                    preexist +
+#                   preexist +
                     age +
                     sex,
             data = dt, family = binomial)
