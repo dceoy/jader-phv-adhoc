@@ -164,12 +164,12 @@ dt_sgnl <- dt_sgnl %>%
 
 tables()
 #      NAME       NROW NCOL MB COLS                                       KEY
-# [1,] dt_base 168,576    6 15 case_id,suspected,quarter,age,sex,incretin
-# [2,] dt_ccmt 863,547    2 23 case_id,drug
-# [3,] dt_hist 432,870    2 12 case_id,hlt_code
-# [4,] dt_hlts     705    4  1 hlt_code,hlt_name,hlt_kanji,case_count     hlt_code
-# [5,] dt_reac 383,572    2 13 case_id,hlt_code
-# [6,] dt_sgnl  39,081    2  1 drug,hlt_code
-# Total: 66MB
+# [1,] dt_base 173,133    6 15 case_id,suspected,quarter,age,sex,incretin
+# [2,] dt_ccmt 883,596    2 23 case_id,drug
+# [3,] dt_hist 456,848    2 12 case_id,hlt_code
+# [4,] dt_hlts     707    4  1 hlt_code,hlt_name,hlt_kanji,case_count     hlt_code
+# [5,] dt_reac 393,009    2 13 case_id,hlt_code
+# [6,] dt_sgnl  39,693    2  1 drug,hlt_code
+# Total: 68MB
 
 save.image('output/sc_tbl.Rdata')

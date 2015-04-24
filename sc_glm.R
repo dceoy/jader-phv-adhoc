@@ -33,7 +33,6 @@ cat('', file = csv_path)
 foreach (code = dt_hlts$hlt_code, .packages = pkgs) %dopar% {
   hlt <- dt_hlts %>% filter(hlt_code == code)
   reac <- dt_reac %>% filter(hlt_code == code)
-  hist <- dt_hist %>% filter(hlt_code == code)
   sgnl <- dt_sgnl %>% filter(hlt_code == code)
   ccmt <- dt_ccmt %>%
             filter(drug %in% sgnl$drug) %>%
@@ -43,13 +42,11 @@ foreach (code = dt_hlts$hlt_code, .packages = pkgs) %dopar% {
   dt <- dt_base %>%
           left_join(ccmt, by = 'case_id') %>%
           mutate(concomit = as.integer(ifelse(is.na(concomit), 0, concomit))) %>%
-          mutate(preexist = as.integer(ifelse(case_id %in% hist$case_id, 1, 0))) %>%
           mutate(event = as.integer(ifelse(case_id %in% reac$case_id, 1, 0))) %>%
-          select(event, incretin, concomit, preexist, age, sex)
+          select(event, incretin, concomit, age, sex)
 
   lr <- glm(event ~ incretin +
                     concomit +
-#                   preexist +
                     age +
                     sex,
             data = dt, family = binomial)

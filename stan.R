@@ -30,7 +30,7 @@ cat('', file = out_path)
 rdata <- list()
 hlt_codes <- yaml.load_file('hlts.yml')$stan
 
-st_model <- stan_model(file = 'car.stan')
+st_model <- stan_model(file = 'mixed.stan')
 
 foreach (code = hlt_codes) %do% {
   hlt <- dt_hlts %>% filter(hlt_code == code)
@@ -63,7 +63,7 @@ foreach (code = hlt_codes) %do% {
                        .$q_id)
 
   sflist <- foreach(i = 1:8, .packages = 'rstan') %dopar% {
-              sampling(object = st_model, data = ae_dat, iter = 2000, chains = 1, chain_id = i, refresh = -1)
+              sampling(object = st_model, data = ae_dat, iter = 1000, chains = 1, chain_id = i, refresh = -1)
             }
   stanfit <- sflist2stanfit(sflist)
 

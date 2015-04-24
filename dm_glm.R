@@ -35,7 +35,6 @@ hlt_codes <- yaml.load_file('hlts.yml')$glm
 foreach (code = hlt_codes, .packages = pkgs) %dopar% {
   hlt <- dt_hlts %>% filter(hlt_code == code)
   reac <- dt_reac %>% filter(hlt_code == code)
-  hist <- dt_hist %>% filter(hlt_code == code)
   sgnl <- dt_sgnl %>% filter(hlt_code == code)
   ccmt <- dt_ccmt %>%
             filter(drug %in% sgnl$drug) %>%
@@ -46,14 +45,12 @@ foreach (code = hlt_codes, .packages = pkgs) %dopar% {
   dt <- dt_base %>%
           left_join(ccmt, by = 'case_id') %>%
           mutate(concomit = as.integer(ifelse(is.na(concomit), 0, concomit))) %>%
-          mutate(preexist = as.integer(ifelse(case_id %in% hist$case_id, 1, 0))) %>%
           mutate(event = as.integer(ifelse(case_id %in% reac$case_id, 1, 0))) %>%
           mutate(incretin = as.integer(ifelse(dpp4_inhibitor + glp1_agonist > 0, 1, 0))) %>%
-          select(event, incretin, concomit, preexist, age, sex)
+          select(event, incretin, concomit, age, sex)
 
   lr <- glm(event ~ incretin +
                     concomit +
-#                   preexist +
                     age +
                     sex,
             data = dt, family = binomial)
