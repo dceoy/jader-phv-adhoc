@@ -1,6 +1,22 @@
+# History files
+.Rhistory
+.Rapp.history
+
+# Example code in package build process
+*-Ex.R
+
+# RStudio files
+.Rproj.user/
+
+# produced vignettes
+vignettes/*.html
+vignettes/*.pdf
+
+# custom
 *.sqlite3
+*.sqlite3-journal
+*.docx
 Rplots.pdf
-img/
 repos/
 output/
 legacy/

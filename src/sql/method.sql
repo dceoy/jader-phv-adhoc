@@ -1,5 +1,20 @@
 -- 1. Extraction of Drug-Event Combinations from 2009q4 to 2013q2 (Jan 2010 - Sep 2013)
 
+/*
+CREATE TABLE ade10 (
+  drug VARCHAR(120),
+  pt_kanji VARCHAR(120),
+  pt_code SMALLINT,
+  hlt_code SMALLINT,
+  case_id VARCHAR(10),
+  drug_start_date VARCHAR(20),
+  drug_end_date VARCHAR(20),
+  event_onset_date VARCHAR(20)
+);
+
+INSERT INTO ade10 (drug, pt_kanji, pt_code, hlt_code, case_id, drug_start_date, drug_end_date, event_onset_date)
+*/
+
 CREATE VIEW ade10 AS
   SELECT DISTINCT
     name AS drug,
@@ -27,7 +42,7 @@ CREATE VIEW ade10 AS
       WHERE
         age LIKE "%0歳%" AND
         sex IN ("男性", "女性") AND
-        (quarter LIKE '201%' AND quarter != '2014・第四' OR quarter == '2009・第四')
+        (quarter == '2009・第四' OR quarter LIKE '201%')
     );
 
 
@@ -43,6 +58,20 @@ INSERT INTO d_class (drug, class)
     drug LIKE '%インスリン%';
 /*
 Insulin
+
+-- イソフェンインスリン
+-- インスリン
+-- インスリン　アスパルト（遺伝子組換え）
+-- インスリン　グラルギン（遺伝子組換え）
+-- インスリン　グルリジン（遺伝子組換え）
+-- インスリン　デグルデク（遺伝子組換え）
+-- インスリン　デテミル（遺伝子組換え）
+-- インスリン　リスプロ（遺伝子組換え）
+-- ヒトインスリン
+-- ヒトインスリン（遺伝子組換え）
+-- ヒューマンモノコンポーネントインスリン
+-- プロタミンインスリン亜鉛
+-- 半合成ヒトインスリン
 */
 
 INSERT INTO d_class (drug, class)
@@ -66,6 +95,15 @@ Sulfonylurea
         glibenclamide                       グリベンクラミド
     3rd Generation
         glimepiride                         グリメピリド
+
+-- アセトヘキサミド
+-- クロルプロパミド
+-- グリクラジド
+-- グリクロピラミド
+-- グリベンクラミド
+-- グリメピリド
+-- トルブタミド
+-- ピオグリタゾン塩酸塩・グリメピリド配合剤
 */
 
 INSERT INTO d_class (drug, class)
@@ -78,6 +116,11 @@ Rapid Acting Insulin Secretagogue
     nateglinide                             ナテグリニド
     mitiglinide calcium hydrate             ミチグリニドカルシウム水和物
     repaglinide                             レパグリニド
+
+-- ナテグリニド
+-- ミチグリニドカルシウム水和物
+-- ミチグリニドカルシウム水和物・ボグリボース配合剤
+-- レパグリニド
 */
 
 INSERT INTO d_class (drug, class)
@@ -88,6 +131,11 @@ INSERT INTO d_class (drug, class)
 Biguanide
     metformin hydrochloride                 メトホルミン塩酸塩
     buformine hydrochloride                 ブホルミン塩酸塩
+
+-- ピオグリタゾン塩酸塩・メトホルミン塩酸塩配合剤
+-- ブホルミン塩酸塩
+-- メトホルミン
+-- メトホルミン塩酸塩
 */
 
 INSERT INTO d_class (drug, class)
@@ -100,6 +148,11 @@ Alpha-Glucosidase Inhibitor
     voglibose                               ボグリボース
     acarbose                                アカルボース
     miglitol                                ミグリトール
+
+-- アカルボース
+-- ボグリボース
+-- ミグリトール
+-- ミチグリニドカルシウム水和物・ボグリボース配合剤
 */
 
 INSERT INTO d_class (drug, class)
@@ -108,6 +161,12 @@ INSERT INTO d_class (drug, class)
 /*
 Thiazolidinedione
     pioglitazone hydrochloride              ピオグリタゾン塩酸塩
+
+-- アログリプチン安息香酸塩・ピオグリタゾン塩酸塩配合剤
+-- ピオグリタゾン塩酸塩
+-- ピオグリタゾン塩酸塩・グリメピリド配合剤
+-- ピオグリタゾン塩酸塩・メトホルミン塩酸塩配合剤
+-- 塩酸ピオグリタゾン
 */
 
 INSERT INTO d_class (drug, class)
@@ -118,7 +177,6 @@ INSERT INTO d_class (drug, class)
     drug LIKE '%リナグリプチン%' OR
     drug LIKE '%テネリグリプチン%' OR
     drug LIKE '%アナグリプチン%' OR
-    drug LIKE '%サクサグリプチン%' OR
     drug LIKE '%サキサグリプチン%';
 /*
 DPP-4 Inhibitors
@@ -129,6 +187,15 @@ DPP-4 Inhibitors
     teneligliptin hydrobromide hydrate  テネリグリプチン臭化水素酸塩水和物
     anagliptin                          アナグリプチン
     saxagliptin                         サキサグリプチン
+
+-- アナグリプチン
+-- アログリプチン安息香酸塩
+-- アログリプチン安息香酸塩・ピオグリタゾン塩酸塩配合剤
+-- サキサグリプチン水和物
+-- シタグリプチンリン酸塩水和物
+-- テネリグリプチン臭化水素酸塩水和物
+-- ビルダグリプチン
+-- リナグリプチン
 */
 
 INSERT INTO d_class (drug, class)
@@ -141,6 +208,11 @@ GLP-1 Analogs
     liraglutide                         リラグルチド
     exenatide                           エキセナチド
     lixisenatide                        リキシセナチド
+
+-- エキセナチド
+-- リキシセナチド
+-- リラグルチド（遺伝子組換え）
+-- 持続性エキセナチド注射剤
 */
 
 INSERT INTO d_class (drug, class)
@@ -158,5 +230,10 @@ SGLT-2 Inhibitors
     tofogliflozin   トホグリフロジン
     luseogliflozin  ルセオグリフロジン
     canagliflozin   カナグリフロジン
-    empagliflozin   エンパグリフロジン
+
+-- イプラグリフロジン　Ｌ−プロリン
+-- ダパグリフロジンプロピレングリコール水和物
+-- トホグリフロジン水和物
+-- ルセオグリフロジン水和物
+-- カナグリフロジン水和物
 */

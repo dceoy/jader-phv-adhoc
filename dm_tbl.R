@@ -1,4 +1,4 @@
-#!/usr/bin/env R
+#!/usr/bin/env Rscript
 #
 #                event
 #              +       -
@@ -9,20 +9,20 @@
 #          +-------+-------+
 #            a + c   b + d
 #
-# Preset DATABASE PATH as 'db'
 
-dt_pkgs <- c('RSQLite', 'dplyr', 'data.table', 'snow')
-sapply(dt_pkgs, function(p) require(p, character.only = TRUE))
+if (! 'fex' %in% ls()) source('func.R')
 
-if (! 'cl' %in% objects()) cl <- makeCluster(4, type = 'SOCK')
-if (! 'db' %in% objects()) db <- 'mj.sqlite3'
-
-con <- dbConnect(dbDriver('SQLite'), db)
+db <- 'mj.sqlite3'
+con <- connect_sqlite(db)
 
 sql_base <- 'SELECT
                d.case_id AS case_id,
-               suspected,
-               quarter,
+               CASE
+                 WHEN quarter LIKE "%・第一" THEN REPLACE(quarter, "・第一", "q1")
+                 WHEN quarter LIKE "%・第二" THEN REPLACE(quarter, "・第二", "q2")
+                 WHEN quarter LIKE "%・第三" THEN REPLACE(quarter, "・第三", "q3")
+                 WHEN quarter LIKE "%・第四" THEN REPLACE(quarter, "・第四", "q4")
+               END AS quarter,
                CASE
                  WHEN age == "10歳未満" THEN 0
                  WHEN age LIKE "%歳代" THEN REPLACE(age, "歳代", "")
@@ -49,16 +49,6 @@ sql_base <- 'SELECT
                END AS glp1_agonist
              FROM
                demo d
-             INNER JOIN
-               (
-                 SELECT
-                   case_id,
-                   name AS suspected
-                 FROM
-                   drug
-                 WHERE
-                   sn == 1
-               ) s ON s.case_id == d.case_id
              WHERE
                d.case_id IN (
                  SELECT DISTINCT
@@ -98,20 +88,6 @@ sql_reac <- 'SELECT DISTINCT
              FROM
                ade10;'
 
-sql_hist <- 'SELECT DISTINCT
-               case_id,
-               hlt_code
-             FROM
-               hist h
-             INNER JOIN
-               pt_j p ON p.pt_kanji == h.disease
-             INNER JOIN
-               hlt_pt hp ON hp.pt_code == p.pt_code
-             WHERE
-               case_id IN (
-                 SELECT DISTINCT case_id FROM ade10
-               );'
-
 sql_ccmt <- 'SELECT DISTINCT
                case_id,
                drug
@@ -146,12 +122,11 @@ sql_sgnl <- 'SELECT
              WHERE
                a != 0 AND b != 0 AND c != 0 AND d != 0;'
 
-dt_base <- tbl_dt(data.table(dbGetQuery(con, sql_base)))
-dt_hlts <- tbl_dt(data.table(dbGetQuery(con, sql_hlts)))
-dt_reac <- tbl_dt(data.table(dbGetQuery(con, sql_reac)))
-dt_hist <- tbl_dt(data.table(dbGetQuery(con, sql_hist)))
-dt_ccmt <- tbl_dt(data.table(dbGetQuery(con, sql_ccmt)))
-dt_sgnl <- tbl_dt(data.table(dbGetQuery(con, sql_sgnl)))
+dt_base <- sql_dt(con, sql_base)
+dt_hlts <- sql_dt(con, sql_hlts)
+dt_reac <- sql_dt(con, sql_reac)
+dt_ccmt <- sql_dt(con, sql_ccmt)
+dt_sgnl <- sql_dt(con, sql_sgnl)
 
 dt_hlts <- dt_base %>%
              filter(dpp4_inhibitor == 1 | glp1_agonist == 1) %>%
@@ -161,7 +136,6 @@ dt_hlts <- dt_base %>%
              inner_join(dt_hlts, by = 'hlt_code')
 
 dt_reac <- dt_reac %>% filter(case_id %in% dt_base$case_id, hlt_code %in% dt_hlts$hlt_code)
-dt_hist <- dt_hist %>% filter(case_id %in% dt_base$case_id, hlt_code %in% dt_hlts$hlt_code)
 dt_ccmt <- dt_ccmt %>% filter(case_id %in% dt_base$case_id)
 dt_sgnl <- dt_sgnl %>% filter(drug %in% unique(dt_ccmt$drug), hlt_code %in% dt_hlts$hlt_code)
 
@@ -171,29 +145,15 @@ dt_base <- dt_base %>%
              mutate(dpp4_inhibitor = as.integer(dpp4_inhibitor)) %>%
              mutate(glp1_agonist = as.integer(glp1_agonist))
 
-fex <- function(t) {
-  f <- fisher.test(matrix(t, nrow = 2), alternative = 'two.sided', conf.level = 0.99)
-  p_or <- c(f$p.value, f$estimate, f$conf.int)
-  names(p_or) <- c('p_val', 'or_mle', 'or_ll', 'or_ul')
-  return(p_or)
-}
-
+alpha <- 0.01
 dt_sgnl <- dt_sgnl %>%
              select(a:d) %>%
              parApply(cl, ., 1, fex) %>%
              t() %>%
              cbind(dt_sgnl) %>%
-             filter(p_val < 0.01, or_mle > 1) %>%
+             filter(p_val < alpha, or_mle > 1) %>%
              select(drug, hlt_code)
 
 tables()
-#      NAME      NROW NCOL MB COLS                                                          KEY
-# [1,] dt_base  7,378    7  1 case_id,suspected,quarter,age,sex,dpp4_inhibitor,glp1_agonist
-# [2,] dt_ccmt 58,796    2  2 case_id,drug
-# [3,] dt_hist 32,876    2  1 case_id,hlt_code
-# [4,] dt_hlts    630    4  1 hlt_code,hlt_name,hlt_kanji,case_count                        hlt_code
-# [5,] dt_reac 15,488    2  1 case_id,hlt_code
-# [6,] dt_sgnl 27,661    2  1 drug,hlt_code
-# Total: 7MB
 
-save.image('output/dm_tbl.Rdata')
+save.image('output/rdata/dm_tbl.Rdata')

@@ -1,38 +1,18 @@
-#!/usr/bin/env R
+#!/usr/bin/env Rscript
 
-pload <- function(p) {
-  if (! p %in% installed.packages()[,1]) install.packages(p, dependencies = TRUE)
-  require(p, character.only = TRUE)
-}
+source('func.R')
 
-r <- getOption('repos')
-r['CRAN'] <- 'http://cran.us.r-project.org'
-options(repos = r)
-rm(r)
-
-pkgs <- c('RSQLite', 'dplyr', 'data.table', 'snow', 'foreach', 'doSNOW', 'parallel', 'yaml')
-sapply(pkgs, pload)
-
-select <- dplyr::select
-cl <- makeCluster(detectCores(), type = 'SOCK')
-registerDoSNOW(cl)
-.Last <- function() stopCluster(cl)
-
-if (file.exists(data_path <- 'output/dm_tbl.Rdata')) {
+if (file.exists(data_path <- 'output/rdata/dm_tbl.Rdata')) {
   load(data_path)
 } else {
-  db <- 'mj.sqlite3'
   source('dm_tbl.R')
 }
 
-stdout_path <- 'output/dm_log.txt'
-csv_path <- 'output/dm_or.csv'
-cat('', file = stdout_path)
-cat('', file = csv_path)
+cat('', file = log_path <- 'output/log/dm_log.txt')
+cat('', file = csv_path <- 'output/csv/dm_or.csv')
+codes <- yaml.load_file('hlts.yml')$glm
 
-hlt_codes <- yaml.load_file('hlts.yml')$glm
-
-foreach (code = hlt_codes, .packages = pkgs) %dopar% {
+foreach (code = codes, .packages = c('dplyr', 'data.table')) %dopar% {
   hlt <- dt_hlts %>% filter(hlt_code == code)
   reac <- dt_reac %>% filter(hlt_code == code)
   sgnl <- dt_sgnl %>% filter(hlt_code == code)
@@ -44,32 +24,29 @@ foreach (code = hlt_codes, .packages = pkgs) %dopar% {
 
   dt <- dt_base %>%
           left_join(ccmt, by = 'case_id') %>%
+          mutate(event = as.factor(ifelse(case_id %in% reac$case_id, 1, 0))) %>%
+          mutate(incretin = as.factor(ifelse(dpp4_inhibitor + glp1_agonist > 0, 1, 0))) %>%
           mutate(concomit = as.integer(ifelse(is.na(concomit), 0, concomit))) %>%
-          mutate(event = as.integer(ifelse(case_id %in% reac$case_id, 1, 0))) %>%
-          mutate(incretin = as.integer(ifelse(dpp4_inhibitor + glp1_agonist > 0, 1, 0))) %>%
+          mutate(age = as.integer(age)) %>%
+          mutate(sex = as.factor(sex)) %>%
           select(event, incretin, concomit, age, sex)
 
-  lr <- glm(event ~ incretin +
-                    concomit +
-                    age +
-                    sex,
-            data = dt, family = binomial)
-
-  s <- summary(lr)
+  lr <- glm(event ~ incretin + concomit + age + sex, data = dt, family = binomial)
 
   alpha <- 0.01
-  orci <- exp(cbind(OR = s$coefficient[,1],
-                    confint.default(lr, level = 1 - alpha)))
 
-  out <- list(event = t(hlt), summary = s, or_wald_ci = orci, association = '')
+  out <- list(event = t(hlt),
+              summary = summary(lr),
+              or_wald_ci = exp(cbind(OR = lr$coefficients,
+                                     confint.default(lr, level = 1 - alpha))))
 
-  if (orci[2,2] > 1) {
+  if (out$or_wald_ci[2,2] > 1) {
     out$association <- 'significant'
-    write.table(matrix(c(orci[2,], hlt), nrow = 1), file = csv_path,
-                append = TRUE, sep = ',', row.names = FALSE, col.names = FALSE)
+    write.table(matrix(c(out$or_wald_ci[2,], hlt), nrow = 1),
+                file = csv_path, append = TRUE, sep = ',', row.names = FALSE, col.names = FALSE)
   }
 
-  sink(stdout_path, append = TRUE)
-    print(out)
+  sink(log_path, append = TRUE)
+  print(out)
   sink()
 }

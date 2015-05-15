@@ -1,56 +1,57 @@
 # hlts
 
 glm:
-  - 10008424 # Chemical injuries  化学的損傷  14
-  - 10039438 # Salmonella infections  サルモネラ感染  9
-  - 10011774 # Cystic pancreatic disorders  嚢胞性膵障害  16
-  - 10007607 # Cardiac septal defects congenital  先天性心中隔欠損  31
-  - 10028004 # Motor neurone diseases  運動神経疾患  8
-  - 10017989 # Gastrointestinal neoplasms benign NEC  良性消化器新生物ＮＥＣ  21
-  - 10027692 # Pancreatic disorders NEC  膵障害ＮＥＣ  46
-  - 10033646 # Acute and chronic pancreatitis  急性および慢性膵炎  972
-  - 10033632 # Pancreatic neoplasms  膵新生物  151
-  - 10033633 # Pancreatic neoplasms malignant (excl islet cell and carcinoid)  悪性膵新生物（膵島細胞腫瘍およびカルチノイドを除く）  127
-  - 10014714 # Endocrine neoplasms NEC  内分泌腺新生物ＮＥＣ  26
-  - 10001438 # Affect alterations NEC  感情の変化ＮＥＣ  37
-  - 10035098 # Pituitary neoplasms  下垂体新生物  48
-  - 10012655 # Diabetic complications NEC  糖尿病性合併症ＮＥＣ  153
-  - 10017950 # Gastrointestinal dyskinetic disorders  消化管ジスキネジア  26
-  - 10036107 # Chronic polyneuropathies  慢性多発ニューロパチー  41
-  - 10021001 # Hypoglycaemic conditions NEC  低血糖状態ＮＥＣ  2612
-  - 10039078 # Rheumatoid arthropathies  リウマチ性関節症  147
-  - 10039075 # Rheumatoid arthritis and associated conditions  関節リウマチおよびその関連疾患  148
-  - 10012981 # Digestive enzymes  消化酵素  241
-  - 10018009 # Gastrointestinal stenosis and obstruction NEC  消化管狭窄および閉塞ＮＥＣ  1124
-  - 10024948 # Lower gastrointestinal neoplasms benign  良性下部消化管新生物  49
-  - 10017988 # Benign neoplasms gastrointestinal (excl oral cavity)  良性消化管新生物（口腔内新生物を除く）  90
-  - 10008616 # Cholecystitis and cholelithiasis  胆嚢炎および胆石症  401
-  - 10052738 # Skin autoimmune disorders NEC  皮膚の自己免疫障害ＮＥＣ  168
-  - 10043409 # Therapeutic and nontherapeutic responses  治療的効果および非治療的効果  97
-  - 10007217 # Carbohydrate tolerance analyses (incl diabetes)  炭水化物耐性検査（糖尿病を含む）  482
-  - 10029976 # Obstructive bile duct disorders (excl neoplasms)  閉塞性胆管障害（新生物による閉塞を除く）  86
-  - 10003818 # Endocrine autoimmune disorders  内分泌系の自己免疫障害  232
-  - 10020638 # Hyperglycaemic conditions NEC  高血糖ＮＥＣ  678
-  - 10025614 # Malignant intestinal neoplasms  悪性腸管新生物  262
-  - 10027416 # Metabolic acidoses (excl diabetic acidoses)  代謝性アシドーシス（糖尿病性アシドーシスを除く）  543
-  - 10017933 # Gastrointestinal atonic and hypomotility disorders NEC  消化管アトニーおよび運動低下障害ＮＥＣ  366
-  - 10038932 # Retinopathies NEC  網膜症ＮＥＣ  185
-  - 10046512 # Urinalysis NEC  検尿ＮＥＣ  132
-  - 10052736 # Non-mechanical ileus  非機械的イレウス  303
-  - 10003284 # Arthropathies NEC  関節症ＮＥＣ  390
-  - 10052770 # Coma states  昏睡状態  471
-  - 10040768 # Skeletal and cardiac muscle analyses  骨格筋および心筋検査  840
-  - 10012602 # Diabetes mellitus (incl subtypes)  真性糖尿病（亜型を含む）  1126
-  - 10029511 # Non-site specific injuries NEC  部位不明の損傷ＮＥＣ  1098
+  - 10001438  # Affect alterations NEC  感情の変化ＮＥＣ  38
+  - 10003818  # Endocrine autoimmune disorders  内分泌系の自己免疫障害  235
+  - 10007217  # Carbohydrate tolerance analyses (incl diabetes)  炭水化物耐性検査（糖尿病を含む）  495
+  - 10007607  # Cardiac septal defects congenital  先天性心中隔欠損  31
+  - 10008424  # Chemical injuries  化学的損傷  14
+  - 10008616  # Cholecystitis and cholelithiasis  胆嚢炎および胆石症  405
+  - 10011774  # Cystic pancreatic disorders  嚢胞性膵障害  16
+  - 10012602  # Diabetes mellitus (incl subtypes)  真性糖尿病（亜型を含む）  1153
+  - 10012655  # Diabetic complications NEC  糖尿病性合併症ＮＥＣ  163
+  - 10012981  # Digestive enzymes  消化酵素  242
+  - 10014714  # Endocrine neoplasms NEC  内分泌腺新生物ＮＥＣ  26
+  - 10017933  # Gastrointestinal atonic and hypomotility disorders NEC  消化管アトニーおよび運動低下障害ＮＥＣ  372
+  - 10017950  # Gastrointestinal dyskinetic disorders  消化管ジスキネジア  26
+  - 10017988  # Benign neoplasms gastrointestinal (excl oral cavity)  良性消化管新生物（口腔内新生物を除く）  91
+  - 10017989  # Gastrointestinal neoplasms benign NEC  良性消化器新生物ＮＥＣ  21
+  - 10017994  # Gastrointestinal neoplasms malignancy unspecified NEC  消化管新生物ＮＥＣ、悪性度不明  164
+  - 10018009  # Gastrointestinal stenosis and obstruction NEC  消化管狭窄および閉塞ＮＥＣ  1141
+  - 10020638  # Hyperglycaemic conditions NEC  高血糖ＮＥＣ  694
+  - 10021001  # Hypoglycaemic conditions NEC  低血糖状態ＮＥＣ  2667
+  - 10024948  # Lower gastrointestinal neoplasms benign  良性下部消化管新生物  50
+  - 10024973  # Lower respiratory tract neoplasms  下気道新生物  363
+  - 10025614  # Malignant intestinal neoplasms  悪性腸管新生物  269
+  - 10027416  # Metabolic acidoses (excl diabetic acidoses)  代謝性アシドーシス（糖尿病性アシドーシスを除く）  564
+  - 10027692  # Pancreatic disorders NEC  膵障害ＮＥＣ  47
+  - 10028004  # Motor neurone diseases  運動神経疾患  8
+  - 10029511  # Non-site specific injuries NEC  部位不明の損傷ＮＥＣ  1117
+  - 10033632  # Pancreatic neoplasms  膵新生物  155
+  - 10033646  # Acute and chronic pancreatitis  急性および慢性膵炎  997
+  - 10033633  # Pancreatic neoplasms malignant (excl islet cell and carcinoid)  悪性膵新生物（膵島細胞腫瘍およびカルチノイドを除く）  130
+  - 10035098  # Pituitary neoplasms  下垂体新生物  48
+  - 10036107  # Chronic polyneuropathies  慢性多発ニューロパチー  43
+  - 10038472  # Renal infections and inflammations (excl nephritis)  腎感染および炎症（腎炎を除く）  528
+  - 10038723  # Respiratory tract and pleural neoplasms malignant cell type unspecified NEC  悪性呼吸器系および胸膜新生物ＮＥＣ、細胞型不明  200
+  - 10039075  # Rheumatoid arthritis and associated conditions  関節リウマチおよびその関連疾患  151
+  - 10039078  # Rheumatoid arthropathies  リウマチ性関節症  150
+  - 10039438  # Salmonella infections  サルモネラ感染  9
+  - 10040768  # Skeletal and cardiac muscle analyses  骨格筋および心筋検査  857
+  - 10043409  # Therapeutic and nontherapeutic responses  治療的効果および非治療的効果  107
+  - 10044084  # Total fluid volume decreased  全体液量減少  994
+  - 10044657  # Triglyceride analyses  トリグリセリド検査  72
+  - 10046512  # Urinalysis NEC  検尿ＮＥＣ  138
+  - 10052738  # Skin autoimmune disorders NEC  皮膚の自己免疫障害ＮＥＣ  176
+  - 10052770  # Coma states  昏睡状態  480
 
 stan:
-  - 10033632 # Pancreatic neoplasms  膵新生物  49
-  - 10033633 # Pancreatic neoplasms malignant (excl islet cell and carcinoid)  悪性膵新生物（膵島細胞腫瘍およびカルチノイドを除く）  43
-  - 10033646 # Acute and chronic pancreatitis  急性および慢性膵炎  215
-  - 10046512 # Urinalysis NEC  検尿ＮＥＣ  24
-  - 10018009 # Gastrointestinal stenosis and obstruction NEC  消化管狭窄および閉塞ＮＥＣ  108
-  - 10052736 # Non-mechanical ileus  非機械的イレウス  22
-  - 10025614 # Malignant intestinal neoplasms  悪性腸管新生物  26
-  - 10008616 # Cholecystitis and cholelithiasis  胆嚢炎および胆石症  47
-  - 10012981 # Digestive enzymes  消化酵素  27
-  - 10012655 # Diabetic complications NEC  糖尿病性合併症ＮＥＣ  50
+  - 10008616  # Cholecystitis and cholelithiasis  胆嚢炎および胆石症  47
+  - 10012655  # Diabetic complications NEC  糖尿病性合併症ＮＥＣ  52
+  - 10018009  # Gastrointestinal stenosis and obstruction NEC  消化管狭窄および閉塞ＮＥＣ  110
+  - 10024973  # Lower respiratory tract neoplasms  下気道新生物  25
+  - 10033632  # Pancreatic neoplasms  膵新生物  52
+  - 10033646  # Acute and chronic pancreatitis  急性および慢性膵炎  220
+  - 10033633  # Pancreatic neoplasms malignant (excl islet cell and carcinoid)  悪性膵新生物（膵島細胞腫瘍およびカルチノイドを除く）  45
+  - 10046512  # Urinalysis NEC  検尿ＮＥＣ  27
+
