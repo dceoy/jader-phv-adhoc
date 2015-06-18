@@ -2,47 +2,81 @@
 
 # package loading
 load_pkgs <- function(pkgs, repos = 'http://cran.rstudio.com/') {
+  update.packages(checkBuilt = TRUE, ask = FALSE, repos = repos)
   sapply(pkgs,
          function(p) {
-           if (p %in% installed.packages()[,1]) {
-             update.packages(p, checkBuilt = TRUE, ask = FALSE, repos = repos)
-           } else {
-             install.packages(p, dependencies = TRUE, repos = repos)
-           }
+           if (! p %in% installed.packages()[,1]) install.packages(p, dependencies = TRUE, repos = repos)
            require(p, character.only = TRUE)
          })
 }
 
-v_require <- function(pkgs) {
+require_v <- function(pkgs) {
   sapply(pkgs, function(p) require(p, character.only = TRUE))
 }
 
+# write to file
+write_log <- function(txt, file, apd = TRUE) {
+  sink(file, append = apd)
+  print(txt)
+  sink()
+}
+
+# plot data
+svg_plot <- function(data, file, w = 12, h = 8) {
+  svg(file, width = w, height = h)
+  plot(data)
+  dev.off()
+}
+
+png_plot <- function(data, file, w = 800, h = 500) {
+  png(file, width = w, height = h)
+  plot(data)
+  dev.off()
+}
+
+tif_plot <- function(data, file, w = 800, h = 500) {
+  tiff(file, width = w, height = h)
+  plot(data)
+  dev.off()
+}
+
+three_plot <- function(data, path, name) {
+  svg_plot(data, paste(path, name, '.svg', sep = ''))
+  png_plot(data, paste(path, name, '.png', sep = ''))
+  tif_plot(data, paste(path, name, '.tif', sep = ''))
+}
+
+pdf_traceplot <- function(data, path, name) {
+  pdf(paste(path, 'plot_', name, '.pdf', sep = ''))
+  plot(data)
+  dev.off()
+  pdf(paste(path, 'traceplot_', name, '.pdf', sep = ''))
+  traceplot(data)
+  dev.off()
+}
 
 # database
-connect_sqlite <- function(b) {
-  return(dbConnect(dbDriver('SQLite'), b))
+connect_sqlite <- function(file, type = 'SQLite') {
+  return(dbConnect(dbDriver(type), file))
 }
 
-sql_dt <- function(c, q) {
-  return(tbl_dt(data.table(dbGetQuery(c, q))))
+sql_dt <- function(con, sql) {
+  return(tbl_dt(data.table(dbGetQuery(con, sql))))
 }
 
-
-# fisher test
-fex <- function(t, alt = 'two.sided', cnf = 0.95) {
-  f <- fisher.test(matrix(t, nrow = 2), alternative = alt, conf.level = cnf)
-  return(c(p_val = as.numeric(f$p.value),
-           or_mle = as.numeric(f$estimate),
-           or_ll = as.numeric(f$conf.int[1]),
-           or_ul = as.numeric(f$conf.int[2])))
-}
-
-
-# init cluster
-pkgs <- c('RSQLite', 'dplyr', 'tidyr', 'data.table', 'foreach', 'doSNOW', 'parallel', 'ggplot2', 'ggmcmc', 'yaml', 'rstan', 'devtools')
-load_pkgs(pkgs)
+# init
+require_v(pkgs <- c('dplyr',
+                    'tidyr',
+                    'data.table',
+                    'RSQLite',
+                    'foreach',
+                    'doSNOW',
+                    'parallel',
+                    'ggplot2',
+                    'grid',
+                    'ggmcmc',
+                    'yaml',
+                    'glmmML',
+                    'rstan',
+                    'devtools'))
 select <- dplyr::select
-
-registerDoSNOW(cl <- makeCluster(detectCores(), type = 'SOCK'))
-.Last <- function() try(stopCluster(cl))
-

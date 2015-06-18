@@ -27,7 +27,13 @@ CREATE VIEW ade10 AS
       WHERE
         age LIKE "%0歳%" AND
         sex IN ("男性", "女性") AND
-        (quarter LIKE '201%' AND quarter != '2014・第四' OR quarter == '2009・第四')
+        (quarter == '2009・第四' OR
+         quarter LIKE '2010%' OR
+         quarter LIKE '2011%' OR
+         quarter LIKE '2012%' OR
+         quarter LIKE '2013%' OR
+         quarter LIKE '2014%' AND
+         quarter != '2014・第四')
     );
 
 
