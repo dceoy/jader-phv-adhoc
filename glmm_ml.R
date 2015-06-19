@@ -1,8 +1,8 @@
 #!/usr/bin/env Rscript
 
-ifelse(file.exists(data_file <- 'output/rdata/dt.Rdata'), load(data_file), source('prep_dt.R'))
+ifelse(file.exists(data_file <- 'output/rdata/tables.Rdata'), load(data_file), source('db_query.R'))
 source('func.R')
-registerDoSNOW(cl <- makeCluster(detectCores(), type = 'SOCK'))
+registerDoSNOW(cl <- makeCluster(parallel::detectCores(), type = 'SOCK'))
 .Last <- function() try(stopCluster(cl))
 
 fex <- function(row, alt = 'two.sided', cnf = 0.95) {
@@ -47,8 +47,9 @@ dt_ccmt <- dt_ccmt %>% filter(drug %in% unique(dt_sgnl$drug))
 
 tables()
 cat('', file = log_file <- 'output/log/glmm_log.txt')
-cat('', file = mm_or_file <- 'output/csv/glmm_or.csv')
-cat('', file = fm_or_file <- 'output/csv/glm_or.csv')
+cat('', file = mm_or_file <- 'output/csv/mixed_or.csv')
+cat('', file = fm_or_file <- 'output/csv/fixed_or.csv')
+cat('', file = aic_file <- 'output/csv/aic_hlt.csv')
 
 foreach(code = v_hltc, .packages = c('dplyr', 'data.table', 'glmmML')) %dopar% {
   reac <- dt_reac %>% filter(hlt_code == code)
@@ -60,23 +61,26 @@ foreach(code = v_hltc, .packages = c('dplyr', 'data.table', 'glmmML')) %dopar% {
   hlt <- dt_hlts %>%
            filter(hlt_code == code) %>%
            mutate(total_count = nrow(reac))
-  dt <- dt_base %>%
-          left_join(ccmt, by = 'case_id') %>%
-          mutate(event = as.factor(ifelse(case_id %in% reac$case_id, 1, 0)),
-                 concomit = as.integer(ifelse(is.na(concomit), 0, concomit))) %>%
-          select(event, dpp4i, glp1a, hg, concomit, age, sex, qid)
+  dat <- dt_base %>%
+           left_join(ccmt, by = 'case_id') %>%
+           mutate(event = as.factor(ifelse(case_id %in% reac$case_id, 1, 0)),
+                  concomit = as.integer(ifelse(is.na(concomit), 0, concomit))) %>%
+           select(event, dpp4i, glp1a, hg, concomit, age, sex, qid)
 
   lr <- list(event = t(hlt))
   e <- try({
-    mix <- glmmML(event ~ dpp4i + glp1a + hg + concomit + age + sex, family = binomial, data = dt, cluster = qid, prior = 'gaussian')
-    fix <- glm(event ~ dpp4i + glp1a + hg + concomit + age + sex, family = binomial, data = dt)
-    lr <- c(lr, list(dt = summary(dt),
-                     mixed = mix,
-                     fixed = summary(fix),
-                     mm_ci = data.frame(coef = mix$coefficients, ci_glmm(mix, alpha = alpha)),
-                     fm_ci = data.frame(coef = fix$coefficients, confint.default(fix, level = 1 - alpha))))
-    write_or(lr$mm_ci[2:3,], hlt = hlt, file = mm_or_file)
-    write_or(lr$fm_ci[2:3,], hlt = hlt, file = fm_or_file)
+    mm <- glmmML(event ~ dpp4i + glp1a + hg + concomit + age + sex, family = binomial, data = dat, cluster = qid)
+    fm <- glm(event ~ dpp4i + glp1a + hg + concomit + age + sex, family = binomial, data = dat)
+    lr <- c(lr, list(data = summary(dat),
+                     mixed_model = mm,
+                     fixed_model = summary(fm),
+                     mixed_ci = data.frame(coef = mm$coefficients, ci_glmm(mm, alpha = alpha)),
+                     fixed_ci = data.frame(coef = fm$coefficients, confint.default(fm, level = 1 - alpha))))
+    if (! is.na(mm$sigma.sd)) {
+      write.table(cbind(matrix(c(mm$aic, fm$aic), nrow = 1), hlt), file = aic_file, append = TRUE, sep = ',', row.names = FALSE, col.names = FALSE)
+      write_or(cbind(lr$mixed_ci[2:3,]), hlt = hlt, file = mm_or_file)
+      write_or(cbind(lr$fixed_ci[2:3,]), hlt = hlt, file = fm_or_file)
+    }
   }, silent = FALSE)
 
   if (class(e) == 'try-error') lr <- c(lr, list(error = e))

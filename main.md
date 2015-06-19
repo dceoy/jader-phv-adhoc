@@ -11,11 +11,11 @@
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
 
-Adverse Events Associated with Incretin-based Drugs: A Logistic Regression Analysis of Japanese Adverse Drug Event Reports
+Adverse Events Associated with Incretin-based Drugs in Spontaneous Reports: A Logistic Regression Analysis of Japanese Adverse Drug Event Reports
 =======
 
 Authors:  
-Daichi Narushima, ST, HY
+Daichi Narushima, YK, ST, HY
 
 Author Affiliations:  
 Department of Drug Evaluation & Informatics, Graduate school of Pharmaceutical Sciences, University of Shizuoka, Shizuoka, Japan (DN and HY);
@@ -29,7 +29,7 @@ Abstract
 --------
 
 ##### Background
-Glucagon-like peptide 1 (GLP-1) agonists and dipeptidyl peptidase 4 (DPP-4) inhibitors are incretin-based hypoglycemic drugs which are widely used to treat type 2 diabetes.
+Dipeptidyl peptidase 4 (DPP-4) inhibitors and glucagon-like peptide 1 (GLP-1) agonists are incretin-based hypoglycemic drugs which are widely used to treat type 2 diabetes.
 The safety of these drugs is one of the most concerns in diabetes medication.
 To assess adverse drug events (ADEs) associated with incretin-based drugs, we analyzed Japanese spontaneous reports.
 
@@ -39,8 +39,20 @@ To assess adverse drug events (ADEs) associated with incretin-based drugs, we an
 ##### Methods and Findings
 This study is designed as a disproportionality analysis based on logistic regression model of spontaneous ADE reports.
 The report data was fetched from Japanese Adverse Drug Event Report database (JADER), which is published by Pharmaceuticals and Medical Devices Agency (PMDA).
-165,779 unique cases were analyzed, which were reported from 2010 to 2014 and had available records about age and sex.
-In the first screening, all the cases were analyzed using fixed effects model and ADEs associated with incretin-based drug were extracted.
+176,957 unique cases were analyzed, which were reported from 2010 to 2014 and had available records about age and sex.
+
+
+
+In the first, Fisher's exact test were performed by all combinations between generic names of drugs and MedDRA High Level Terms (HLTs) including adverse events.
+drug-event combinations which two-sided p-value < 0.01 and odds ratio > 1
+
+
+significant association were extracted.
+
+
+
+using fixed effects model and ADEs associated with incretin-based drug were extracted.
+
 This model includes use of incretin-based drug, concomitant suspected drug, history of the event, age and sex as predictor variables, and occurrence of each ADEs as an outcome variable.
 In the second screening, the cases treated with hypoglycemic drug were analyzed using the same model as that in the previous screening.
 In the final analysis, the cases treated with hypoglycemic drug were analyzed using the mixed effects model which has reporting quarter as a random effect besides the fixed effects.
@@ -70,15 +82,16 @@ Introduction
 ------------
 
 Incretin is a group of hormones stimulating insulin secretion and several hypoglycemic drugs based on this mechanism have been developed during the last decade.
-There are two types of incretin-based drugs, Glucagon-like peptide 1 (GLP-1) agonists and dipeptidyl peptidase 4 (DPP-4) inhibitors.
+There are two types of incretin-based drugs, dipeptidyl peptidase 4 (DPP-4) inhibitors and glucagon-like peptide 1 (GLP-1) agonists.
 
-GLP-1 agonists demonstrate an efficacy comparable to insulin treatment and appear to do so with significant effects to promote weight loss with minimal hypoglycemia.
+GLP-1 agonists demonstrate an efficacy comparable to insulin treatment and appear to do so with significant effects to promote weight loss with minimal hypoglycemia. <sup>1</sup>
 
 In addition, there are significant data with dipeptidyl peptidase 4 (DPP-4) inhibitors showing efficacy comparable to sulfonylureas but with weight neutral effects and reduced risk for hypoglycemia.
 
     <-  advantages of incretin-based drugs
 
 These drugs have many advantages, however
+Adverse Event (AE)
 Adverse Drug Event (ADE)
 
     <-  feared ADE
@@ -97,56 +110,36 @@ The report data is fetched from Japanese Adverse Drug Event Report database (JAD
 Methods
 -------
 
+##### Study Design
+
+This study comprises two phases of analyses for drug-ADE associations on spontaneous ADE reports.
+The first phase is a frequency analysis based on Fisher's exact test, the second phase is a multivariate analysis using a mixed effects logistic regression model.
+
 ##### Data Source
 
 Japanese ADE report data, JADER was acquired from the website of Pharmaceuticals and Medical Devices Agency (PMDA).
-We used data published in April 2015 which contain 338,224 cases.
-In these cases, 165,779 unique cases were analyzed, which were reported from 2010 to 2014 and had available records about age and sex.
-For classification of ADEs in JADER, the Japanese version of MedDRA, MedDRA/J was used.
+We used the dataset published in May 2015 which contain 345,715 unique cases.
+Of these, cases which were reported from January 2010 to December 2014 and had available records about age and sex were analyzed.
 
-We constructed a relational database based on JADER and MedDRA/J for analysis using SQLite3.
+ADEs in JADER were coded as Preferred Terms (PTs) in the Japanese version of the Medical Dictionary for Regulatory Activities (MedDRA/J).
+For data analysis, we constructed a relational database (RDB) containing the JADER dataset and MedDRA/J version 18.0.
+As RDB management system, SQLite version 3.8.5 was used.
 
 ##### Data Analysis
 
-This study is designed as a disproportionality analysis based on logistic regression model of spontaneous ADE reports.
+The PTs of ADEs were classified by MedDRA High Level Terms (HLTs), all combinations between drug (generic) names and HLTs were extracted.
+Fisher's exact tests were performed by the all drug-HLT combinations.
+Combinations where a two-sided p-value was less than 0.01 and an odds ratio (OR) was greater than 1 were handled as significant associations.
+
+About the HLTs significantly associated with incretin-based drugs, mixed effects logistic regressions for occurrence of each HLT were performed.
+Mixed effects model contains random effects besides traditional fixed effects.
+
+In this study, the model treats use of DPP-4 inhibitors, use of GLP-1 agonists, hyperglycemia, concomitant suspected drug, age and sex as fixed effects, and reporting date as a random effect.
+
+All data analyses were performed on the environment of R version 3.2.1 [].
+For mixed effects logistic regression, glmmML package version 1.0 were used [].
 
 
-
-
-In the first screening, all the cases were analyzed using fixed effects model and ADEs associated with incretin-based drug were extracted.
-This model includes use of incretin-based drug, concomitant suspected drug, history of the event, age and sex as predictor variables, and occurrence of each ADEs as an outcome variable.
-
-
-\[
-  \ln(\frac{ p }{ 1 - p })  = \alpha + \beta_1 x_1 + \beta_2 x_2
-\]
-
-In the second screening, the cases treated with hypoglycemic drug were analyzed using the same model as that in the previous screening.
-
-In the final analysis, the cases treated with hypoglycemic drug were analyzed using the mixed effects model which has reporting quarter as a random effect besides the fixed effects.
-
-    <-  formula
-
-
-
-We analyzed the data and created all figures in the R Environment for Statistical Computing (nn).
-
-For the mixed effects model, We used Stan (nn), a Hamiltonian Monte Carlo sampler.
-Results are based on 5,000 samples each from eight chains, after 5,000 adaptation steps in each.
-Convergence was assessed by both trace plots and the R-hat Gelman and Rubin statistic.
-
-We analyzed the data using both uninformative priors, as well as weakly informative variance priors, without any substantive change in inferences.
-
-
-    Analysis. We used multilevel logistic regressions to analyze our binary outcome variable: whether or not participants selected the 1/1 payoff distribution in the CSG and PG or the 2/2 payoff in FAM1. We center participants’ age (PA) to create an age parameter CA, and we create a second age parameter by squaring CA:
-    CA =.PA−dmean of PAT_=dSD of PAT
-    CA2 =f.PA −dmean of PAT_=dSD of PATg2:
-
-    We analyzed the data in the R Environment for Statistical Computing (46). We fit the models using Stan (47), a Hamiltonian Monte Carlo sampler. Results are based on 5,000 samples each from four chains, after 5,000 adaptation steps in each. Convergence was assessed by both trace plots and the R-hat Gelman and Rubin statistic. Model code was generated and DIC calculated using glmer2stan (48), a convenience package for Rstan. We analyzed the data using both uninformative (flat) priors, as well as weakly informative variance priors, without any substantive change in inferences.
-
-    何のためのベイズか
-    モデルとそのパラメータ
-    事前分布の適切性
 
     方法[methods]
     研究デザイン[study design] 4 研究デザインの重要な要素を論文のはじめの[early]部分で示す。
@@ -173,29 +166,31 @@ We analyzed the data using both uninformative priors, as well as weakly informat
 Results
 -------
 
-165,779 unique cases were analyzed, which were reported from 2010 to 2014 and had available records about age and sex.
+176,957 unique cases were analyzed, which were reported from 2010 to 2014 and had available records about age and sex.
 
     classification of target drugs -> Table. 1
-    analysis flow -> Figure. 1
     characteristics of Japanese SRS -> Table. 2
+    Preffered Term under High Level Term -> Table. 3
+
+![Fig. 1](output/img/flow.png)
+
+**Figure. 1** Data analysis flow
+
+![Fig. 2](output/img/q_count.png)
 
 **Figure. 2** Report counts of incretin-based drugs
 
-![Fig. 2](output/img/case_count.svg)
+![Fig. 3](output/img/mixed_or_dpp4i.png)
 
-    Preffered Term under High Level Term -> Table. 3
+**Figure. 3** Odds Ratios of DPP-4 inhibitors
 
-**Figure. 3** Forest plot of the first screening
+![Fig. 4](output/img/fixed_or_glp1a.png)
 
-![Fig. 3](output/img/sc_forest.svg)
+**Figure. 4** Odds Ratios of GLP-1 agonists
 
-**Figure. 4** Forest plot of the second screening
+![Fig. 5](output/img/aic_hlt.png)
 
-![Fig. 4](output/img/dm_forest.svg)
-
-**Figure. 5** Violin plot of the final analysis
-
-![Fig. 5](output/img/violin.svg)
+**Figure. 5** AIC improvements with a random effect
 
 
 
