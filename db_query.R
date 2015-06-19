@@ -115,4 +115,4 @@ dt_base <- dt_base %>%
                     glp1a = as.integer(ifelse(case_id %in% dcid(v_glp1), 1, 0)))
 
 tables()
-save.image('output/rdata/dt.Rdata')
+save.image('output/rdata/tables.Rdata')

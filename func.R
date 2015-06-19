@@ -22,19 +22,19 @@ write_log <- function(txt, file, apd = TRUE) {
 }
 
 # plot data
-svg_plot <- function(data, file, w = 12, h = 8) {
+svg_plot <- function(data, file, w = 16, h = 10) {
   svg(file, width = w, height = h)
   plot(data)
   dev.off()
 }
 
-png_plot <- function(data, file, w = 800, h = 500) {
+png_plot <- function(data, file, w = 880, h = 550) {
   png(file, width = w, height = h)
   plot(data)
   dev.off()
 }
 
-tif_plot <- function(data, file, w = 800, h = 500) {
+tif_plot <- function(data, file, w = 880, h = 550) {
   tiff(file, width = w, height = h)
   plot(data)
   dev.off()
@@ -71,7 +71,6 @@ require_v(pkgs <- c('dplyr',
                     'RSQLite',
                     'foreach',
                     'doSNOW',
-                    'parallel',
                     'ggplot2',
                     'grid',
                     'ggmcmc',

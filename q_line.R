@@ -3,7 +3,7 @@
 source('func.R')
 
 if (file.exists(csv_file <- 'output/csv/q_count.csv')) {
-  dt <- setnames(fread(csv_file), c('class', 'quarter', 'case_c'))
+  dt_dr <- setnames(fread(csv_file), c('class', 'quarter', 'case_c'))
 } else {
   con <- connect_sqlite('mj.sqlite3')
 
@@ -71,8 +71,8 @@ if (file.exists(csv_file <- 'output/csv/q_count.csv')) {
                   quarter
             );'
 
-  dt <- sql_dt(con, sql_q)
-  write.table(dt, file = csv_file, sep = ',', row.names = FALSE, col.names = FALSE)
+  dt_dr <- sql_dt(con, sql_q)
+  write.table(dt_dr, file = csv_file, sep = ',', row.names = FALSE, col.names = FALSE)
 }
 
 v_hgdr <- c(dpp4_inhibitor = 'DPP-4 inhibitors',
@@ -81,30 +81,31 @@ v_hgdr <- c(dpp4_inhibitor = 'DPP-4 inhibitors',
             insulin = 'Insulin',
             any_antidiabetes_drugs = 'Any antidiabetes drugs')
 
-dt_q <- dt %>%
+dt_qc <- dt_dr %>%
           expand(class, quarter) %>%
           mutate(case_c = 0) %>%
-          rbind(dt) %>%
+          rbind(dt_dr) %>%
           group_by(class, quarter) %>%
           summarize(case_c = sum(case_c)) %>%
           mutate(class = v_hgdr[class])
 
-qcount <- function(dt, odr = v_hgdr) {
+qcount <- function(dt, od = v_hgdr) {
   return(ggplot(dt, aes(x = quarter, y = case_c, group = class, colour = class)) +
-           geom_point(size = 2.4, shape = 18) +
-           geom_line() +
+           geom_point(size = 3, shape = 18) +
+           geom_line(size = 0.8) +
            scale_x_discrete(breaks = c('2009q4', '2010q4', '2011q4', '2012q4', '2013q4'),
                             labels = c(2010, 2011, 2012, 2013, 2014)) +
            scale_y_continuous(limits = c(0, 1300), breaks = c(0:2 * 500)) +
-           scale_colour_discrete(limits = odr) +
+           scale_colour_discrete(limits = od) +
            labs(x = 'Reporting Date', y = 'Unique Case Count', colour = element_blank()) +
            theme(legend.position = c(0, 1), legend.justification = c(0, 1),
                  legend.background = element_blank(), legend.key = element_blank(),
-                 legend.text = element_text(colour = '#000066'),
-                 axis.title.x = element_text(colour = '#000066', vjust = 0),
-                 axis.title.y = element_text(colour = '#000066', vjust = 1),
+                 legend.text = element_text(colour = '#000066', size = 15),
+                 axis.title.x = element_text(colour = '#000066', vjust = 0, size = 25),
+                 axis.title.y = element_text(colour = '#000066', vjust = 1, size = 25),
+                 axis.text = element_text(colour = '#000066', size = 15),
                  panel.grid.major.x = element_blank(), panel.grid.minor = element_blank(),
-                 panel.background = element_rect(fill = '#DDDDFF')))
+                 panel.background = element_rect(fill = '#E8E8FF')))
 }
 
-three_plot(qcount(dt_q), path = 'output/img/', name = 'q_count')
+three_plot(qcount(dt_qc), path = 'output/img/', name = 'q_count')
