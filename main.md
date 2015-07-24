@@ -78,6 +78,7 @@ These results are consistent with
     2. 抄録では，研究で行われたことと明らかにされたことについて，十分 な情報を含み，かつバランスのよい要約を記載する。 
 
 
+
 Introduction
 ------------
 
@@ -118,8 +119,8 @@ The first phase is a frequency analysis based on Fisher's exact test, the second
 ##### Data Source
 
 Japanese ADE report data, JADER was acquired from the website of Pharmaceuticals and Medical Devices Agency (PMDA).
-We used the dataset published in May 2015 which contain 345,715 unique cases.
-Of these, cases which were reported from January 2010 to December 2014 and had available records about age and sex were analyzed.
+We used the dataset published in May 2015 which contain 353,988 unique cases.
+Of these, cases which were reported from January 2010 to March 2015 and had available records about age and sex were analyzed.
 
 ADEs in JADER were coded as Preferred Terms (PTs) in the Japanese version of the Medical Dictionary for Regulatory Activities (MedDRA/J).
 For data analysis, we constructed a relational database (RDB) containing the JADER dataset and MedDRA/J version 18.0.
@@ -138,7 +139,6 @@ In this study, the model treats use of DPP-4 inhibitors, use of GLP-1 agonists, 
 
 All data analyses were performed on the environment of R version 3.2.1 [].
 For mixed effects logistic regression, glmmML package version 1.0 were used [].
-
 
 
     方法[methods]

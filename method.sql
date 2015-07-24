@@ -32,8 +32,7 @@ CREATE VIEW ade10 AS
          quarter LIKE '2011%' OR
          quarter LIKE '2012%' OR
          quarter LIKE '2013%' OR
-         quarter LIKE '2014%' AND
-         quarter != '2014・第四')
+         quarter LIKE '2014%')
     );
 
 

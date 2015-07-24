@@ -92,18 +92,18 @@ dt_qc <- dt_dr %>%
 qcount <- function(dt, od = v_hgdr) {
   return(ggplot(dt, aes(x = quarter, y = case_c, group = class, colour = class)) +
            geom_point(size = 3, shape = 18) +
-           geom_line(size = 0.8) +
-           scale_x_discrete(breaks = c('2009q4', '2010q4', '2011q4', '2012q4', '2013q4'),
-                            labels = c(2010, 2011, 2012, 2013, 2014)) +
+           geom_line(size = 1.2) +
+           scale_x_discrete(breaks = c('2009q4', '2010q4', '2011q4', '2012q4', '2013q4', '2014q4'),
+                            labels = c(2010, 2011, 2012, 2013, 2014, 2015)) +
            scale_y_continuous(limits = c(0, 1300), breaks = c(0:2 * 500)) +
            scale_colour_discrete(limits = od) +
            labs(x = 'Reporting Date', y = 'Unique Case Count', colour = element_blank()) +
            theme(legend.position = c(0, 1), legend.justification = c(0, 1),
                  legend.background = element_blank(), legend.key = element_blank(),
-                 legend.text = element_text(colour = '#000066', size = 15),
-                 axis.title.x = element_text(colour = '#000066', vjust = 0, size = 25),
-                 axis.title.y = element_text(colour = '#000066', vjust = 1, size = 25),
-                 axis.text = element_text(colour = '#000066', size = 15),
+                 legend.text = element_text(colour = '#000066', size = 18),
+                 axis.title.x = element_text(colour = '#000066', vjust = 0, size = 22),
+                 axis.title.y = element_text(colour = '#000066', vjust = 1, size = 22),
+                 axis.text = element_text(colour = '#000066', size = 18),
                  panel.grid.major.x = element_blank(), panel.grid.minor = element_blank(),
                  panel.background = element_rect(fill = '#E8E8FF')))
 }

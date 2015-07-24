@@ -44,14 +44,14 @@ ecount <- function(dt, odr) {
            labs(x = 'MedDRA High Level Term', y = 'Unique Case Count') +
            coord_flip() +
            theme(panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(),
-                 axis.title.x = element_text(colour = '#000066', vjust = 0, size = 25),
-                 axis.title.y = element_text(colour = '#000066', vjust = 1, size = 25),
-                 axis.text = element_text(colour = '#000066', size = 15),
+                 axis.title.x = element_text(colour = '#000066', vjust = 0, size = 24),
+                 axis.title.y = element_text(colour = '#000066', vjust = 1, size = 24),
+                 axis.text = element_text(colour = '#000066', size = 18),
                  panel.background = element_rect(fill = '#DDDDFF')))
 }
 
 v_hgdr <- c(dpp4_inhibitor = 'DPP-4 inhibitors', glp1_agonist = 'GLP-1 agonists')
-tcc <- read_tc('output/csv/glmm_or.csv')
+tcc <- read_tc('output/csv/mixed_or.csv')
 dt_e <- dt %>%
           filter(hlt %in% tcc$hlt) %>%
           mutate(class = v_hgdr[class])
