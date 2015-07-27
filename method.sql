@@ -1,6 +1,6 @@
 -- 1. Extraction of Drug-Event Combinations from 2009q4 to 2013q2 (Jan 2010 - Sep 2013)
 
-CREATE VIEW ade10 AS
+CREATE VIEW ade AS
   SELECT DISTINCT
     name AS drug,
     pt_kanji,
@@ -44,14 +44,14 @@ CREATE TABLE d_class (
 );
 
 INSERT INTO d_class (drug, class)
-  SELECT DISTINCT drug, 'insulin' FROM ade10 WHERE
+  SELECT DISTINCT drug, 'insulin' FROM ade WHERE
     drug LIKE '%インスリン%';
 /*
 Insulin
 */
 
 INSERT INTO d_class (drug, class)
-  SELECT DISTINCT drug, 'sulfonylurea' FROM ade10 WHERE
+  SELECT DISTINCT drug, 'sulfonylurea' FROM ade WHERE
     drug LIKE '%トルブタミド%' OR
     drug LIKE '%グリクロピラミド%' OR
     drug LIKE '%アセトヘキサミド%' OR
@@ -74,7 +74,7 @@ Sulfonylurea
 */
 
 INSERT INTO d_class (drug, class)
-  SELECT DISTINCT drug, 'meglitinide' FROM ade10 WHERE
+  SELECT DISTINCT drug, 'meglitinide' FROM ade WHERE
     drug LIKE '%ナテグリニド%' OR
     drug LIKE '%ミチグリニド%' OR
     drug LIKE '%レパグリニド%';
@@ -86,7 +86,7 @@ Rapid Acting Insulin Secretagogue
 */
 
 INSERT INTO d_class (drug, class)
-  SELECT DISTINCT drug, 'biguanide' FROM ade10 WHERE
+  SELECT DISTINCT drug, 'biguanide' FROM ade WHERE
     drug LIKE '%メトホルミン%' OR
     drug LIKE '%ブホルミン%';
 /*
@@ -96,7 +96,7 @@ Biguanide
 */
 
 INSERT INTO d_class (drug, class)
-  SELECT DISTINCT drug, 'alpha_glucosidase_inhibitor' FROM ade10 WHERE
+  SELECT DISTINCT drug, 'alpha_glucosidase_inhibitor' FROM ade WHERE
     drug LIKE '%ボグリボース%' OR
     drug LIKE '%アカルボース%' OR
     drug LIKE '%ミグリトール%';
@@ -108,7 +108,7 @@ Alpha-Glucosidase Inhibitor
 */
 
 INSERT INTO d_class (drug, class)
-  SELECT DISTINCT drug, 'thiazolidinedione' FROM ade10 WHERE
+  SELECT DISTINCT drug, 'thiazolidinedione' FROM ade WHERE
     drug LIKE '%ピオグリタゾン%';
 /*
 Thiazolidinedione
@@ -116,7 +116,7 @@ Thiazolidinedione
 */
 
 INSERT INTO d_class (drug, class)
-  SELECT DISTINCT drug, 'dpp4_inhibitor' FROM ade10 WHERE
+  SELECT DISTINCT drug, 'dpp4_inhibitor' FROM ade WHERE
     drug LIKE '%シタグリプチン%' OR
     drug LIKE '%ビルダグリプチン%' OR
     drug LIKE '%アログリプチン%' OR
@@ -137,7 +137,7 @@ DPP-4 Inhibitors
 */
 
 INSERT INTO d_class (drug, class)
-  SELECT DISTINCT drug, 'glp1_agonist' FROM ade10 WHERE
+  SELECT DISTINCT drug, 'glp1_agonist' FROM ade WHERE
     drug LIKE '%リラグルチド%' OR
     drug LIKE '%エキセナチド%' OR
     drug LIKE '%リキシセナチド%';
@@ -149,7 +149,7 @@ GLP-1 Analogs
 */
 
 INSERT INTO d_class (drug, class)
-  SELECT DISTINCT drug, 'sglt2_inhibitor' FROM ade10 WHERE
+  SELECT DISTINCT drug, 'sglt2_inhibitor' FROM ade WHERE
     drug LIKE '%イプラグリフロジン%' OR
     drug LIKE '%ダパグリフロジン%' OR
     drug LIKE '%ルセオグリフロジン%' OR

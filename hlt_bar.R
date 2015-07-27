@@ -2,7 +2,7 @@
 
 source('func.R')
 
-if (file.exists(csv_file <- 'output/csv/hlt_count.csv')) {
+if(file.exists(csv_file <- 'output/csv/hlt_count.csv')) {
   dt <- setnames(fread(csv_file), c('class', 'hlt', 'case_c'))
 } else {
   con <- connect_sqlite('mj.sqlite3')
@@ -12,7 +12,7 @@ if (file.exists(csv_file <- 'output/csv/hlt_count.csv')) {
               hlt_name AS hlt,
               count(distinct case_id) AS case_c
             FROM
-              ade10 a
+              ade a
             INNER JOIN
               d_class d ON d.drug == a.drug
             INNER JOIN

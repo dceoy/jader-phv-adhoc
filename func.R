@@ -5,7 +5,7 @@ load_pkgs <- function(pkgs, repos = 'http://cran.rstudio.com/') {
   update.packages(checkBuilt = TRUE, ask = FALSE, repos = repos)
   sapply(pkgs,
          function(p) {
-           if (! p %in% installed.packages()[,1]) install.packages(p, dependencies = TRUE, repos = repos)
+           if(! p %in% installed.packages()[,1]) install.packages(p, dependencies = TRUE, repos = repos)
            require(p, character.only = TRUE)
          })
 }
@@ -73,9 +73,5 @@ require_v(pkgs <- c('dplyr',
                     'doSNOW',
                     'ggplot2',
                     'grid',
-                    'ggmcmc',
-                    'yaml',
-                    'glmmML',
-                    'rstan',
-                    'devtools'))
+                    'glmmML'))
 select <- dplyr::select

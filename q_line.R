@@ -2,7 +2,7 @@
 
 source('func.R')
 
-if (file.exists(csv_file <- 'output/csv/q_count.csv')) {
+if(file.exists(csv_file <- 'output/csv/q_count.csv')) {
   dt_dr <- setnames(fread(csv_file), c('class', 'quarter', 'case_c'))
 } else {
   con <- connect_sqlite('mj.sqlite3')
@@ -22,7 +22,7 @@ if (file.exists(csv_file <- 'output/csv/q_count.csv')) {
                 quarter,
                 COUNT(DISTINCT a.case_id) AS case_c
               FROM
-                ade10 a
+                ade a
               INNER JOIN
                 demo d ON d.case_id == a.case_id
               INNER JOIN
@@ -37,7 +37,7 @@ if (file.exists(csv_file <- 'output/csv/q_count.csv')) {
                   quarter,
                   COUNT(DISTINCT a.case_id) AS case_c
                 FROM
-                  ade10 a
+                  ade a
                 INNER JOIN
                   demo d ON d.case_id == a.case_id
                 WHERE
@@ -57,7 +57,7 @@ if (file.exists(csv_file <- 'output/csv/q_count.csv')) {
                   quarter,
                   COUNT(DISTINCT a.case_id) AS case_c
                 FROM
-                  ade10 a
+                  ade a
                 INNER JOIN
                   demo d ON d.case_id == a.case_id
                 WHERE
