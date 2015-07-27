@@ -13,10 +13,10 @@ daic <- function(dt) {
            geom_segment(size = 1.2, arrow = arrow(length = unit(0.2, 'cm'))) +
 #          geom_text(aes(x = case_count, y = aic_diff, label = lab), hjust = 1, colour = '#000066') +
            scale_x_log10(limits = c(1, 10100), breaks = c(10 ^ (0:4))) +
-           scale_y_continuous(limits = c(-200, 10)) +
-           scale_colour_discrete(name = 'MedDRA High Level Term',
-                                 label = c(mixed = 'favors the Mixed Model',
-                                           fixed = 'favors the Fixed Model')) +
+           scale_y_continuous(limits = c(-200, 3)) +
+           scale_colour_discrete(name = 'MedDRA High Level Terms',
+                                 label = c(mixed = 'favor the MIXED model',
+                                           fixed = 'favor the FIXED model')) +
            labs(x = 'Unique Case Count', y = 'AIC Difference', colour = element_blank()) +
            theme(legend.position = c(0.04, 0.04), legend.justification = c(0, 0),
                  legend.background = element_blank(), legend.key = element_blank(),

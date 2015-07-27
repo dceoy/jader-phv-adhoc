@@ -98,7 +98,7 @@ qcount <- function(dt, od = v_hgdr) {
            scale_y_continuous(limits = c(0, 1300), breaks = c(0:2 * 500)) +
            scale_colour_discrete(limits = od) +
            labs(x = 'Reporting Date', y = 'Unique Case Count', colour = element_blank()) +
-           theme(legend.position = c(0, 1), legend.justification = c(0, 1),
+           theme(legend.position = c(0.01, 1), legend.justification = c(0, 1),
                  legend.background = element_blank(), legend.key = element_blank(),
                  legend.text = element_text(colour = '#000066', size = 18),
                  axis.title.x = element_text(colour = '#000066', vjust = 0, size = 22),
