@@ -43,11 +43,11 @@ ecount <- function(dt, odr) {
            scale_x_discrete(limits = odr) +
            labs(x = 'MedDRA High Level Term', y = 'Unique Case Count') +
            coord_flip() +
+           theme_bw() +
            theme(panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(),
                  axis.title.x = element_text(colour = '#000066', vjust = 0, size = 24),
                  axis.title.y = element_text(colour = '#000066', vjust = 1, size = 24),
-                 axis.text = element_text(colour = '#000066', size = 18),
-                 panel.background = element_rect(fill = '#DDDDFF')))
+                 axis.text = element_text(colour = '#000066', size = 18)))
 }
 
 v_hgdr <- c(dpp4_inhibitor = 'DPP-4 inhibitors', glp1_agonist = 'GLP-1 agonists')
@@ -56,4 +56,4 @@ dt_e <- dt %>%
           filter(hlt %in% tcc$hlt) %>%
           mutate(class = v_hgdr[class])
 
-three_plot(ecount(dt_e, odr = tcc$hlt), path = 'output/img/', name = 'hlt_bar')
+png_plot(ecount(dt_e, odr = tcc$hlt), file = 'output/img/hlt_bar.png')

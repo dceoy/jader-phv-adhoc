@@ -81,7 +81,8 @@ sql <- c(base = 'SELECT
                  WHERE
                    a != 0 AND b != 0 AND c != 0 AND d != 0;')
 
-tbl <- sapply(names(sql), function(t) return(sql_dt(connect_sqlite('mj.sqlite3'), sql[t])))
+con <- connect_sqlite('mj.sqlite3')
+tbl <- sapply(names(sql), function(t) return(sql_dt(con, sql[t])))
 
 cid <- function(dr) {
   return(tbl$drug %>%

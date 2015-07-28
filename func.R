@@ -14,13 +14,6 @@ require_v <- function(pkgs) {
   sapply(pkgs, function(p) require(p, character.only = TRUE))
 }
 
-# write to file
-write_log <- function(txt, file, apd = TRUE) {
-  sink(file, append = apd)
-  print(txt)
-  sink()
-}
-
 # plot data
 svg_plot <- function(data, file, w = 16, h = 10) {
   svg(file, width = w, height = h)
@@ -40,10 +33,10 @@ tif_plot <- function(data, file, w = 880, h = 550) {
   dev.off()
 }
 
-three_plot <- function(data, path, name) {
-  svg_plot(data, paste(path, name, '.svg', sep = ''))
-  png_plot(data, paste(path, name, '.png', sep = ''))
-  tif_plot(data, paste(path, name, '.tif', sep = ''))
+jpg_plot <- function(data, file, w = 880, h = 550) {
+  jpeg(file, width = w, height = h)
+  plot(data)
+  dev.off()
 }
 
 pdf_traceplot <- function(data, path, name) {
@@ -72,6 +65,7 @@ require_v(pkgs <- c('dplyr',
                     'foreach',
                     'doSNOW',
                     'ggplot2',
+                    'gridExtra',
                     'grid',
                     'glmmML'))
 select <- dplyr::select

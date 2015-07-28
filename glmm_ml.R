@@ -40,7 +40,7 @@ cat('', file = mm_or_file <- 'output/csv/mixed_or.csv')
 cat('', file = fm_or_file <- 'output/csv/fixed_or.csv')
 cat('', file = aic_file <- 'output/csv/aic_hlt.csv')
 
-lr_ls <- foreach(code = tbl$hlts$hlt_code, .packages = c('dplyr', 'data.table', 'glmmML')) %dopar% {
+lr_log <- foreach(code = unique(tbl$sgnl$hlt_code), .packages = c('dplyr', 'data.table', 'glmmML')) %dopar% {
   reac <- tbl$reac %>% filter(hlt_code == code)
   sgnl <- tbl$sgnl %>% filter(hlt_code == code)
   ccmt <- tbl$ccmt %>%
@@ -66,7 +66,7 @@ lr_ls <- foreach(code = tbl$hlts$hlt_code, .packages = c('dplyr', 'data.table', 
                      mixed_ci = data.frame(coef = mm$coefficients, ci_glmm(mm, alpha = alpha)),
                      fixed_ci = data.frame(coef = fm$coefficients, confint.default(fm, level = 1 - alpha))))
     if(! is.na(mm$sigma.sd)) {
-      write.table(cbind(matrix(c(mm$aic, fm$aic), nrow = 1), hlt),
+      write.table(cbind(matrix(c(mm$aic, fm$aic, mm$sigma, mm$sigma.sd), nrow = 1), hlt),
                   file = aic_file, append = TRUE, sep = ',', row.names = FALSE, col.names = FALSE)
       if(code %in% v_hltc) {
         write.table(cbind(exp(lr$mixed_ci[2:3,]), sapply(hlt, function(v) rep(v, 2))),
@@ -78,8 +78,7 @@ lr_ls <- foreach(code = tbl$hlts$hlt_code, .packages = c('dplyr', 'data.table', 
   }, silent = FALSE)
 
   if(class(e) == 'try-error') lr <- c(lr, error = e)
-  return(lr)
+  return(capture.output(print(lr), file = log_file, append = TRUE))
 }
 
-write_log(lr_ls, log_file)
 save.image('output/rdata/glmm.Rdata')
