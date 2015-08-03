@@ -42,13 +42,8 @@ The report data was fetched from Japanese Adverse Drug Event Report database (JA
 176,957 unique cases were analyzed, which were reported from 2010 to 2014 and had available records about age and sex.
 
 
-
 In the first, Fisher's exact test were performed by all combinations between generic names of drugs and MedDRA High Level Terms (HLTs) including adverse events.
 drug-event combinations which two-sided p-value < 0.01 and odds ratio > 1
-
-
-significant association were extracted.
-
 
 
 using fixed effects model and AEs associated with incretin-based drug were extracted.
@@ -114,7 +109,7 @@ Methods
 
 ##### Study Design
 
-This study comprises two phases of analyses for drug-AE associations on spontaneous AE reports.
+This study comprises two phases of analyses for drug-event associations on spontaneous reports.
 The first phase is a frequency analysis based on Fisher's exact test, the second phase is a multivariate analysis using a mixed effects logistic regression model.
 
 ##### Data Source
@@ -122,34 +117,27 @@ The first phase is a frequency analysis based on Fisher's exact test, the second
 Japanese AE report data of JADER were fetched from the website of PMDA, and the dataset published in July 2015 was used, which contain 353,988 unique cases.
 In these, cases which were reported from January 2010 to March 2015 and had available records about age and sex were analyzed.
 
-AEs in JADER were coded as Preferred Terms (PTs) in the Japanese version of the Medical Dictionary for Regulatory Activities (MedDRA/J) [1].
+AEs in JADER were coded as Preferred Terms (PTs) in the Japanese version of the Medical Dictionary for Regulatory Activities (MedDRA/J). [1]
 For data analysis, we constructed a relational database (RDB) containing the JADER dataset and MedDRA/J version 18.0.
-As an RDB management system, SQLite version 3.8.5 was used [2].
+As an RDB management system, SQLite version 3.8.5 was used. [2]
 
 ##### Data Analysis
 
-The PTs of AEs were classified in MedDRA High Level Terms (HLTs), all combinations between drug (generic) names and HLTs were extracted.
+The PTs of AEs were classified in MedDRA High Level Terms (HLTs), all the combinations between drug generic names and HLTs were extracted.
 Fisher's exact tests were performed by all the drug-HLT combinations.
-Combinations where a two-sided p-value was less than 0.01 and an odds ratio (OR) was greater than 1 were handled as significant associations.
+Combinations in which a two-sided p-value was less than 0.01 and an odds ratio (OR) was greater than 1 were handled as significant associations.
 
-About the HLTs significantly associated with incretin-based drugs, mixed effects logistic regressions for occurrences of each HLT were performed.
-A mixed effects model contains random effects at group levels besides traditional fixed effects.
-In this study, as fixed effects, uses of DPP-4 inhibitors, use of GLP-1 agonists, use of any hypoglycemic drugs (an alternative indicator of hyperglycemia), sum of concomitant suspected drugs (determined by reference to the Fisher's exact tests), age (each 10-year) and sex were treated.
-As a random effect, reporting date (quarter period) was treated.
-The associations between incretin-based drugs and HLTs were assessed by ORs with 99% confidence intervals.
-Furthermore, adequacy of the random effect was assessed by Akaike information criteria (AIC).
+About the HLTs significantly associated with incretin-based drugs (Table 1), mixed effects logistic regressions for occurrences of each HLT were performed.
+A mixed effects model contains random effects at group levels besides traditional fixed effects. [3]
 
-All data analyses were performed in the statistical computing environment of R version 3.2.1 [3].
-For mixed effects logistic regression, glmmML package version 1.0 were used [4].
+In this study, the following variates were treated as fixed effects: use of DPP-4 inhibitors, use of GLP-1 agonists, use of any hypoglycemic drugs (an alternative indicator of hyperglycemia), sum of concomitant suspected drugs (determined by reference to the Fisher's exact tests), age (each 10-year) and sex.
+Moreover, reporting date (quarterly period) was treated as a random effect.
+This was supposed to be a random intercept normally distributed with mean 0 and a common variance.
+The associations between incretin-based drugs and HLTs were assessed by ORs with 99% Wald-type confidence intervals.
+Furthermore, adequacy of the random effect was assessed using Akaike information criteria (AIC) among HLTs reported along with incretin-based drug.
 
-
-References
-1.  MedDRA
-2.  SQLite
-3.  R Core Team. R: A Language and Environment for Statistical Computing. Vienna, Austria2015.
-4.  Broström G. glmmML: Generalized linear models with clustering. 2013.
-
-
+All data analyses were performed in the statistical computing environment of R version 3.2.1. [4]
+For mixed effects logistic regression, glmmML package version 1.0 were used with method 'ghq' (Gauss-Hermite quadrature). [5]
 
 
     方法[methods]
@@ -177,31 +165,25 @@ References
 Results
 -------
 
-176,957 unique cases were analyzed, which were reported from 2010 to 2014 and had available records about age and sex.
+176,957 unique cases were analyzed, which were reported from January 2010 to March 2015 had available records about age and sex.
 
-    classification of target drugs -> Table. 1
-    characteristics of Japanese SRS -> Table. 2
-    Preffered Term under High Level Term -> Table. 3
 
-![Fig. 1](output/img/flow.png)
 
-**Figure. 1** Data analysis flow
 
-![Fig. 2](output/img/q_count.png)
 
-**Figure. 2** Report counts of incretin-based drugs
+**Table 1** at mixed effects logistic regression
 
-![Fig. 3](output/img/mixed_or_dpp4i.png)
+![](output/img/q_count.png)
 
-**Figure. 3** Odds Ratios of DPP-4 inhibitors
+**Figure 1** Report counts of hypoglycemic drugs
 
-![Fig. 4](output/img/fixed_or_glp1a.png)
+![](output/img/mixed_or.png)
 
-**Figure. 4** Odds Ratios of GLP-1 agonists
+**Figure 2** HLTs associated with DPP-4 inhibitors or GLP-1 agonists
 
-![Fig. 5](output/img/aic_diff.png)
+![](output/img/aic_diff.png)
 
-**Figure. 5** AIC improvements with a random effect
+**Figure 3** AIC improvements with a random effect
 
 
 
@@ -222,6 +204,14 @@ Results
     (b)連続変数[continuous variable]がカテゴリー化されているときは，カテ ゴリー境界[category boundary]を報告する。
     (c)意味のある[relevant]場合は，相対リスク[relative risk]を，意味をもつ 期間の絶対リスク[absolute risk]に換算することを考慮する。
     他の解析[other analysis] 17 その他に行われたすべての分析(例：サブグループと相互作用の解析や感 度分析)の結果を報告する。
+
+
+References
+1.  MedDRA
+2.  SQLite
+3.  Larsen, K., et al. (2000). "Interpreting Parameters in the Logistic Regression Model with Random Effects." Biometrics 56(3): 909-914.
+4.  R Core Team. R: A Language and Environment for Statistical Computing. Vienna, Austria2015.
+5.  Broström G. glmmML: Generalized linear models with clustering. 2013.
 
 
 Discussion

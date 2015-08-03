@@ -58,7 +58,7 @@ lr_log <- foreach(code = unique(tbl$sgnl$hlt_code), .packages = c('dplyr', 'data
 
   lr <- list(event = t(hlt))
   e <- try({
-    mm <- glmmML(event ~ dpp4i + glp1a + hg + concomit + age + sex, family = binomial, data = d, cluster = qid)
+    mm <- glmmML(event ~ dpp4i + glp1a + hg + concomit + age + sex, family = binomial, data = d, cluster = qid, method = 'ghq')
     fm <- glm(event ~ dpp4i + glp1a + hg + concomit + age + sex, family = binomial, data = d)
     lr <- c(lr, list(data = summary(d),
                      mixed_model = mm,
