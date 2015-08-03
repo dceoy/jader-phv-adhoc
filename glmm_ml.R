@@ -58,7 +58,7 @@ lr_log <- foreach(code = unique(tbl$sgnl$hlt_code), .packages = c('dplyr', 'data
 
   lr <- list(event = t(hlt))
   e <- try({
-    mm <- glmmML(event ~ dpp4i + glp1a + hg + concomit + age + sex, family = binomial, data = d, cluster = qid)
+    mm <- glmmML(event ~ dpp4i + glp1a + hg + concomit + age + sex, family = binomial, data = d, cluster = qid, method = 'ghq')
     fm <- glm(event ~ dpp4i + glp1a + hg + concomit + age + sex, family = binomial, data = d)
     lr <- c(lr, list(data = summary(d),
                      mixed_model = mm,
@@ -69,9 +69,9 @@ lr_log <- foreach(code = unique(tbl$sgnl$hlt_code), .packages = c('dplyr', 'data
       write.table(cbind(matrix(c(mm$aic, fm$aic, mm$sigma, mm$sigma.sd), nrow = 1), hlt),
                   file = aic_file, append = TRUE, sep = ',', row.names = FALSE, col.names = FALSE)
       if(code %in% v_hltc) {
-        write.table(cbind(exp(lr$mixed_ci[2:3,]), sapply(hlt, function(v) rep(v, 2))),
+        write.table(cbind(exp(lr$mixed_ci[2:3,]), sapply(hlt, function(v) rep(v, 2)), mm$coefficients[2:3], mm$coef.sd[2:3]),
                     file = mm_or_file, append = TRUE, sep = ',', col.names = FALSE)
-        write.table(cbind(exp(lr$fixed_ci[2:3,]), sapply(hlt, function(v) rep(v, 2))),
+        write.table(cbind(exp(lr$fixed_ci[2:3,]), sapply(hlt, function(v) rep(v, 2)), lr$fixed_model$coefficients[2:3,1:2]),
                     file = fm_or_file, append = TRUE, sep = ',', col.names = FALSE)
       }
     }

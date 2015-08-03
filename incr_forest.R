@@ -2,11 +2,6 @@
 
 source('func.R')
 
-read_or <- function(file) {
-  return(fread(file)[,c(1:4, 6), with = FALSE] %>%
-           setnames(c('class', 'or', 'll', 'ul', 'hlt')))
-}
-
 forest <- function(ci, ord, ulim = 200) {
   return(ggplot(ci %>%
                   mutate(ar_or = ifelse(ul > ulim, or, NA),
@@ -33,17 +28,18 @@ forest <- function(ci, ord, ulim = 200) {
                  panel.grid.major.y = element_blank(), panel.grid.minor = element_blank()))
 }
 
-dt_orci <- read_or('output/csv/mixed_or.csv') %>%
+dt_orci <- fread('output/csv/mixed_or.csv')[,c(1:4, 6), with = FALSE] %>%
+             setnames(c('class', 'or', 'll', 'ul', 'hlt')) %>%
              filter(ll > 1) %>%
-             arrange(or) %>%
              mutate(class = ifelse(class == 'dpp4i', 'DPP-4 inhibitors', class)) %>%
              mutate(class = ifelse(class == 'glp1a', 'GLP-1 agonists', class))
-v_hltc <- dt_orci %>%
-            group_by(hlt) %>%
-            summarize(maxor = max(or)) %>%
-            arrange(maxor) %>%
-            .$hlt
 
-png_plot(forest(dt_orci, v_hltc),
+v_hlt <- dt_orci %>%
+           group_by(hlt) %>%
+           summarize(maxor = max(or)) %>%
+           arrange(maxor) %>%
+           .$hlt
+
+png_plot(forest(dt_orci, v_hlt),
          file = 'output/img/mixed_or.png',
          w = 900, h = 900)
