@@ -53,7 +53,7 @@ if(file.exists(csv_file <- 'output/csv/q_count.csv')) {
                   quarter
               UNION ALL
                 SELECT
-                  "any_antidiabetes_drugs" AS class,
+                  "any_hypoglycemic_drugs" AS class,
                   quarter,
                   COUNT(DISTINCT a.case_id) AS case_c
                 FROM
@@ -79,7 +79,7 @@ v_hgdr <- c(dpp4_inhibitor = 'DPP-4 inhibitors',
             glp1_agonist = 'GLP-1 agonists',
             oral_hypoglycemic_drugs_except_dpp4_inhibitors = 'Oral hypoglycemic drugs except DPP-4 inhibitors',
             insulin = 'Insulin',
-            any_antidiabetes_drugs = 'Any antidiabetes drugs')
+            any_hypoglycemic_drugs = 'Any hypoglycemic drugs')
 
 dt_qc <- dt_dr %>%
           expand(class, quarter) %>%
@@ -92,7 +92,7 @@ dt_qc <- dt_dr %>%
 qcount <- function(dt, od = v_hgdr) {
   return(ggplot(dt, aes(x = quarter, y = case_c, group = class, colour = class)) +
            geom_point(size = 3, shape = 18) +
-           geom_line(size = 1.4) +
+           geom_line(size = 1.4, alpha = 0.5) +
            scale_x_discrete(breaks = c('2009q4', '2010q4', '2011q4', '2012q4', '2013q4', '2014q4'),
                             labels = c(2010, 2011, 2012, 2013, 2014, 2015)) +
            scale_y_continuous(limits = c(0, 1300), breaks = c(500 * (0:2))) +

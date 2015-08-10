@@ -27,7 +27,7 @@ if(file.exists(csv_file <- 'output/csv/hlt_count.csv')) {
 }
 
 read_tc <- function(file) {
-  return(fread(file)[,c(2, 3, 6, 8), with = FALSE] %>%
+  return(fread(file)[, c(2, 3, 6, 8), with = FALSE] %>%
            setnames(c('or', 'll', 'hlt', 'total_c')) %>%
            mutate(total_c = as.integer(total_c)) %>%
            filter(ll > 1) %>%

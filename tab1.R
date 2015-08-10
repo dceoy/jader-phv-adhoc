@@ -15,7 +15,7 @@ incr_or <- function(dt, incr) {
                       paste(incr, 'll95', sep = '_'))))
 }
 
-dt_orci <- fread('output/csv/mixed_or.csv')[,c(1:3, 6, 8:10), with = FALSE] %>%
+dt_orci <- fread('output/csv/mixed_or.csv')[, c(1:3, 6, 8:10), with = FALSE] %>%
              setnames(c('class', 'or', 'll', 'hlt', 'cc', 'coef', 'coef_sd'))
 
 tab1 <- dt_orci %>%

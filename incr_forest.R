@@ -15,7 +15,7 @@ forest <- function(ci, ord, ulim = 200) {
                         arrow = arrow(length = unit(2, 'mm')), colour = '#6600FF') +
            scale_y_log10(limits = c(0.5, ulim), breaks = c(10 ^ (0:2))) +
            scale_x_discrete(limits = ord) +
-           labs(x = 'MedDRA HLT', y = 'Odds Ratio [ 99% Confidence Interval ]', colour = '#000066') +
+           labs(x = 'MedDRA HLT', y = 'Odds Ratio [ 99 % Confidence Interval ]', colour = '#000066') +
            coord_flip() +
            facet_grid(. ~ class) +
            theme_bw() +
@@ -28,7 +28,7 @@ forest <- function(ci, ord, ulim = 200) {
                  panel.grid.major.y = element_blank(), panel.grid.minor = element_blank()))
 }
 
-dt_orci <- fread('output/csv/mixed_or.csv')[,c(1:4, 6), with = FALSE] %>%
+dt_orci <- fread('output/csv/mixed_or.csv')[, c(1:4, 6), with = FALSE] %>%
              setnames(c('class', 'or', 'll', 'ul', 'hlt')) %>%
              filter(ll > 1) %>%
              mutate(class = ifelse(class == 'dpp4i', 'DPP-4 inhibitors', class)) %>%

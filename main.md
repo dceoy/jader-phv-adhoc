@@ -10,20 +10,31 @@
 </script>
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
+ORIGINAL RESEARCH
 
-Adverse Events Associated with Incretin-based Drugs in Spontaneous Reports: A Logistic Regression Analysis of Japanese Adverse Drug Event Reports
+An statistical analysis of adverse event reports
+
+Daichi Narushima et al
+
+Adverse Events Associated with Incretin-based Drugs in Spontaneous Reports: A Mixed Effects Logistic Regression Analysis of the Japanese spontaneous reporting system
 =======
 
-Authors:  
+Authors' names:  
 Daichi Narushima, Yohei Kawasaki, Shoji Takamatsu, Hiroshi Yamada
 
-Author Affiliations:  
+Author affiliations:  
 Department of Drug Evaluation & Informatics, Graduate school of Pharmaceutical Sciences, University of Shizuoka, Shizuoka, Japan (DN, YK and HY);
 Office of Safety II, Pharmaceuticals and Medical Devices Agency, Japan (ST)
 
-Corresponding Author:  
-Hiroshi Yamada, MD, PhD, FACP, Department of Drug Evaluation & Informatics, Graduate School of Pharmaceutical Sciences, University of Shizuoka, 52-1 Yada, Suruga-ku, Shizuoka 422-8526, Japan (hyamada@u-shizuoka-ken.ac.jp).
+Correspondence:  
+Hiroshi Yamada, MD, PhD, FACP  
+Department of Drug Evaluation & Informatics, Graduate School of Pharmaceutical Sciences, University of Shizuoka, 52-1 Yada, Suruga-ku, Shizuoka 422-8526, Japan  
+Tel: +81 54 264 5762  
+Fax: +81 54 264 5762  
+Email: hyamada@u-shizuoka-ken.ac.jp
 
+Keywords:  
+Spontaneous retporting system, mixed effect, logistic regression, hypoglycemic drug, incretin-based drug
 
 Abstract
 --------
@@ -31,39 +42,36 @@ Abstract
 ##### Background
 Dipeptidyl peptidase 4 (DPP-4) inhibitors and glucagon-like peptide 1 (GLP-1) agonists are incretin-based hypoglycemic drugs which are widely used to treat type 2 diabetes.
 The safety of these drugs is one of the most concerns in diabetes medication.
-To assess adverse events (AEs) associated with incretin-based drugs, we analyzed Japanese spontaneous reports.
+To assess adverse events associated with incretin-based drugs, Japanese spontaneous reports were analysed.
 
     - the rationale of study
     - the specific study hypothesis and/or study objectives
 
-##### Methods and Findings
-This study is designed as a disproportionality analysis based on logistic regression model of spontaneous AE reports.
-The report data was fetched from Japanese Adverse Drug Event Report database (JADER), which is published by Pharmaceuticals and Medical Devices Agency (PMDA).
+##### Methods
+This study is designed as a disproportionality analysis based on logistic regression model of spontaneous ADE reports.
+The report data was fetched from the Japanese Adverse Drug Event Report database (JADER), which is published by Pharmaceuticals and Medical Devices Agency (PMDA).
 176,957 unique cases were analyzed, which were reported from 2010 to 2014 and had available records about age and sex.
 
-
-In the first, Fisher's exact test were performed by all combinations between generic names of drugs and MedDRA High Level Terms (HLTs) including adverse events.
+In the first, Fisher's exact tests were performed by all combinations between generic names of drugs and MedDRA High Level Terms (HLTs) including adverse events.
 drug-event combinations which two-sided p-value < 0.01 and odds ratio > 1
 
+##### Results
 
-using fixed effects model and AEs associated with incretin-based drug were extracted.
+using fixed effects model and adverse events associated with incretin-based drug were extracted.
 
-This model includes use of incretin-based drug, concomitant suspected drug, history of the event, age and sex as predictor variables, and occurrence of each AEs as an outcome variable.
+This model includes use of incretin-based drug, concomitant suspected drug, history of the event, age and sex as predictor variables, and occurrence of each HLTs as an outcome variable.
 In the second screening, the cases treated with hypoglycemic drug were analyzed using the same model as that in the previous screening.
-In the final analysis, the cases treated with hypoglycemic drug were analyzed using the mixed effects model which has reporting quarter as a random effect besides the fixed effects.
-The result showed that GLP-1 agonists associated with risks of pancreatic neoplasms (odds ratio 25.0, 99% credible interval 8.2 to 79.3) and pancreatitis (12.5, 5.9 to 26.9) and that DPP-4 inhibitors are associated with risks of pancreatic neoplasms (4.9, 1.76 to 15.4), pancreatitis (13.3, 7.2 to 27.9) and abnormal urinalysis (7.8, 1.5 to 69.1).
+In the final analysis, the cases treated with hypoglycemic drug were analyzed using the random effects model which has reporting quarter as a random effect besides the fixed effects.
+The result showed that GLP-1 agonists associated with risks of pancreatic neoplasms (odds ratio 25.0, 99 % credible interval 8.2 to 79.3) and pancreatitis (12.5, 5.9 to 26.9) and that DPP-4 inhibitors are associated with risks of pancreatic neoplasms (4.9, 1.76 to 15.4), pancreatitis (13.3, 7.2 to 27.9) and abnormal urinalysis (7.8, 1.5 to 69.1).
 
     - What was studied
     - main methods used
     - how many participants were enrolled
     - statistical tests
-    - a measure of its precision (99%CI)
+    - a measure of its precision
     - main limitation
 
 ##### Conclusions
-Incretin-based drugs associate with various AEs on Japanese spontaneous reports.
-
-These results are consistent with
 
     - general interpretation for any implications
     - important recommendation for future
@@ -77,150 +85,137 @@ These results are consistent with
 Introduction
 ------------
 
-Incretin is a group of hormones stimulating insulin secretion and several hypoglycemic drugs based on this mechanism have been developed during the last decade.
-There are two types of incretin-based drugs, dipeptidyl peptidase 4 (DPP-4) inhibitors and glucagon-like peptide 1 (GLP-1) agonists.
+Incretin is a group of intestinal hormones stimulating insulin secretion, and several hypoglycemic drugs based on this mechanisms have been developed during the last decade.
+There are two types of incretin-based drugs, inhibitors of the incretin-degrading protease dipeptidyl peptidase 4 (DPP-4) and receptor agonists of the incretin hormone glucagon-like peptide 1 (GLP-1), which are gaining widespread use for type 2 diabetes.
+DPP-4 inhibitors and GLP-1 agonists have the clinical advantages, e.g. effective lowering of fasting and postprandial glucose, avoidance of hypoglycemia, no risk of body weight gain, reduction in blood pressure, and so on. [1]
 
-GLP-1 agonists demonstrate an efficacy comparable to insulin treatment and appear to do so with significant effects to promote weight loss with minimal hypoglycemia. <sup>1</sup>
+Incretin-based drugs have many benefits, by contrast, there are safety concerns about adverse outcomes.
+Pancreatitis and pancreatic cancer are ones of the most controversial issues in the concerns.
+In one study analyzing the US Food and Drug Administration (FDA) Adverse Event Reporting System (FAERS), use of the DPP-4 inhibitor sitagliptin or the GLP-1 agonist exenatide increased the odds ratio (OR) for pancreatitis more than 6-fold and for pancreatic cancer more than 2-fold  as compared with other medications. [2]
+However, in most other clinical studies, data have suggested no evidence for the risks of pancreatitis or pancreatic cancer. [1, 3]
+The FDA and the European Medicines Agency (EMA) explored multiple streams of data and agreed that assertions concerning a causal association between incretin-based drugs and pancreatitis or pancreatic cancer were inconsistent with the current data. [4]
 
-In addition, there are significant data with dipeptidyl peptidase 4 (DPP-4) inhibitors showing efficacy comparable to sulfonylureas but with weight neutral effects and reduced risk for hypoglycemia.
+Spontaneous reporting systems (SRSs) such as FAERS are passive systems composed of reports of suspected adverse drug events (ADEs) collected from healthcare professionals, consumers, and pharmaceutical companies. [5]
+Although they cover large populations, their data have some bias in reporting.
+In the case of incretin-based drugs in the FAERS, reporting of pancreatitis was largely influenced by the relevant FDA alerts, which is so-called notoriety bias and could cause overestimation of risks. [6]
 
-    <-  advantages of incretin-based drugs
-
-These drugs have many advantages, however
-Adverse Event (AE)
-
-    <-  feared AE
-
-
-Spontaneous reporting systems (SRSs) play an essential roles in drug safety surveillance. These cumulate a large quantity of case reports.
-
-Japanese Adverse Drug Event Report database (JADER)
-Pharmaceuticals and Medical Devices Agency (PMDA)
-
-The report data is fetched from Japanese Adverse Drug Event Report database (JADER), which is published by Pharmaceuticals and Medical Devices Agency (PMDA).
-
-    はじめに[introduction]
-    背景[background]/ 論拠[rationale] 2 研究の科学的な背景と論拠を説明する。
-    目的[objective] 3 特定の仮説を含む目的を明記する。
+The objective of this article is to evaluate associations between incretin-based drugs and adverse events reported in spontaneous reports by statistical approach.
+We performed comprehensive analyses based on multivariate mixed effects logistic regression.
+The analyzed data were from the Japanese SRS that is termed JADER (Japanese Adverse Drug Event Report database) and maintained by the Pharmaceuticals and Medical Devices Agency (PMDA).
+Most of case reports in the JADER are medically confirmed, while those in the FAERS are from consumers or lawyers. [7]
+In the analyses, in addition to logistic regressions, disproportionality analyses (DPA) were used adjunctively.
+As methods applied to SRSs, while DPA are traditional approaches, multivariate logistic regressions are more appropriate to handle confounding. [5]
+Mixed effects logistic regression is one of generalized linear mixed models (GLMMs) and contains variables for fixed and random effects.
+By introducing random variable in a logistic regression model, ramifications of different sources of heterogeneity and associations between outcomes are described. [8]
+As an application of GLMMs to SRSs, the approach based on mixed effects Poisson regression models was proposed in one study. [9]
+This method yields rate multipliers for each drug in a class of drugs that describe the deviation of the rate for a specific adverse event from that for the drug class as a whole.
+On the other hand, the present approach is based on the logistic regression model with the random intercept, where time of reporting is treated as a random effect so as to address heterogeneity between reporting periods.
+To the best of our knowledge, this is the first application of logistic regression models with random effects for time on data analysis of SRSs.
 
 
-Methods
--------
+Material and Methods
+--------------------
 
 ##### Study Design
 
-This study comprises two phases of analyses for drug-event associations on spontaneous reports.
-The first phase is a frequency analysis based on Fisher's exact test, the second phase is a multivariate analysis using a mixed effects logistic regression model.
+This study was designed as two phases of analyses for drug-event associations on spontaneous reports.
+The first phase is DPA based on Fisher's exact test, the second phase is multivariate analyses based on a mixed effects logistic regression model.
 
 ##### Data Source
 
-Japanese AE report data of JADER were fetched from the website of PMDA, and the dataset published in July 2015 was used, which contain 353,988 unique cases.
-In these, cases which were reported from January 2010 to March 2015 and had available records about age and sex were analyzed.
+The JADER dataset was fetched from the website of the PMDA, which was published in July 2015 and contained 353,988 unique cases.
+The cases analyzed were reported from January 2010 to March 2015 and had available records about age and sex.
 
-AEs in JADER were coded as Preferred Terms (PTs) in the Japanese version of the Medical Dictionary for Regulatory Activities (MedDRA/J). [1]
-For data analysis, we constructed a relational database (RDB) containing the JADER dataset and MedDRA/J version 18.0.
-As an RDB management system, SQLite version 3.8.5 was used. [2]
+Adverse events in the JADER were coded as Preferred Terms (PTs) in the Japanese version of the Medical Dictionary for Regulatory Activities (MedDRA/J). [10]
+Before data analyses, a relational database was constructed from the JADER dataset and MedDRA/J version 18.0.
+For the database management system, SQLite version 3.8.5 was used. [11]
 
-Incretin-based drugs
+As incretin-based drugs, all of the approved DPP-4 inhibitors and GLP-1 agonists in Japan were followed.
+The DPP-4 inhibitors were: sitagliptin phosphate hydrate, vildagliptin, alogliptin benzoate, alogliptin benzoate / pioglitazone hydrochloride (combination drug), linagliptin, teneligliptin hydrobromide hydrate, anagliptin and saxagliptin hydrate.
+The GLP-1 agonists were: exenatide, liraglutide and lixisenatide.
 
 ##### Data Analysis
 
-The PTs of AEs were classified in MedDRA High Level Terms (HLTs), all the combinations between drug generic names and HLTs were extracted.
-Fisher's exact tests were performed by all the drug-HLT combinations.
-Combinations in which a two-sided p-value was less than 0.01 and an odds ratio (OR) was greater than 1 were handled as significant associations.
+The PTs of adverse events were classified in MedDRA High Level Terms (HLTs), all the combinations between drug generic names and HLTs were extracted.
+Fisher's exact tests were performed by all the combinations between drugs and HLTs reported along with incretin-based drugs.
+Combinations where a two-sided p-value < 0.01 and an OR > 1 were handled as significant associations.
 
-About the HLTs significantly associated with incretin-based drugs (Table 1), mixed effects logistic regressions for occurrences of each HLT were performed.
-A mixed effects model contains random effects at group levels besides traditional fixed effects. [3]
+About the HLTs significantly associated with incretin-based drugs, mixed effects logistic regressions for occurrences of each HLT were performed.
+A model for mixed effects logistic regression, i.e. logistic regression with random effects, is described as the following:
 
-In this study, the following covariates were treated as fixed effects: use of DPP-4 inhibitors, use of GLP-1 agonists, use of any hypoglycemic drugs (an alternative indicator of hyperglycemia), sum of concomitant suspected drugs (determined by reference to the Fisher's exact tests), age (each 10-year) and sex.
-Moreover, reporting date (quarterly period) was treated as a random effect.
-This was supposed to be a random intercept normally distributed with mean 0 and a common variance.
-The associations between incretin-based drugs and HLTs were assessed by ORs with 99% Wald-type confidence intervals.
-Furthermore, adequacy of the random effect was assessed using Akaike information criteria (AIC) among HLTs reported along with incretin-based drug.
+\[\frac{P\left( Y_{i} = 1 \middle| x_{i},z_{i} \right)}{P\left( Y_{i} = 0 \middle| x_{i},z_{i} \right)} = \exp\left( x_{i}^{T}\beta + z_{i}^{T}u \right)\]
 
-All data analyses were performed in the statistical computing environment of R version 3.2.1. [4]
-For mixed effects logistic regression, glmmML package version 1.0 were used with method 'ghq' (Gauss-Hermite quadrature). [5]
+Y_{_i_} is the variable for a binary outcome of case _i_, which is 0 or 1.
+\beta is the fixed effects parameters, and x_{_i_} is the vector for the fixed effects.
+_u_ contains the random effects, and z_{_i_} is the vector for the random effects.
+_u_ can be thought as unmeasured covariates, as a way to model heterogeneity, or as a way to model correlated data. [8]
 
+In the present analyses, the binary outcome was whether each HLT was reported or not, and the covariates were the followings.
+For fixed effects: use of DPP-4 inhibitors, use of GLP-1 agonists, use of any hypoglycemic drugs (an alternative indicator for hyperglycemia), sum of concomitant suspected drugs (determined by reference to the Fisher's exact tests), age (each 10-year) and sex.
+For a random effect: reporting date (quarterly period).
+The variables for the random effect was supposed to be random intercepts normally distributed with mean 0 and one common variance.
+The associations between incretin-based drugs and HLTs were assessed by ORs with 99 % Wald-type confidence intervals (CIs).
 
-    方法[methods]
-    研究デザイン[study design] 4 研究デザインの重要な要素を論文のはじめの[early]部分で示す。
-    セッティング[setting] 5 セッティング，実施場所のほか，基準となる日付については，登録，曝露 [exposure]，追跡，データ収集の期間を含めて明記する。
-    参加者[participant] 6
-    (a)・コホート研究[cohort study]：適格基準[eligibility criteria]，参加者の 母集団[sources]，選定方法を明記する。追跡の方法についても記述 する。
-    (a)・ケース・コントロール研究[case-control study]：適格基準，参加者 の母集団，ケース[case]の確定方法とコントロール[control]の選択 方法を示す。ケースとコントロールの選択における論拠を示す。
-    (a)・横断研究[cross-sectional study]：適格基準，参加者の母集団，選択 方法を示す。
-    (b)・コホート研究：マッチング研究[matched study]の場合，マッチング の基準，曝露群[exposed]と非曝露群[unexposed]の各人数を記載する。
-    (b)・ケース・コントロール研究：マッチング研究[matched study]の場合， マッチングの基準，ケースあたりのコントロールの人数を記載する。
-    変数[variable] 7 すべてのアウトカム，曝露，予測因子[predictor]，潜在的交絡因子 [potential confounder]，潜在的な効果修飾因子[effect modifier]を明確に定義 する。該当する場合は，診断方法を示す。 データ源[data source]/ 測定方法 8＊ 関連する各因子に対して，データ源，測定・評価方法の詳細を示す。二つ 以上の群がある場合は，測定方法の比較可能性[comparability]を明記する。
-    バイアス[bias] 9 潜在的なバイアス源に対応するためにとられた措置があればすべて示す。
-    研究サイズ[study size] 10 研究サイズ[訳者注：観察対象者数]がどのように算出されたかを説明する。
-    量的変数 [quantitative variable] 11 (a)量的変数の分析方法を説明する。該当する場合は，どのグルーピング [grouping]がなぜ選ばれたかを記載する。
-    統計・分析方法 [statistical method] 12
-    (a)交絡因子の調整に用いた方法を含め，すべての統計学的方法を示す。
-    (b)サブグループと相互作用[interaction]の検証に用いたすべての方法を示す。
-    (c)欠損データ[missing data]をどのように扱ったかを説明する。
-    (d)・コホート研究：該当する場合は，脱落例[loss to follow-up]をどのように扱ったかを説明する。 (d)・ケース・コントロール研究：該当する場合は，ケースとコントロー ルのマッチングをどのように行ったかを説明する。
-    (d)・横断研究：該当する場合は，サンプリング方式[sampling strategy]を 考慮した分析法について記述する。
-    (e)あらゆる感度分析[sensitivity analysis]の方法を示す。
+Furthermore, this mixed model was compared with the fixed model without the random effect.
+The covariates for fix effects in the fixed model were common with those in the mixed model.
+Logistic regressions based on each model were performed by all the HLTs reported along with incretin-based drugs, so that the adequacy of the random effect was assessed by Akaike information criteria (AIC).
+
+All the data analyses were performed in the statistical computing environment of R version 3.2.1. [12]
+For the mixed effects logistic regressions, glmmML package version 1.0 were used with a method "ghq" (Gauss-Hermite quadrature). [13]
 
 
 Results
 -------
 
-176,957 unique cases were analyzed, which were reported from January 2010 to March 2015 had available records about age and sex.
-In these cases, 4,952 unique drug generic name and 6,151 unique PTs were reported.
-1,377 unique HLTs
+##### Description of the analyzed case reports
 
+187,181 unique cases which were reported from January 2010 to March 2015 and had available records about age and sex were analyzed, where 4,952 drug generic name and 6,151 PTs under 1,377 HLTs were reported.
+DPP-4 inhibitors were in 7,265 cases and GLP-1 agonists were in 451 cases.
+The counts of the cases with hypoglycemic drugs by each quarterly period were described in Figure 1.
+Although cases with other hypoglycemic drugs were increasing, cases with DPP-4 inhibitors were increasing markedly.
 
+##### The mixed effects logistic regressions
 
+1,430 PTs under 735 HLTs were reported in the cases with incretin-based drugs.
+In the Fisher's exact tests, 106 of the 735 HLTs were significantly associated with any incretin-based drug by two-sided p-value < 0.01 and OR > 1.
+In the mixed effects logistic regressions, 33 of the 106 HLTs were significantly associated with DPP-4 inhibitors or GLP-1 agonists by 99 % CI (Table 1).
+ORs with 99 % CIs for the significant combinations between HLTs and DPP-4 inhibitors or GLP-1 agonists were described in Figure 2.
+The following HLTs were remarkably associated.
+With DPP-4 inhibitors:  Pancreatic disorders NEC (OR 18.65; 99 % CI 2.09-166.25), Acute and chronic pancreatitis (8.65; 5.76-12.98), Skin autoimmune disorders NEC (6.87; 2.13-22.19), and so on.
+With GLP-1 agonists: Thyroid neoplasms (87.25; 6.64-1146.27), Cystic pancreatic disorders (61.32; 1.69-2224.49), Pancreatic disorders NEC (37.98; 5.56-259.52), and so on.
+"NEC" in MedDRA terms is the abbreviation of "Not Elsewhere Classified" to denote groupings of miscellaneous terms.
 
-**Table 1** results of logistic regressions
+##### AIC comparison between the models with or without the random effect
 
-![](output/img/q_count.png)
-
-**Figure 1** Report counts of hypoglycemic drugs
-
-![](output/img/mixed_or.png)
-
-**Figure 2** Odds ratios of HLTs associated with DPP-4 inhibitors or GLP-1 agonists
-
-![](output/img/aic_diff.png)
-
-**Figure 3** AIC improvements with a random effect
-
-
-
-    結果[result]
-    参加者[participant] 13＊
-    (a)研究の各段階における人数を示す(例：潜在的な適格[eligible]者数， 適格性が調査された数，適格と確認された数，研究に組入れられた数， フォローアップを完了した数，分析された数)。
-    (b)各段階での非参加者の理由を示す。
-    (c)フローチャートによる記載を考慮する。
-    記述的データ [descriptive data] 14＊
-    (a)参加者の特徴(例：人口統計学的，臨床的，社会学的特徴)と曝露や 潜在的交絡因子の情報を示す。 (b)それぞれの変数について，データが欠損した参加者数を記載する。
-    (c)コホート研究：追跡期間を平均および合計で要約する。
-    アウトカムデータ [Outcome data] 15＊
-    ・コホート研究：アウトカム事象の発生数や集約尺度[summary measure] の数値を経時的に示す。
-    ・ケース・コントロール研究：各曝露カテゴリーの数，または曝露の集約 尺度を示す。
-    ・横断研究：アウトカム事象の発生数または集約尺度を示す。
-    おもな結果[main result] 16
-    (a)調整前[unadjusted]の推定値と，該当する場合は交絡因子での調整後の 推定値，そしてそれらの精度(例：95％信頼区間)を記述する。どの 交絡因子が，なぜ調整されたかを明確にする。
-    (b)連続変数[continuous variable]がカテゴリー化されているときは，カテ ゴリー境界[category boundary]を報告する。
-    (c)意味のある[relevant]場合は，相対リスク[relative risk]を，意味をもつ 期間の絶対リスク[absolute risk]に換算することを考慮する。
-    他の解析[other analysis] 17 その他に行われたすべての分析(例：サブグループと相互作用の解析や感 度分析)の結果を報告する。
-
-
-References
-1.  MedDRA
-2.  SQLite
-3.  Larsen, K., et al. (2000). "Interpreting Parameters in the Logistic Regression Model with Random Effects." Biometrics 56(3): 909-914.
-4.  R Core Team. R: A Language and Environment for Statistical Computing. Vienna, Austria2015.
-5.  Broström G. glmmML: Generalized linear models with clustering. 2013.
+The comparison between the model with the random effect (mixed model) and the model without the random effect (fixed model) was described in Figure 3.
+In 604 of the 735 HLTs reported along with incretin-based drugs, AIC of the models were calculated normally.
+Of the 604 HLTs, 302 favored the mixed model and the other favored the fixed model.
+Each medians of the total case counts among these two groups were 264 and 83.
+Thus, there was a tendency that frequently reported HLTs favored the mixed model.
 
 
 Discussion
 ----------
 
-##### Limitation
+1.  the characteristics of JADER
+2.  ADEs of incretin-based drugs
+3.  limitations
+4.  benefits of this model
+
+SRSs accumulate large amount of data prefocused on ADEs and are accessible for data analysis.
+
+
+Incretin-based drugs
+
+These results are consistent with
+
+is prone to
+attempts
+
+- Description of the analyzed case reports
+- The mixed effects logistic regressions
+- AIC comparison between the models with or without the random effect
+
 
     考察[discussion]
     鍵となる結果[key result] 18 研究目的に関しての鍵となる結果を要約する。
@@ -231,18 +226,25 @@ Discussion
     研究の財源[funding] 22 研究の資金源，本研究における資金提供者[funder]の役割を示す。該当する場合には，現在の研究の元となる研究[original study]についても同様に示す。
 
 
-Acknowledgement
----------------
+Conclusion
+----------
 
+
+Acknowledgements
+----------------
+
+
+Author contribution
+-------------------
+
+
+Disclosure
+----------
+
+The author reports no conflicts of interest in this work.
 
 Reference
 ---------
-
-    R Development Core Team (2013) R: A Language and Environment for Statistical Computing (R Foundation for Statistical Computing, Vienna, Austria).
-    Stan Development Team (2013) Stan: A C++ Library for Probability and Sampling, Version 1.3. Available at http://mc-stan.org/.
-
-    Wickham H (2009) ggplot2: Elegant Graphics for Data Analysis (Springer, New York).
-    Stan Development Team (2012) Stan: A C++ Library for Probability and Sampling, Version 1.0. Available at http://mc-stan.org/.
 
 
 Competing Interests
@@ -260,4 +262,23 @@ Figure Legends
 Tables
 ------
 
+
+**Table 1** Results of logistic regressions.
+
+
+**Notes:**
+
+**Abbreviations:** ADE, adverse event; SRS, spontaneous reporting system; OR, odds ratio.
+
+**Figure 1** Report counts of hypoglycemic drugs.
+
+![](output/img/q_count.png)
+
+**Figure 2** Odds ratios of HLTs associated with DPP-4 inhibitors or GLP-1 agonists.
+
+![](output/img/mixed_or.png)
+
+**Figure 3** AIC improvements with a random effect.
+
+![](output/img/aic_diff.png)
 

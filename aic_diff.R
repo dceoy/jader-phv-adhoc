@@ -2,7 +2,7 @@
 
 source('func.R')
 
-dt_daic <- fread('output/csv/aic_hlt.csv')[,c(1:4, 6, 8), with = FALSE] %>%
+dt_daic <- fread('output/csv/aic_hlt.csv')[, c(1:4, 6, 8), with = FALSE] %>%
              setnames(c('aic_mixed', 'aic_fixed', 'sigma', 'sigma_sd', 'hlt_name', 'case_count')) %>%
              mutate(aic_diff = aic_mixed - aic_fixed,
 #                   lab = ifelse(aic_diff < -220, hlt_name, ''),
@@ -11,9 +11,10 @@ dt_daic <- fread('output/csv/aic_hlt.csv')[,c(1:4, 6, 8), with = FALSE] %>%
 segment <- function(dt) {
   return(ggplot(dt, aes(x = case_count, y = aic_diff, colour = favor)) +
 #          geom_text(aes(label = lab), vjust = 0, hjust = 1.04, colour = '#003366') +
-           geom_point(size = 4, shape = 18, alpha = 0.8) +
+           geom_point(size = 4, shape = 18, alpha = 0.7) +
            scale_x_log10(breaks = c(10 ^ (1:4)), expand = c(0.02, 0.02)) +
            scale_y_continuous(expand = c(0.02, 0.02)) +
+           scale_colour_manual(values = c('#E377C2', '#17BECF')) +
            labs(x = 'Unique Case Count', y = 'AIC Difference', colour = element_blank()) +
            theme_bw() +
            theme(legend.position = 'none',
@@ -29,9 +30,10 @@ histogram <- function(dt) {
            geom_histogram(position = 'identity', colour = NA, alpha = 0.3) +
            scale_x_log10(labels = NULL, breaks = NULL, expand = c(0.02, 0.02)) +
            scale_y_continuous(expand = c(0, 0.02)) +
-           scale_fill_discrete(name = 'MedDRA HLTs',
-                               label = c(mixed = 'favor the MIXED model',
-                                         fixed = 'favor the FIXED model')) +
+           scale_fill_manual(name = 'MedDRA HLTs',
+                             label = c(mixed = 'favor the MIXED model',
+                                       fixed = 'favor the FIXED model'),
+                             values = c('#E377C2', '#17BECF')) +
            labs(y = 'Frequency') +
            theme_bw() +
            theme(legend.position = c(0, 0.6), legend.justification = c(0, 0),
