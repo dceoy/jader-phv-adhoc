@@ -132,7 +132,7 @@ Combinations in which a two-sided p-value was less than 0.01 and an odds ratio (
 About the HLTs significantly associated with incretin-based drugs (Table 1), mixed effects logistic regressions for occurrences of each HLT were performed.
 A mixed effects model contains random effects at group levels besides traditional fixed effects. [3]
 
-In this study, the following variates were treated as fixed effects: use of DPP-4 inhibitors, use of GLP-1 agonists, use of any hypoglycemic drugs (an alternative indicator of hyperglycemia), sum of concomitant suspected drugs (determined by reference to the Fisher's exact tests), age (each 10-year) and sex.
+In this study, the following covariates were treated as fixed effects: use of DPP-4 inhibitors, use of GLP-1 agonists, use of any hypoglycemic drugs (an alternative indicator of hyperglycemia), sum of concomitant suspected drugs (determined by reference to the Fisher's exact tests), age (each 10-year) and sex.
 Moreover, reporting date (quarterly period) was treated as a random effect.
 This was supposed to be a random intercept normally distributed with mean 0 and a common variance.
 The associations between incretin-based drugs and HLTs were assessed by ORs with 99% Wald-type confidence intervals.

@@ -34,7 +34,7 @@ histogram <- function(dt) {
                                          fixed = 'favor the FIXED model')) +
            labs(y = 'Frequency') +
            theme_bw() +
-           theme(legend.position = c(1, 0.7), legend.justification = c(1, 0),
+           theme(legend.position = c(0, 0.6), legend.justification = c(0, 0),
                  legend.background = element_blank(), legend.key = element_blank(),
                  legend.title = element_text(colour = '#000066', size = 18),
                  legend.text = element_text(colour = '#000066', size = 18),
@@ -47,7 +47,7 @@ histogram <- function(dt) {
                  axis.ticks = element_blank(),
                  axis.text = element_blank(),
                  axis.title.x = element_blank(),
-                 axis.title.y = element_text(colour = '#000066', vjust = 2, size = 22)))
+                 axis.title.y = element_text(colour = '#000066', vjust = 3, size = 22)))
 }
 
 hst_seg <- function(dt) {
