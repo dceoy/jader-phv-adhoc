@@ -15,7 +15,7 @@ segment <- function(dt) {
            scale_x_log10(breaks = c(10 ^ (1:4)), expand = c(0.02, 0.02)) +
            scale_y_continuous(expand = c(0.02, 0.02)) +
            scale_colour_manual(values = c('#E377C2', '#17BECF')) +
-           labs(x = 'Unique Case Count', y = 'AIC Difference', colour = element_blank()) +
+           labs(x = 'Case count', y = 'AIC difference', colour = element_blank()) +
            theme_bw() +
            theme(legend.position = 'none',
                  plot.margin = unit(c(0, 1, 1, 1), 'lines'),
@@ -43,7 +43,6 @@ histogram <- function(dt) {
                  panel.background = element_blank(),
                  panel.grid.major = element_blank(),
                  panel.grid.minor = element_blank(),
-                 panel.margin = unit(0, 'null'),
                  panel.border = element_rect(color = NA),
                  plot.margin = unit(c(1, 1, -0.9, 3.5), 'lines'),
                  axis.ticks = element_blank(),

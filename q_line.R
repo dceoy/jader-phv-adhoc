@@ -69,6 +69,17 @@ if(file.exists(csv_file <- 'output/csv/q_count.csv')) {
                   )
                 GROUP BY
                   quarter
+              UNION ALL
+                SELECT
+                  "all" AS class,
+                  quarter,
+                  COUNT(DISTINCT a.case_id) AS case_c
+                FROM
+                  ade a
+                INNER JOIN
+                  demo d ON d.case_id == a.case_id
+                GROUP BY
+                  quarter
             );'
 
   dt_dr <- sql_dt(con, sql_q)
@@ -79,35 +90,61 @@ v_hgdr <- c(dpp4_inhibitor = 'DPP-4 inhibitors',
             glp1_agonist = 'GLP-1 agonists',
             oral_hypoglycemic_drugs_except_dpp4_inhibitors = 'Oral hypoglycemic drugs except DPP-4 inhibitors',
             insulin = 'Insulin',
-            any_hypoglycemic_drugs = 'Any hypoglycemic drugs')
+            any_hypoglycemic_drugs = 'Any hypoglycemic drugs',
+            all = 'all')
 
 dt_qc <- dt_dr %>%
-          expand(class, quarter) %>%
-          mutate(case_c = 0) %>%
-          rbind(dt_dr) %>%
-          group_by(class, quarter) %>%
-          summarize(case_c = sum(case_c)) %>%
-          mutate(class = v_hgdr[class])
+           expand(class, quarter) %>%
+           mutate(case_c = 0) %>%
+           rbind(dt_dr) %>%
+           group_by(class, quarter) %>%
+           summarize(case_c = sum(case_c)) %>%
+           mutate(class = v_hgdr[class])
 
-qcount <- function(dt, od = v_hgdr) {
+count_line <- function(dt, dc) {
   return(ggplot(dt, aes(x = quarter, y = case_c, group = class, colour = class)) +
            geom_point(size = 3, shape = 18) +
            geom_line(size = 1.4, alpha = 0.5) +
-           scale_x_discrete(breaks = c('2009q4', '2010q4', '2011q4', '2012q4', '2013q4', '2014q4'),
-                            labels = c(2010, 2011, 2012, 2013, 2014, 2015)) +
-           scale_y_continuous(limits = c(0, 1300), breaks = c(500 * (0:2))) +
-           scale_colour_discrete(limits = od) +
-           labs(x = 'Reporting Date', y = 'Unique Case Count', colour = element_blank()) +
+           scale_x_discrete(breaks = c('2009q4', '2010q4', '2011q4', '2012q4', '2013q4', '2014q4')) +
+           scale_y_continuous(limits = c(0, 1300), breaks = c(500 * (0:2)), expand = c(0, 0)) +
+           scale_colour_discrete(limits = dc) +
+           labs(y = 'Case count', colour = element_blank()) +
            theme_bw() +
-           theme(legend.position = c(0.05, 1), legend.justification = c(0, 1),
+           theme(legend.position = c(0.02, 1), legend.justification = c(0, 1),
                  legend.background = element_blank(), legend.key = element_blank(),
                  legend.text = element_text(colour = '#000066', size = 18),
+                 axis.title.x = element_blank(),
+                 axis.title.y = element_text(colour = '#000066', vjust = 3.5, size = 22),
+                 axis.text.x = element_blank(),
+                 axis.text.y = element_text(colour = '#000066', size = 18),
+                 plot.margin = unit(c(1, 1, 1, 1.7), 'lines'),
+                 panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                 panel.border = element_blank(),
+                 axis.line = element_line(colour = '#000066')))
+}
+
+count_area <- function(dt) {
+  return(ggplot(dt, aes(x = quarter, y = case_c, group = class)) +
+           geom_area(fill = '#000066', alpha = 0.2) +
+           scale_x_discrete(breaks = c('2009q4', '2010q4', '2011q4', '2012q4', '2013q4', '2014q4'),
+                            labels = c(2010, 2011, 2012, 2013, 2014, 2015)) +
+           scale_y_continuous(breaks = c(0, 10000), expand = c(0, 0)) +
+           labs(x = 'Reporting period', y = 'Total', colour = element_blank()) +
+           theme_bw() +
+           theme(legend.position = 'none',
                  axis.title.x = element_text(colour = '#000066', vjust = -1, size = 22),
                  axis.title.y = element_text(colour = '#000066', vjust = 2, size = 22),
                  axis.text = element_text(colour = '#000066', size = 18),
-                 plot.margin = unit(c(1, 1, 1, 1), 'lines'),
-                 panel.grid.major.x = element_blank(), panel.grid.minor = element_blank(),
-                 panel.border = element_blank(), axis.line = element_line(colour = '#000066')))
+                 plot.margin = unit(c(0, 1, 1, 1), 'lines'),
+                 panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                 panel.border = element_blank(),
+                 axis.line = element_line(colour = '#000066')))
 }
 
-png_plot(qcount(dt_qc), file = 'output/img/q_count.png', w = 900, h = 500)
+line_area <- function(dt, dc) {
+  return(grid.arrange(count_line(filter(dt, class != 'all'), setdiff(dc, 'all')),
+                      count_area(filter(dt, class == 'all')),
+                      nrow = 2, heights = c(5, 1)))
+}
+
+png_plot(line_area(dt_qc, v_hgdr), file = 'output/img/q_count.png', w = 900, h = 600)

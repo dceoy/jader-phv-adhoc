@@ -59,7 +59,7 @@ drug-event combinations which two-sided p-value < 0.01 and odds ratio > 1
 
 using fixed effects model and adverse events associated with incretin-based drug were extracted.
 
-This model includes use of incretin-based drug, concomitant suspected drug, history of the event, age and sex as predictor variables, and occurrence of each HLTs as an outcome variable.
+This model includes use of incretin-based drug, concomitant suspected drug, history of the event, age, and sex as predictor variables, and occurrence of each HLTs as an outcome variable.
 In the second screening, the cases treated with hypoglycemic drug were analyzed using the same model as that in the previous screening.
 In the final analysis, the cases treated with hypoglycemic drug were analyzed using the random effects model which has reporting quarter as a random effect besides the fixed effects.
 The result showed that GLP-1 agonists associated with risks of pancreatic neoplasms (odds ratio 25.0, 99 % credible interval 8.2 to 79.3) and pancreatitis (12.5, 5.9 to 26.9) and that DPP-4 inhibitors are associated with risks of pancreatic neoplasms (4.9, 1.76 to 15.4), pancreatitis (13.3, 7.2 to 27.9) and abnormal urinalysis (7.8, 1.5 to 69.1).
@@ -131,27 +131,27 @@ Before data analyses, a relational database was constructed from the JADER datas
 For the database management system, SQLite version 3.8.5 was used. [11]
 
 As incretin-based drugs, all of the approved DPP-4 inhibitors and GLP-1 agonists in Japan were followed.
-The DPP-4 inhibitors were: sitagliptin phosphate hydrate, vildagliptin, alogliptin benzoate, alogliptin benzoate / pioglitazone hydrochloride (combination drug), linagliptin, teneligliptin hydrobromide hydrate, anagliptin and saxagliptin hydrate.
-The GLP-1 agonists were: exenatide, liraglutide and lixisenatide.
+The DPP-4 inhibitors were: sitagliptin phosphate hydrate, vildagliptin, alogliptin benzoate, alogliptin benzoate / pioglitazone hydrochloride (combination drug), linagliptin, teneligliptin hydrobromide hydrate, anagliptin, and saxagliptin hydrate.
+The GLP-1 agonists were: exenatide, liraglutide, and lixisenatide.
 
 ##### Data Analysis
 
-The PTs of adverse events were classified in MedDRA High Level Terms (HLTs), all the combinations between drug generic names and HLTs were extracted.
+The PTs of adverse events were classified in MedDRA High Level Terms (HLTs), and all the combinations between drug generic names and HLTs were extracted.
 Fisher's exact tests were performed by all the combinations between drugs and HLTs reported along with incretin-based drugs.
 Combinations where a two-sided p-value < 0.01 and an OR > 1 were handled as significant associations.
 
 About the HLTs significantly associated with incretin-based drugs, mixed effects logistic regressions for occurrences of each HLT were performed.
 A model for mixed effects logistic regression, i.e. logistic regression with random effects, is described as the following:
 
-\[\frac{P\left( Y_{i} = 1 \middle| x_{i},z_{i} \right)}{P\left( Y_{i} = 0 \middle| x_{i},z_{i} \right)} = \exp\left( x_{i}^{T}\beta + z_{i}^{T}u \right)\]
+\[\frac{P\left( Y_{i} = 1 \middle| x_{i},z_{i} \right)}{P\left( Y_{i} = 0 \middle| x_{i},z_{i} \right)} = exp\left( x_{i}^{T}\beta + z_{i}^{T}u \right)\]
 
-Y_{_i_} is the variable for a binary outcome of case _i_, which is 0 or 1.
-\beta is the fixed effects parameters, and x_{_i_} is the vector for the fixed effects.
-_u_ contains the random effects, and z_{_i_} is the vector for the random effects.
+Y_{_i_} is a variable for a binary outcome of case _i_, which is 0 or 1.
+\beta is a fixed parameter vector, and x_{_i_} is a covariate vector for fixed effects.
+_u_ is a vector of random variables from probability distributions, and z_{_i_} is a covariate vector for random effects.
 _u_ can be thought as unmeasured covariates, as a way to model heterogeneity, or as a way to model correlated data. [8]
 
 In the present analyses, the binary outcome was whether each HLT was reported or not, and the covariates were the followings.
-For fixed effects: use of DPP-4 inhibitors, use of GLP-1 agonists, use of any hypoglycemic drugs (an alternative indicator for hyperglycemia), sum of concomitant suspected drugs (determined by reference to the Fisher's exact tests), age (each 10-year) and sex.
+For fixed effects: use of DPP-4 inhibitors, use of GLP-1 agonists, use of any hypoglycemic drugs (an alternative indicator for hyperglycemia), sum of concomitant suspected drugs (determined by reference to the Fisher's exact tests), age (each 10-year), and sex.
 For a random effect: reporting date (quarterly period).
 The variables for the random effect was supposed to be random intercepts normally distributed with mean 0 and one common variance.
 The associations between incretin-based drugs and HLTs were assessed by ORs with 99 % Wald-type confidence intervals (CIs).
@@ -197,15 +197,21 @@ Thus, there was a tendency that frequently reported HLTs favored the mixed model
 Discussion
 ----------
 
-1.  the characteristics of JADER
+1.  limitations
 2.  ADEs of incretin-based drugs
-3.  limitations
-4.  benefits of this model
+3.  benefits of this model
+
+SRSs accumulate large amount of data prefocused on ADEs, where reports are affected by various factors
+
+
+
+
+
+Spontaneous reports has no denominators, namely, how much drugs were prescribed.
+However, denominators affect amounts of reports logically, so that increasing prescriptions are likely to cause increasing reports.
+Incretin-based medications is now being main stream in type II diabetes medications.
 
 SRSs accumulate large amount of data prefocused on ADEs and are accessible for data analysis.
-
-
-Incretin-based drugs
 
 These results are consistent with
 
