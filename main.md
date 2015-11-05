@@ -87,10 +87,10 @@ Introduction
 
 Incretin is a group of intestinal hormones stimulating insulin secretion, and several hypoglycemic drugs based on this mechanisms have been developed during the last decade.
 There are two types of incretin-based drugs, inhibitors of the incretin-degrading protease dipeptidyl peptidase 4 (DPP-4) and receptor agonists of the incretin hormone glucagon-like peptide 1 (GLP-1), which are gaining widespread use for type 2 diabetes.
-DPP-4 inhibitors and GLP-1 agonists have the clinical advantages, e.g. effective lowering of fasting and postprandial glucose, avoidance of hypoglycemia, no risk of body weight gain, reduction in blood pressure, and so on. [1]
+DPP-4 inhibitors and GLP-1 agonists have the clinical advantages, e.g. effective lowering of fasting and postprandial glucose, avoidance of hypoglycemia, no risk of body weight gain, reduction in blood pressure. [1]
 
 Incretin-based drugs have many benefits, by contrast, there are safety concerns about adverse outcomes.
-Pancreatitis and pancreatic cancer are ones of the most controversial issues in the concerns.
+Pancreatic disorders are ones of the most controversial issues in the concerns.
 In one study analyzing the US Food and Drug Administration (FDA) Adverse Event Reporting System (FAERS), use of the DPP-4 inhibitor sitagliptin or the GLP-1 agonist exenatide increased the odds ratio (OR) for pancreatitis more than 6-fold and for pancreatic cancer more than 2-fold  as compared with other medications. [2]
 However, in most other clinical studies, data have suggested no evidence for the risks of pancreatitis or pancreatic cancer. [1, 3]
 The FDA and the European Medicines Agency (EMA) explored multiple streams of data and agreed that assertions concerning a causal association between incretin-based drugs and pancreatitis or pancreatic cancer were inconsistent with the current data. [4]
@@ -169,25 +169,26 @@ Results
 
 ##### Description of the analyzed case reports
 
-187,181 unique cases which were reported from January 2010 to March 2015 and had available records about age and sex were analyzed, where 4,952 drug generic name and 6,151 PTs under 1,377 HLTs were reported.
+204,472 unique cases were reported from January 2010 to March 2015, and 187,181 of these had available records about age and sex, which were analyzed.
+In the data, 4,952 drug generic name and 6,151 PTs under 1,377 HLTs were reported.
 DPP-4 inhibitors were in 7,265 cases and GLP-1 agonists were in 451 cases.
-The counts of the cases with hypoglycemic drugs by each quarterly period were described in Figure 1.
-Although cases with other hypoglycemic drugs were increasing, cases with DPP-4 inhibitors were increasing markedly.
+Figure 1 denotes the counts of the cases with hypoglycemic drugs by each quarterly period.
+Although cases with other hypoglycemic drugs were prone to increase, cases with DPP-4 inhibitors were increasing markedly.
 
 ##### The mixed effects logistic regressions
 
 1,430 PTs under 735 HLTs were reported in the cases with incretin-based drugs.
 In the Fisher's exact tests, 106 of the 735 HLTs were significantly associated with any incretin-based drug by two-sided p-value < 0.01 and OR > 1.
 In the mixed effects logistic regressions, 33 of the 106 HLTs were significantly associated with DPP-4 inhibitors or GLP-1 agonists by 99 % CI (Table 1).
-ORs with 99 % CIs for the significant combinations between HLTs and DPP-4 inhibitors or GLP-1 agonists were described in Figure 2.
+Figure 2 denotes ORs with 99 % CIs for the significant combinations between HLTs and DPP-4 inhibitors or GLP-1 agonists.
 The following HLTs were remarkably associated.
-With DPP-4 inhibitors:  Pancreatic disorders NEC (OR 18.65; 99 % CI 2.09-166.25), Acute and chronic pancreatitis (8.65; 5.76-12.98), Skin autoimmune disorders NEC (6.87; 2.13-22.19), and so on.
-With GLP-1 agonists: Thyroid neoplasms (87.25; 6.64-1146.27), Cystic pancreatic disorders (61.32; 1.69-2224.49), Pancreatic disorders NEC (37.98; 5.56-259.52), and so on.
+With DPP-4 inhibitors: Pancreatic disorders NEC (OR 18.65; 99 % CI 2.09-166.25), Acute and chronic pancreatitis (8.65; 5.76-12.98), etc.
+With GLP-1 agonists: Thyroid neoplasms (87.25; 6.64-1146.27), Cystic pancreatic disorders (61.32; 1.69-2224.49), etc.
 "NEC" in MedDRA terms is the abbreviation of "Not Elsewhere Classified" to denote groupings of miscellaneous terms.
 
 ##### AIC comparison between the models with or without the random effect
 
-The comparison between the model with the random effect (mixed model) and the model without the random effect (fixed model) was described in Figure 3.
+Figure 3 describes the comparison between the model with the random effect (mixed model) and the model without the random effect (fixed model).
 In 604 of the 735 HLTs reported along with incretin-based drugs, AIC of the models were calculated normally.
 Of the 604 HLTs, 302 favored the mixed model and the other favored the fixed model.
 Each medians of the total case counts among these two groups were 264 and 83.
@@ -197,30 +198,72 @@ Thus, there was a tendency that frequently reported HLTs favored the mixed model
 Discussion
 ----------
 
-1.  limitations
-2.  ADEs of incretin-based drugs
-3.  benefits of this model
+SRSs accumulate large amount of data prefocused on ADEs every year, where the contents are not constant.
+In the present study, the report composition by hypoglycemic drug groups had varied during the study period.
+The reports with DPP-4 inhibitors showed a marked increase compared with that with the other hypoglycemic drugs.
+This tendency could be caused by increase of approved products and drug use.
+A report amount at one period are affected logically by various factors at the period.
+This property results in heterogeneity by time, which may support the adequacy of the mixed model.
 
-SRSs accumulate large amount of data prefocused on ADEs, where reports are affected by various factors
+Many of HLTs associated with incretin-based drugs in the study are the concerns in other previous studies.
+Pancreatitis ("Acute and chronic pancreatitis"), pancreatic neoplasms ("Pancreatic neoplasms" and "Pancreatic neoplasms malignant"), and other pancreatic disorders ("Cystic pancreatic disorders" and "Pancreatic disorders NEC") were associated with both of DPP-4 inhibitors and GLP-1 agonists, which are consistent with the result of the study analyzing the FAERS. [2]
+However biases like the FAERS [6]
+Thyroid neoplasms ("Thyroid neoplasms" and "Thyroid neoplasms malignant") were associated with GLP-1 agonists.
 
 
 
+Neoplasms except pancreatic and thyroid ones ("Gastric neoplasms malignant", "Lower respiratory tract neoplasms", etc.)
+Gastrointestinal adverse events ("Gastrointestinal stenosis and obstruction NEC", "Gastrointestinal atonic and hypomotility disorders NEC", etc.)
+Diabetic complications ("Diabetic complications NEC", "Diabetic complications neurological", etc.)
+Hyperglycemia ("Hyperglycaemic conditions NEC")
 
 
-Spontaneous reports has no denominators, namely, how much drugs were prescribed.
-However, denominators affect amounts of reports logically, so that increasing prescriptions are likely to cause increasing reports.
-Incretin-based medications is now being main stream in type II diabetes medications.
 
-SRSs accumulate large amount of data prefocused on ADEs and are accessible for data analysis.
+Cystic pancreatic disorders     嚢胞性膵障害
+Pancreatic disorders NEC        膵障害ＮＥＣ
+Acute and chronic pancreatitis  急性および慢性膵炎
+Pancreatic neoplasms malignant (excl islet cell and carcinoid)  悪性膵新生物（膵島細胞腫瘍およびカルチノイドを除く）
+Pancreatic neoplasms    膵新生物
 
-These results are consistent with
+Thyroid neoplasms malignant     悪性甲状腺新生物
+Thyroid neoplasms       甲状腺新生物
 
-is prone to
-attempts
+Gastrointestinal neoplasms benign NEC   良性消化器新生物ＮＥＣ
+Benign neoplasms gastrointestinal (excl oral cavity)    良性消化管新生物（口腔内新生物を除く）
+Lower gastrointestinal neoplasms benign 良性下部消化管新生物
+Gastric neoplasms malignant     悪性胃新生物
+Lower respiratory tract neoplasms       下気道新生物
 
-- Description of the analyzed case reports
-- The mixed effects logistic regressions
-- AIC comparison between the models with or without the random effect
+Gastrointestinal stenosis and obstruction NEC   消化管狭窄および閉塞ＮＥＣ
+Non-mechanical ileus    非機械的イレウス
+Gastrointestinal atonic and hypomotility disorders NEC  消化管アトニーおよび運動低下障害ＮＥＣ
+Digestive enzymes       消化酵素
+
+Metabolic acidoses (excl diabetic acidoses)     代謝性アシドーシス（糖尿病性アシドーシスを除く）
+Hyperglycaemic conditions NEC   高血糖ＮＥＣ
+Diabetic complications neurological     糖尿病性神経系合併症
+Diabetic complications NEC      糖尿病性合併症ＮＥＣ
+Chronic polyneuropathies        慢性多発ニューロパチー
+
+Rheumatoid arthropathies        リウマチ性関節症
+Rheumatoid arthritis and associated conditions  関節リウマチおよびその関連疾患
+Arthropathies NEC       関節症ＮＥＣ
+
+Adrenal cortical hypofunctions  副腎皮質機能低下
+Skin autoimmune disorders NEC   皮膚の自己免疫障害ＮＥＣ
+Skeletal and cardiac muscle analyses    骨格筋および心筋検査
+Cholecystitis and cholelithiasis        胆嚢炎および胆石症
+Bile duct infections and inflammations  胆管感染および炎症
+Coronary necrosis and vascular insufficiency    冠血管壊死および血行不全
+Urinalysis NEC  検尿ＮＥＣ
+Non-site specific injuries NEC  部位不明の損傷ＮＥＣ
+Injection site reactions        注射部位反応
+
+
+
+With DPP-4 inhibitors: Pancreatic disorders NEC (OR 18.65; 99 % CI 2.09-166.25), Acute and chronic pancreatitis (8.65; 5.76-12.98), Skin autoimmune disorders NEC (6.87; 2.13-22.19), etc.
+With GLP-1 agonists: Thyroid neoplasms (87.25; 6.64-1146.27), Cystic pancreatic disorders (61.32; 1.69-2224.49), Pancreatic disorders NEC (37.98; 5.56-259.52), etc.
+
 
 
     考察[discussion]
