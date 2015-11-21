@@ -50,6 +50,6 @@ tab1 <- dt_orci %>%
           inner_join(incr_or(dt_orci, 'dpp4i'), by = 'hlt') %>%
           inner_join(incr_or(dt_orci, 'glp1a'), by = 'hlt') %>%
           arrange(desc(maxor)) %>%
-          select(hlt, tc, dpp4i_cc, dpp4i_or, dpp4i_ll99, dpp4i_ul99, glp1a_cc, glp1a_or, glp1a_ll99, glp1a_ul99)
+          select(hlt, dpp4i_cc, dpp4i_or, dpp4i_ll99, dpp4i_ul99, glp1a_cc, glp1a_or, glp1a_ll99, glp1a_ul99, tc)
 
 write.table(tab1, file = 'output/csv/tab1.csv', sep = ',', row.name = FALSE)
