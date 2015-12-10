@@ -13,7 +13,7 @@ segment <- function(dt) {
 #          geom_text(aes(label = lab), vjust = 0, hjust = 1.04, colour = '#003366') +
            geom_point(size = 4, shape = 18, alpha = 0.7) +
            scale_x_log10(breaks = c(10 ^ (1:4)), expand = c(0.02, 0.02)) +
-           scale_y_continuous(expand = c(0.02, 0.02)) +
+           scale_y_continuous(limits = c(-240, 10), expand = c(0.02, 0.02)) +
            scale_colour_manual(values = c('#E377C2', '#17BECF')) +
            labs(x = 'Case count', y = 'AIC difference', colour = element_blank()) +
            theme_bw() +
@@ -52,7 +52,7 @@ histogram <- function(dt) {
 }
 
 hst_seg <- function(dt) {
-  return(grid.arrange(histogram(dt), segment(dt), nrow = 2, heights = c(1, 2)))
+  return(grid.arrange(histogram(dt), segment(dt), nrow = 2, heights = c(2, 3)))
 }
 
 png_plot(hst_seg(dt_daic), file = 'output/img/aic_diff.png', w = 900, h = 700)
