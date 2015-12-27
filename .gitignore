@@ -1,6 +1,10 @@
 *.sqlite3
 *.sqlite3-journal
 Rplots.pdf
+freq/legacy/
+freq/output/
 repos/
-output/
-legacy/
+output/rdata/*
+output/img/*
+output/log/*
+!.gitkeep
