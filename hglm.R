@@ -1,89 +1,53 @@
 #!/usr/bin/env Rscript
 
-source('load_tables.R') # dt_ade, dt_soc, dt_ct22
-sapply(c('dplyr', 'tidyr', 'data.table', 'foreach', 'doSNOW', 'ggmcmc', 'rstan'),
+source('prep_tables.R') # dt_ade, dt_soc, dt_bf
+sapply(pkgs <- c('dplyr', 'tidyr', 'data.table', 'foreach', 'doSNOW', 'ggmcmc', 'rstan'),
        function(p) require(p, character.only = TRUE))
 select <- dplyr::select
 registerDoSNOW(cl <- makeCluster(parallel::detectCores(), type = 'SOCK'))
 
-par_bf <- function(dt, cl) {
-  bf_by <- function(d) {
-    Rcpp::sourceCpp('bayes_factor.cpp')
-    return(data.table::as.data.table(t(apply(d, 1, bayes_factor))))
-  }
-  return(bind_rows(parLapply(cl,
-                             lapply(1:length(cl),
-                                    function(i) return(filter(dt,
-                                                              i == rep(1:length(cl),
-                                                                       nrow(dt))))),
-                             bf_by)))
+plot_log <- function(stanfit, tag, log_dir = 'output/log', img_dir = 'output/img') {
+  sink(paste0(log_dir, '/stanfit_', tag, '.txt')); print(stanfit); sink()
+  pdf(paste0(img_dir, '/traceplot_', tag, '.pdf')); traceplot(stanfit); dev.off()
+  pdf(paste0(img_dir, '/traceplot_', tag, '.pdf')); plot(stanfit); dev.off()
+  ggmcmc(ggs(stanfit), file = paste0(img_dir, '/ggmcmc_', tag, '.pdf'))
 }
 
+v_yid <- 1:length(unique(dt_ade$year))
+names(v_yid) <- sort(unique(dt_ade$year))
+dt_base <- dt_ade %>%
+             mutate(age = as.integer(age), yid = v_yid[as.character(year)]) %>%
+             inner_join(dt_bf, by = c('drug', 'soc_code')) %>%
+             select(case_id, drug, soc_code, age, sex, yid, bf)
 bf_threshold <- 100
-dt_sgnl <- dt_ct22 %>%
-             select(a:d) %>%
-             distinct() %>%
-             par_bf(cl) %>%
-             filter(bf > bf_threshold) %>%
-             inner_join(dt_ct22, by = c('a', 'b', 'c', 'd')) %>%
-             select(drug, soc_code, a, bf)
-dt_yid <- dt_ade %>%
-            select(year) %>%
-            arrange(year) %>%
-            distinct(year) %>%
-            mutate(yid = 1:nrow(.))
-
 mixed <- stan_model(file = 'mixed.stan')
 
-hlr <- foreach(socc = unique(dt_soc$soc_code), .packages = c('dplyr', 'data.table', 'rstan', 'foreach')) %dopar% {
-  dt_base <- dt_ade %>%
-               inner_join(dt_yid, by = 'year') %>%
-               left_join(filter(dt_sgnl, soc_code == socc), by = c('drug', 'soc_code')) %>%
-               mutate(age = as.integer(age),
-                      sex = as.factor(sex),
-                      yid = as.integer(yid),
-                      soc = ifelse(soc_code == socc, 1, 0),
-                      signal = ifelse(is.na(bf), 0, 1)) %>%
+print(system.time(hlr <- foreach(socc = dt_soc$soc_code, .packages = pkgs) %dopar% {
+  dt_susp <- dt_base %>%
+               filter(soc_code == socc, bf > bf_threshold) %>%
+               group_by(case_id) %>%
+               summarize(drug_count = n_distinct(drug))
+  dt_stan <- dt_base %>%
                group_by(case_id, age, sex, yid) %>%
-               summarize(event = as.factor(sum(unique(soc))),
-                         drug = as.integer(sum(signal)))
-  ls_dat <- list(N = nrow(dt_base),
-                 M = 3,
-                 L = length(unique(dt_base$yid)),
-                 y = dt_base$event,
-                 x = select(dt_base, drug, age, sex),
-                 t = dt_base$yid)
+               summarize(event = ifelse(socc %in% soc_code, 1, 0)) %>%
+               tbl_dt() %>%
+               left_join(dt_susp, by = 'case_id') %>%
+               replace_na(list(drug_count = 0))
 
-  stanfit <- sampling(object = mixed, data = ls_dat, iter = 2000, warmup = 1000, chains = 4, refresh = -1)
+  ls_d <- list(N = nrow(dt_stan),
+               M = 3,
+               L = length(unique(dt_stan$yid)),
+               y = dt_stan$event,
+               x = select(dt_stan, drug_count, age, sex),
+               t = dt_stan$yid)
 
-  sink(paste0('output/log/stan_', socc, '.txt'))
-  print(out)
-  sink()
+  fit <- sampling(object = mixed, data = ls_d, iter = 2000, warmup = 1000, chains = 4, refresh = -1)
+  plot_log(fit, socc)
 
-  pdf(paste0('output/img/traceplot_', socc, '.pdf'))
-  traceplot(stanfit)
-  plot(stanfit)
-  dev.off()
-  ggmcmc(ggs(stanfit), file = paste0('output/img/ggmcmc_', socc, '.pdf'))
+  return(list(soc = t(filter(dt_soc, soc_code == socc)),
+              fit = fit))
+}))
 
-  la <- extract(stanfit, permuted = TRUE)
-  write.table(data.table(intercept = la$alpha,
-                         setnames(data.table(la$beta), c('drug', 'age', 'sex')),
-                         sigma = la$sigma,
-                         setnames(data.table(la$q), paste0('y', 1:ncol(la$q))),
-                         lp__ = la$lp__),
-              file = paste0('output/csv/stan_', socc, '.csv'), sep = ',', row.names = FALSE)
-
-  return(list(soc_code = filter(dt_soc, soc_code == socc),
-              fit = stanfit))
-}
-
-lapply(hlr,
-       function(l) {
-         sink('out/log/hglm_log.txt')
-         print(l)
-         sink()
-       })
-
+lapply(hlr, function(l) sink('out/log/stan_log.txt'); print(l); sink())
 stopCluster(cl)
 save.image('output/rdata/hglm.Rdata')

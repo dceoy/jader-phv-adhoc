@@ -13,12 +13,12 @@ double bf(NumericVector v, int n) {
 }
 
 // [[Rcpp::export]]
-NumericVector bayes_factor(NumericVector v, int n = 10000) {
+NumericVector bayes_factor(NumericVector ct, int iter = 1000000) {
   return NumericVector::create(
-    _["a"] = v[0],
-    _["b"] = v[1],
-    _["c"] = v[2],
-    _["d"] = v[3],
-    _["bf"] = bf(v, n)
+    _["a"] = ct[0],
+    _["b"] = ct[1],
+    _["c"] = ct[2],
+    _["d"] = ct[3],
+    _["bf"] = bf(ct, iter)
   );
 }

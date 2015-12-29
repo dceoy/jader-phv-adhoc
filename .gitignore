@@ -1,5 +1,7 @@
 *.sqlite3
 *.sqlite3-journal
+*.Rdata
+nohup.out
 Rplots.pdf
 freq/legacy/
 freq/output/
@@ -7,4 +9,5 @@ repos/
 output/rdata/*
 output/img/*
 output/log/*
+output/csv/*
 !.gitkeep

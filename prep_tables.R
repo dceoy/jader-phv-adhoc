@@ -3,32 +3,26 @@
 #                event
 #              +       -
 #          +-------+-------+
-#        + |   a   |   b   | a + b
+#        + |   a   |   b   |
 #  drug    +-------+-------+
-#        - |   c   |   d   | c + d
+#        - |   c   |   d   |
 #          +-------+-------+
-#            a + c   b + d
 #
 
-sapply(c('dplyr', 'data.table', 'RSQLite'), function(p) require(p, character.only = TRUE))
+sapply(c('dplyr', 'data.table', 'RSQLite', 'snow', 'Rcpp'),
+       function(p) require(p, character.only = TRUE))
+select <- dplyr::select
+connect_db <- function(file, type = 'SQLite') return(dbConnect(dbDriver(type), file))
+sql_dt <- function(con, sql) return(tbl_dt(as.data.table(dbGetQuery(con, sql))))
 
-if (file.exists(data_path <- 'output/rdata/tables.Rdata')) {
-  load(data_path)
+if (file.exists(table_data_path <- 'output/rdata/tables.Rdata')) {
+  load(table_data_path)
 } else {
-  connect_db <- function(file, type = 'SQLite') return(dbConnect(dbDriver(type), file))
-  sql_dt <- function(con, sql) return(tbl_dt(data.table(dbGetQuery(con, sql))))
-  con <- connect_db('meddra_jader.sqlite3')
-
   sql_ade = 'SELECT DISTINCT
                drug,
                soc_code,
                case_id,
-               CASE
-                 WHEN quarter LIKE "%q1" THEN REPLACE(quarter, "q1", "")
-                 WHEN quarter LIKE "%q2" THEN REPLACE(quarter, "q2", "")
-                 WHEN quarter LIKE "%q3" THEN REPLACE(quarter, "q3", "")
-                 WHEN quarter LIKE "%q4" THEN REPLACE(quarter, "q4", "")
-               END AS year,
+               year,
                age,
                sex
              FROM
@@ -66,9 +60,32 @@ if (file.exists(data_path <- 'output/rdata/tables.Rdata')) {
                 SELECT COUNT(DISTINCT case_id) AS t FROM ade
               );'
 
-  system.time(dt_ade <- sql_dt(con, sql_ade))
-  system.time(dt_soc <- sql_dt(con, sql_soc))
-  system.time(dt_ct22 <- sql_dt(con, sql_ct22))
+  append_bayes_factor <- function(dt, cl) {
+    par_cal_bf <- function(dt, cl) {
+      divide_dt <- function(dt, k) {
+        return(lapply(1:k, function(i) return(filter(dt, i == rep(1:k, nrow(dt))))))
+      }
+      cal_bf <- function(d) {
+        Rcpp::sourceCpp('bayes_factor.cpp')
+        return(as.data.frame(t(apply(d, 1, bayes_factor))))
+      }
+      return(as.data.table(bind_rows(parLapply(cl, divide_dt(dt, length(cl)), cal_bf))))
+    }
 
-  save.image(data_path)
+    return(inner_join(dt,
+                      par_cal_bf(distinct(select(dt, a:d)), cl),
+                      by = c('a', 'b', 'c', 'd')))
+  }
+
+  cl <- makeCluster(parallel::detectCores(), type = 'SOCK')
+  con <- connect_db('meddra_jader.sqlite3')
+
+  system.time(dt_ade <- sql_dt(con, sql_ade)) %>% print()
+  system.time(dt_soc <- sql_dt(con, sql_soc)) %>% print()
+  system.time(dt_bf <- append_bayes_factor(sql_dt(con, sql_ct22), cl)) %>% print()
+
+  dbDisconnect(con)
+  stopCluster(cl)
+
+  save.image(table_data_path)
 }

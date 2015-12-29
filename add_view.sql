@@ -6,11 +6,11 @@ CREATE VIEW ade AS
     p.pt_soc_code AS soc_code,
     dr.case_id AS case_id,
     CASE
-      WHEN quarter LIKE "%・第一" THEN REPLACE(quarter, "・第一", "q1")
-      WHEN quarter LIKE "%・第二" THEN REPLACE(quarter, "・第二", "q2")
-      WHEN quarter LIKE "%・第三" THEN REPLACE(quarter, "・第三", "q3")
-      WHEN quarter LIKE "%・第四" THEN REPLACE(quarter, "・第四", "q4")
-    END AS quarter,
+      WHEN quarter LIKE "%・第一" THEN REPLACE(quarter, "・第一", "")
+      WHEN quarter LIKE "%・第二" THEN REPLACE(quarter, "・第二", "")
+      WHEN quarter LIKE "%・第三" THEN REPLACE(quarter, "・第三", "")
+      WHEN quarter LIKE "%・第四" THEN REPLACE(quarter, "・第四", "")
+    END AS year,
     CASE
       WHEN age == "10歳未満" THEN 0
       WHEN age LIKE "%歳代" THEN REPLACE(age, "歳代", "")
