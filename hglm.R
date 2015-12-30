@@ -1,12 +1,12 @@
 #!/usr/bin/env Rscript
 
 source('prep_tables.R') # dt_ade, dt_soc, dt_bf
-sapply(pkgs <- c('dplyr', 'tidyr', 'data.table', 'foreach', 'doSNOW', 'ggmcmc', 'rstan'),
+sapply(pkgs <- c('dplyr', 'tidyr', 'data.table', 'foreach', 'doSNOW', 'rstan', 'ggmcmc'),
        function(p) require(p, character.only = TRUE))
 select <- dplyr::select
 
 nuts <- function(md, dat, tag, log_dir = 'output/log', img_dir = 'output/img') {
-  fit <- sampling(md, data = dat, chains = 4, iter = 2000, warmup = 1000)
+  fit <- sampling(md, data = dat, chains = 4, iter = 1000, warmup = 500)
   sink(paste0(log_dir, '/stanfit_', tag, '.txt')); print(fit); sink()
   pdf(paste0(img_dir, '/traceplot_', tag, '.pdf')); traceplot(fit); dev.off()
   pdf(paste0(img_dir, '/traceplot_', tag, '.pdf')); plot(fit); dev.off()
@@ -22,10 +22,11 @@ dt_base <- dt_ade %>%
              select(case_id, drug, soc_code, age, sex, yid, bf)
 
 bf_threshold <- 100
-registerDoSNOW(cl <- makeCluster(parallel::detectCores(), type = 'SOCK'))
-models <- parSapply(cl, c(mixed = 'mixed.stan', ar = 'ar.stan'), stan_model)
+registerDoSNOW(cl <- makeCluster(2, type = 'SOCK'))
+models <- parLapply(cl, c(fixed = 'fixed.stan', mixed = 'mixed.stan'), stan_model)
 
 print(system.time(hlr <- foreach(socc = dt_soc$soc_code, .packages = pkgs) %dopar% {
+  rstan_options(auto_write = TRUE); options(mc.cores = parallel::detectCores())
   dt_susp <- dt_base %>%
                filter(soc_code == socc, bf > bf_threshold) %>%
                group_by(case_id) %>%
@@ -36,18 +37,17 @@ print(system.time(hlr <- foreach(socc = dt_soc$soc_code, .packages = pkgs) %dopa
                tbl_dt() %>%
                left_join(dt_susp, by = 'case_id') %>%
                replace_na(list(drug_count = 0))
-  ls_d <- list(N = nrow(dt_stan),
-               M = 3,
+  d_fixed <- list(N = nrow(dt_stan),
+                  M = 3,
+                  y = dt_stan$event,
+                  x = select(dt_stan, drug_count, age, sex))
+  d_fixed <- c(d_fixed,
                L = length(unique(dt_stan$yid)),
-               y = dt_stan$event,
-               x = select(dt_stan, drug_count, age, sex),
                t = dt_stan$yid)
 
   return(list(soc = t(filter(dt_soc, soc_code == socc)),
-              fit = lapply(names(models),
-                           function(m) return(nuts(models[[m]],
-                                                   ls_d,
-                                                   paste(socc, m, sep = '_'))))))
+              fixed = nuts(models$fixed, d_fixed, paste0('fixed_', socc)),
+              mixed = nuts(models$mixed, d_mixed, paste0('mixed_', socc))))
 }))
 lapply(hlr, function(l) sink('out/log/stan_log.txt'); print(l); sink())
 
