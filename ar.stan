@@ -23,3 +23,8 @@ model {
   for (i in 1:N)
     y[i] ~ bernoulli_logit(alpha + dot_product(x[i], beta) + r[t[i]]);
 }
+generated quantities {
+  vector[N] log_lik;
+  for(i in 1:N)
+    log_lik[i] <- bernoulli_logit_log(alpha + dot_product(x[i], beta) + r[t[i]]);
+}
