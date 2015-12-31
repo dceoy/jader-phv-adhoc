@@ -1,6 +1,7 @@
 *.sqlite3
 *.sqlite3-journal
 *.Rdata
+*.rda
 nohup.out
 Rplots.pdf
 freq/legacy/

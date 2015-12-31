@@ -9,15 +9,14 @@
 #          +-------+-------+
 #
 
-sapply(c('dplyr', 'data.table', 'RSQLite', 'snow', 'Rcpp'),
-       function(p) require(p, character.only = TRUE))
-select <- dplyr::select
-connect_db <- function(file, type = 'SQLite') return(dbConnect(dbDriver(type), file))
-sql_dt <- function(con, sql) return(tbl_dt(as.data.table(dbGetQuery(con, sql))))
-
 if (file.exists(table_data_path <- 'output/rdata/tables.Rdata')) {
   load(table_data_path)
 } else {
+  sapply(c('dplyr', 'data.table', 'RSQLite', 'snow', 'Rcpp'), require, character.only = TRUE)
+  select <- dplyr::select
+  connect_db <- function(file, type = 'SQLite') return(dbConnect(dbDriver(type), file))
+  sql_dt <- function(con, sql) return(tbl_dt(as.data.table(dbGetQuery(con, sql))))
+
   sql_ade = 'SELECT DISTINCT
                drug,
                soc_code,
@@ -87,5 +86,5 @@ if (file.exists(table_data_path <- 'output/rdata/tables.Rdata')) {
   dbDisconnect(con)
   stopCluster(cl)
 
-  save.image(table_data_path)
+  save(dt_ade, dt_soc, dt_bf, file = table_data_path)
 }
