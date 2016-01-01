@@ -3,6 +3,7 @@
 *.Rdata
 *.rda
 nohup.out
+.DS_Store
 Rplots.pdf
 freq/legacy/
 freq/output/
