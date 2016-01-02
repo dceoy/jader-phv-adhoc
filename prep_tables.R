@@ -9,7 +9,7 @@
 #          +-------+-------+
 #
 
-sapply(c('dplyr', 'data.table', 'RSQLite', 'snow', 'Rcpp'), require, character.only = TRUE)
+sapply(c('dplyr', 'data.table', 'RSQLite', 'snow', 'rstan'), require, character.only = TRUE)
 select <- dplyr::select
 connect_db <- function(file, type = 'SQLite') return(dbConnect(dbDriver(type), file))
 sql_dt <- function(con, sql) return(tbl_dt(as.data.table(dbGetQuery(con, sql))))
@@ -109,5 +109,10 @@ system.time(parLapply(cl,
                         mutate(age = as.integer(age), yid = v_yid[as.character(year)]) %>%
                         inner_join(dt_bf, by = c('drug', 'soc_code')) %>%
                         select(case_id, drug, soc_code, age, sex, yid, bf))) %>% print()
+
+system.time(models <- parLapply(cl,
+                                c(fixed = 'fixed.stan', mixed = 'mixed.stan'),
+                                stan_model))
+save(models, file = 'output/rdata/stan_models.Rdata')
 
 stopCluster(cl)

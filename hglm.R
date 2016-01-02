@@ -1,7 +1,8 @@
 #!/usr/bin/env Rscript
 
-sapply(c('dplyr', 'tidyr', 'data.table', 'snow', 'rstan', 'ggmcmc'), require, character.only = TRUE)
+sapply(c('dplyr', 'tidyr', 'data.table', 'rstan', 'ggmcmc'), require, character.only = TRUE)
 select <- dplyr::select
+load('output/rdata/stan_models.Rdata')
 if(length(v_socc <- as.integer(commandArgs(trailingOnly = TRUE))) == 0) {
   v_socc <- tbl_dt(fread('output/csv/dt_soc.csv'))$soc_code
 }
@@ -38,8 +39,4 @@ hglm_ic <- function(socc, models, rdata_dir = 'output/rdata/') {
   return(dt_waic)
 }
 
-cl <- makeCluster(2, type = 'SOCK')
-system.time(models <- parLapply(cl, c(fixed = 'fixed.stan', mixed = 'mixed.stan'), stan_model))
-stopCluster(cl)
-
-system.time(lapply(v_socc, hglm_ic, models = models, rdata_dir = '~/rdata/'))
+system.time(lapply(v_socc, hglm_ic, models = models))
