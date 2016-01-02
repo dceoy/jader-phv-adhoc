@@ -13,12 +13,13 @@ hglm_ic <- function(socc, models, rdata_dir = 'output/rdata/') {
     waic <- function(ll) {
       return(- mean(log(colMeans(exp(ll)))) + mean(colMeans(ll ^ 2) - colMeans(ll) ^ 2))
     }
-    stanfit <- sampling(model, data = data, chains = 2, iter = 2000, warmup = 1000)
+    sink(paste0('output/log/stanfit_', tag, '.txt'))
+    print(stanfit <- sampling(model, data = data, chains = 2, iter = 2000, warmup = 1000))
+    sink()
     save(stanfit, file = paste0(rdata_dir, 'stanfit_', tag, '.Rdata'))
-    pdf(paste0('output/img/traceplot_', tag, '.pdf')); traceplot(stanfit); dev.off()
-    pdf(paste0('output/img/traceplot_', tag, '.pdf')); plot(stanfit); dev.off()
     ggmcmc(ggs(stanfit), file = paste0('output/img/ggmcmc_', tag, '.pdf'))
-    sink(paste0('output/log/stanfit_', tag, '.txt')); print(stanfit); sink()
+    pdf(paste0('output/img/traceplot_', tag, '.pdf')); traceplot(stanfit); dev.off()
+    pdf(paste0('output/img/plot_', tag, '.pdf')); plot(stanfit); dev.off()
     return(waic(extract(stanfit)$log_lik))
   }
   ls_d <- fread(paste0('output/csv/dt_', socc, '.csv')) %>%
@@ -29,14 +30,15 @@ hglm_ic <- function(socc, models, rdata_dir = 'output/rdata/') {
          L = length(unique(.$yid)),
          t = .$yid)
   write.table(dt_waic <- data.table(soc_code = socc,
-                                    fixed = stan_waic(models$fixed,
-                                                      ls_d[c('N', 'M', 'y', 'x')],
-                                                      paste0('fixed_', socc)),
                                     mixed = stan_waic(models$mixed,
                                                       ls_d,
+                                                      paste0('fixed_', socc)),
+                                    fixed = stan_waic(models$fixed,
+                                                      ls_d[c('N', 'M', 'y', 'x')],
                                                       paste0('fixed_', socc))),
               file = paste0('waic_', socc, '.csv'), sep = ',', row.names = FALSE)
   return(dt_waic)
 }
 
-system.time(lapply(v_socc, hglm_ic, models = models))
+rstan_options(auto_write = TRUE); options(mc.cores = 2)
+system.time(lapply(v_socc, hglm_ic, models = models, rdata_dir = 'output/rdata/'))
