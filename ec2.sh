@@ -6,7 +6,7 @@ S3_DIR="/dev/shm/s3"
 S3_BUCKET="r3.8xlarge"
 IAM_ROLE="s3user"
 PHV="phv"
-SOC_CSV="output/csv/dt_soc.csv"
+SOC_CSV="input/csv/dt_soc.csv"
 
 cd ${HOME}/${PHV}
 git pull

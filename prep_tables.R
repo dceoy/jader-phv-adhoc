@@ -75,9 +75,9 @@ append_bayes_factor <- function(dt, cl) {
 
 cl <- makeCluster(parallel::detectCores(), type = 'SOCK')
 
-con <- connect_db('meddra_jader.sqlite3')
+con <- connect_db('input/db/meddra_jader.sqlite3')
 system.time(dt_ade <- sql_dt(con, sql_ade)) %>% print()
-system.time(write.table(dt_soc <- sql_dt(con, sql_soc), file = 'output/csv/dt_soc.csv', row.names = FALSE)) %>% print()
+system.time(write.table(dt_soc <- sql_dt(con, sql_soc), file = 'input/csv/dt_soc.csv', row.names = FALSE)) %>% print()
 system.time(dt_bf <- append_bayes_factor(sql_dt(con, sql_ct22), cl)) %>% print()
 dbDisconnect(con)
 
@@ -85,7 +85,7 @@ v_yid <- 1:length(unique(dt_ade$year))
 names(v_yid) <- sort(unique(dt_ade$year))
 
 write_dt_by_soc <- function(socc, dt, bf_threshold = 100) {
-  if(! file.exists(path <- paste0('output/csv/dt_', socc, '.csv'))) {
+  if(! file.exists(path <- paste0('input/csv/dt_', socc, '.csv'))) {
     sapply(c('dplyr', 'tidyr', 'data.table'), require, character.only = TRUE)
     dt_susp <- dt %>%
       filter(soc_code == socc, bf > bf_threshold) %>%
@@ -113,6 +113,6 @@ system.time(parLapply(cl,
 system.time(models <- parLapply(cl,
                                 c(fixed = 'fixed.stan', mixed = 'mixed.stan'),
                                 stan_model))
-save(models, file = 'output/rdata/stan_models.Rdata')
+save(models, file = 'input/rdata/stan_models.Rdata')
 
 stopCluster(cl)

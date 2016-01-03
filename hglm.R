@@ -2,10 +2,10 @@
 
 sapply(c('dplyr', 'tidyr', 'data.table', 'loo', 'rstan', 'ggmcmc'), require, character.only = TRUE)
 select <- dplyr::select
-load('output/rdata/stan_models.Rdata')
-if(length(v_socc <- as.integer(commandArgs(trailingOnly = TRUE))) == 0) {
-  v_socc <- tbl_dt(fread('output/csv/dt_soc.csv'))$soc_code
-}
+lapply(paste0('output/', c('csv', 'log', 'pdf', 'rdata')), function(p) if(! dir.exists(p)) dir.create(p))
+load('input/rdata/stan_models.Rdata')
+v_socc <- as.integer(commandArgs(trailingOnly = TRUE))
+if(length(v_socc) == 0) v_socc <- tbl_dt(fread('input/csv/dt_soc.csv'))$soc_code
 print(v_socc)
 
 hglm_waic <- function(socc, models, rdata_dir) {
@@ -23,8 +23,8 @@ hglm_waic <- function(socc, models, rdata_dir) {
                                  d = rstan::extract(stanfit, pars = pars),
                                  cn = names(stanfit))),
                 file = paste0('output/csv/posterier_', tag, '.csv'), sep = ',', row.names = FALSE)
-    ggmcmc(filter(ggs(stanfit), ! grepl('^log_lik', Parameter)), file = paste0('output/img/ggmcmc_', tag, '.pdf'))
-    pdf(paste0('output/img/traceplot_', tag, '.pdf'))
+    ggmcmc(filter(ggs(stanfit), ! grepl('^log_lik', Parameter)), file = paste0('output/pdf/ggmcmc_', tag, '.pdf'))
+    pdf(paste0('output/pdf/traceplot_', tag, '.pdf'))
     traceplot(stanfit, pars = pars)
     plot(stanfit, pars = pars)
     dev.off()
@@ -33,7 +33,7 @@ hglm_waic <- function(socc, models, rdata_dir) {
   }
   write.table(d <- bind_rows(lapply(models,
                                     stan_waic,
-                                    data = fread(paste0('output/csv/dt_', socc, '.csv')) %>%
+                                    data = fread(paste0('input/csv/dt_', socc, '.csv')) %>%
 #                                     slice(., sample(1:nrow(.), 100)) %>%
                                       list(N = nrow(.),
                                            M = 3,
