@@ -9,7 +9,6 @@ PHV="phv"
 SOC_CSV="input/csv/dt_soc.csv"
 
 cd ${HOME}/${PHV}
-git pull
 [[ -f ${SOC_CSV} ]] || time Rscript prep_tables.R
 if mkdir ${S3_DIR}; then
   sudo /usr/local/bin/s3fs ${S3_BUCKET} ${S3_DIR} \

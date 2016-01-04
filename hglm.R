@@ -2,20 +2,19 @@
 
 sapply(c('dplyr', 'tidyr', 'data.table', 'loo', 'rstan', 'ggmcmc'), require, character.only = TRUE)
 select <- dplyr::select
-lapply(paste0('output/', c('csv', 'log', 'pdf', 'rdata')), function(p) if(! dir.exists(p)) dir.create(p))
-load('input/rdata/stan_models.Rdata')
+sapply(paste0('output/', c('csv', 'log', 'pdf', 'rds')), function(p) if(! dir.exists(p)) dir.create(p))
 v_socc <- as.integer(commandArgs(trailingOnly = TRUE))
 if(length(v_socc) == 0) v_socc <- tbl_dt(fread('input/csv/dt_soc.csv'))$soc_code
 print(v_socc)
 
-hglm_waic <- function(socc, models, rdata_dir) {
+hglm_waic <- function(socc, models, rds_dir) {
   stan_waic <- function(model, data, socc) {
     tag <- paste0(model@model_name, '_', socc)
     sink(paste0('output/log/stanfit_', tag, '.txt'))
-    print(stanfit <- sampling(model, data = data, chains = 2, iter = 2000, warmup = 1000))
+    print(stanfit <- sampling(model, data = data, chains = 3, iter = 3000, warmup = 2000))
     print(loo_waic <- waic(extract_log_lik(stanfit)))
     sink()
-    save(stanfit, file = paste0(rdata_dir, 'stanfit_', tag, '.Rdata'))
+    saveRDS(stanfit, file = paste0(rds_dir, 'stanfit_', tag, '.rds'))
     pars <- setdiff(stanfit@model_pars, 'log_lik')
     write.table(bind_cols(lapply(pars,
                                  function(p, d, cn) return(setnames(data.table(d[[p]]),
@@ -34,7 +33,6 @@ hglm_waic <- function(socc, models, rdata_dir) {
   write.table(d <- bind_rows(lapply(models,
                                     stan_waic,
                                     data = fread(paste0('input/csv/dt_', socc, '.csv')) %>%
-#                                     slice(., sample(1:nrow(.), 100)) %>%
                                       list(N = nrow(.),
                                            M = 3,
                                            y = .$event,
@@ -46,5 +44,10 @@ hglm_waic <- function(socc, models, rdata_dir) {
   return(d)
 }
 
-rstan_options(auto_write = TRUE); options(mc.cores = 2)
-system.time(print(bind_rows(lapply(v_socc, hglm_waic, models = models, rdata_dir = 'output/rdata/')))) %>% print()
+rstan_options(auto_write = TRUE); options(mc.cores = 3)
+v_socc %>%
+  lapply(hglm_waic, models = readRDS(file = 'input/rds/stan_models.rds'), rds_dir = 'output/rds/') %>%
+  bind_rows() %>%
+  print() %>%
+  system.time() %>%
+  print()

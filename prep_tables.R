@@ -110,9 +110,9 @@ system.time(parLapply(cl,
                         inner_join(dt_bf, by = c('drug', 'soc_code')) %>%
                         select(case_id, drug, soc_code, age, sex, yid, bf))) %>% print()
 
-system.time(models <- parLapply(cl,
-                                c(fixed = 'fixed.stan', mixed = 'mixed.stan'),
-                                stan_model))
-save(models, file = 'input/rdata/stan_models.Rdata')
+system.time(saveRDS(parLapply(cl,
+                              c(mixed = 'mixed.stan', fixed = 'fixed.stan'),
+                              stan_model),
+                    file = 'input/rds/stan_models.rds'))
 
 stopCluster(cl)

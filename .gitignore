@@ -3,6 +3,7 @@
 *.sql.gz
 *.Rdata
 *.rda
+*.rds
 nohup.out
 .DS_Store
 Rplots.pdf
@@ -10,6 +11,6 @@ freq/legacy/
 freq/output/
 input/repos/
 input/csv/*
-input/rdata/*
+input/rds/*
 output/*
 !.gitkeep
