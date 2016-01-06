@@ -18,6 +18,7 @@ fi
 mkdir ${S3_PHV} && scp -r input output ${S3_PHV}
 
 cd ${S3_PHV}
-sed '1d' ${SOC_CSV} | cut -f 1 -d ' ' | xargs -P 9 -I {} time Rscript ${PHV}/hglm.R {} \
+sed '1d' ${SOC_CSV} | cut -f 1 -d ' ' \
+  | xargs -P $(expr $(wc -l ${SOC_CSV} | cut -f 1 -d ' ') / 2) -I {} time Rscript ${PHV}/hglm.R {} \
   || echo '*** Abnormal termination ***'
 sudo poweroff
