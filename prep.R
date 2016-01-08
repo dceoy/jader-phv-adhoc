@@ -69,12 +69,15 @@ if(! file.exists('input/csv/dt_soc.csv')) {
 
   con <- connect_db('input/db/meddra_jader.sqlite3')
   system.time(dt_ade <- sql_dt(con, sql_ade)) %>% print()
-  system.time(write.table(dt_soc <- sql_dt(con, sql_soc), file = 'input/csv/dt_soc.csv', row.names = FALSE)) %>% print()
+  system.time(write.table(dt_soc <- sql_dt(con, sql_soc),
+                          file = 'input/csv/dt_soc.csv', sep = ',', row.names = FALSE)) %>% print()
   system.time(dt_bf <- append_bayes_factor(sql_dt(con, sql_ct22), cl)) %>% print()
   dbDisconnect(con)
 
   v_yid <- 1:length(unique(dt_ade$year))
   names(v_yid) <- sort(unique(dt_ade$year))
+  write.table(data.table(yid = v_yid, year = as.integer(names(v_yid))),
+              file = 'input/csv/dt_yid.csv', sep = ',', row.names = FALSE)
 
   write_dt_by_soc <- function(socc, dt, bf_threshold = 100) {
     if(! file.exists(path <- paste0('input/csv/dt_', socc, '.csv'))) {
