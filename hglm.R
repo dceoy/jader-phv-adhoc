@@ -37,7 +37,7 @@ hglm_waic <- function(socc, models, fit_dir = NULL, plot = FALSE) {
     print(loo_waic <- loo::waic(loo::extract_log_lik(stanfit)))
     sink()
     pars <- setdiff(stanfit@model_pars, 'log_lik')
-    ggmcmc(higgs(stanfit), file = paste0('output/pdf/ggmcmc_', tag, '.pdf'))
+    ggmcmc(higgs(stanfit), file = paste0('output/pdf/ggmcmc_', tag, '.pdf'), param_page = 6)
     if(! is.null(fit_dir)) saveRDS(stanfit, file = paste0(fit_dir, 'stanfit_', tag, '.rds'))
     saveRDS(la <- rstan::extract(stanfit, pars = pars), file = paste0('output/rds/la_', tag, '.rds'))
     write.table(bind_cols(lapply(pars,
