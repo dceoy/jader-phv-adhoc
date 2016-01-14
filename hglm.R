@@ -5,6 +5,7 @@ select <- dplyr::select
 v_socc <- as.integer(commandArgs(trailingOnly = TRUE))
 if(length(v_socc) == 0) v_socc <- tbl_dt(fread('input/csv/dt_soc.csv'))$soc_code
 print(v_socc)
+models <- readRDS(file = 'input/rds/stan_models.rds')[c('mixed', 'fixed', 'ar')]
 
 higgs <- function(fit, inc_warmup = TRUE) {
   d <- dplyr::bind_rows(lapply(1:fit@sim$chains,
@@ -65,7 +66,6 @@ hglm_waic <- function(socc, models, fit_dir = NULL, plot = FALSE) {
   return(d)
 }
 
-models <- readRDS(file = 'input/rds/stan_models.rds')[c('mixed', 'fixed', 'sigma', 'ar')]
 rstan_options(auto_write = TRUE); options(mc.cores = 2)
 v_socc %>%
   lapply(hglm_waic, models = models, fit_dir = NULL) %>%

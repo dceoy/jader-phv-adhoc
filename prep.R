@@ -15,7 +15,7 @@ connect_db <- function(file, type = 'SQLite') return(dbConnect(dbDriver(type), f
 sql_dt <- function(con, sql) return(tbl_dt(as.data.table(dbGetQuery(con, sql))))
 cl <- makeCluster(parallel::detectCores(), type = 'SOCK')
 
-stan_files <- c(mixed = 'mixed.stan', fixed = 'fixed.stan', sigma = 'sigma.stan', ar = 'ar.stan')
+stan_files <- c(mixed = 'mixed.stan', fixed = 'fixed.stan', ar = 'ar.stan')
 system.time(saveRDS(parLapply(cl, stan_files, stan_model), file = 'input/rds/stan_models.rds'))
 sapply(paste0('output/', c('csv', 'log', 'pdf', 'rds')), function(p) if(! dir.exists(p)) dir.create(p))
 
