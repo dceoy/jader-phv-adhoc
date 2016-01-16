@@ -200,7 +200,7 @@ This property results in the heterogeneity by time, which may support the adequa
 ##### Adverse events associated with incretin-based drugs
 
 Some of HLTs associated with incretin-based drugs in the study are the concerns in other previous studies.
-Some groups of similar HLTs, e.g., "Thyroid neoplasms malignant" and "Thyroid neoplasms malignant" were shown because some PTs are linked to multiple HLTs in the MedDRA.
+Some groups of similar HLTs, e.g., "Thyroid neoplasms" and "Thyroid neoplasms malignant" were shown because some PTs are linked to multiple HLTs in the MedDRA.
 GLP-1 receptor agonists showed relatively wide CIs for some of the HLTs because the cases reported with them were fewer than that with DPP-4 inhibitors.
 Such results will be unreliable.
 

@@ -39,7 +39,7 @@ append_p_value <- function(dt, cl) {
                     by = c('a', 'b', 'c', 'd')))
 }
 
-dt_test <- setnames(data.table(matrix(abs(ceiling(runif(400000) * 100)), ncol = 4)),
+dt_test <- setnames(data.table(matrix(sample(0:1000, size = 400000, replace = TRUE), ncol = 4)),
                     c('a', 'b', 'c', 'd'))
 
 cl <- makeCluster(floor(parallel::detectCores() * 3 / 4), type = 'SOCK')
@@ -51,8 +51,8 @@ stopCluster(cl)
 bf_scatter <- function(dt, text_color = '#000066') {
   return(ggplot(dt, aes(x = bf, y = p_val)) +
            geom_point(shape = 3, size = 0.1, colour = '#000066', alpha = 0.8) +
-           scale_x_continuous(limits = c(0, 2000), expand = c(0, 0)) +
-           scale_y_continuous(limits = c(0, 0.2), expand = c(0, 0)) +
+           scale_x_continuous(limits = c(0, 400), breaks = c(0:4 * 100), expand = c(0, 0)) +
+           scale_y_continuous(limits = c(0, 0.1), breaks = c(0:4 / 40), expand = c(0, 0)) +
            labs(x = 'Bayes factor', y = 'p-value from Fisher\'s exact test') +
            theme_bw() +
            theme(axis.title.x = element_text(colour = text_color, vjust = -3, size = 22),

@@ -49,6 +49,6 @@ y_bar <- function(dt, text_color = '#000066') {
                  axis.line = element_line(colour = text_color)))
 }
 
-png('output/img/y_count.png', width = 960, height = 600)
+png('output/img/year_count.png', width = 960, height = 600)
 plot(y_bar(dt_bar))
 dev.off()

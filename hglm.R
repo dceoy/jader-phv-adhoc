@@ -5,7 +5,7 @@ select <- dplyr::select
 v_socc <- as.integer(commandArgs(trailingOnly = TRUE))
 if(length(v_socc) == 0) v_socc <- tbl_dt(fread('input/csv/dt_soc.csv'))$soc_code
 print(v_socc)
-models <- readRDS(file = 'input/rds/stan_models.rds')[c('mixed', 'fixed', 'ar')]
+models <- readRDS(file = 'input/rds/stan_models.rds')[c('mixed', 'ar', 'fixed')]
 
 higgs <- function(fit, inc_warmup = TRUE) {
   d <- dplyr::bind_rows(lapply(1:fit@sim$chains,
@@ -34,17 +34,19 @@ hglm_waic <- function(socc, models, fit_dir = NULL, plot = FALSE) {
   stan_waic <- function(model, data, socc) {
     tag <- paste0(model@model_name, '_', socc)
     sink(paste0('output/log/stanfit_', tag, '.txt'))
-    print(stanfit <- sampling(model, data = data, chains = 2, iter = 2000, warmup = 1000))
+    print(stanfit <- sampling(model, data = data, chains = 4, iter = 2000, warmup = 1000))
     print(loo_waic <- loo::waic(loo::extract_log_lik(stanfit)))
     sink()
     pars <- setdiff(stanfit@model_pars, 'log_lik')
     ggmcmc(higgs(stanfit), file = paste0('output/pdf/ggmcmc_', tag, '.pdf'), param_page = 6)
     if(! is.null(fit_dir)) saveRDS(stanfit, file = paste0(fit_dir, 'stanfit_', tag, '.rds'))
+    write.table(data.frame(summary(stanfit)$summary) %>% .[! grepl('^log_lik', rownames(.)), ],
+                file = paste0('output/csv/summary_', tag, '.csv'), sep = ',')
     saveRDS(la <- rstan::extract(stanfit, pars = pars), file = paste0('output/rds/la_', tag, '.rds'))
     write.table(bind_cols(lapply(pars,
                                  function(p, d, cn) return(setnames(data.table(d[[p]]), cn[grep(paste0('^', p), cn)])),
                                  d = la, cn = names(stanfit))),
-                file = paste0('output/csv/posterier_', tag, '.csv'), sep = ',', row.names = FALSE)
+                file = paste0('output/csv/posterior_', tag, '.csv'), sep = ',', row.names = FALSE)
     if(plot) {
       pdf(paste0('output/pdf/traceplot_', tag, '.pdf')); traceplot(stanfit, pars = pars); dev.off()
       pdf(paste0('output/pdf/plot_', tag, '.pdf')); plot(stanfit, pars = pars); dev.off()
@@ -66,7 +68,7 @@ hglm_waic <- function(socc, models, fit_dir = NULL, plot = FALSE) {
   return(d)
 }
 
-rstan_options(auto_write = TRUE); options(mc.cores = 2)
+rstan_options(auto_write = TRUE); options(mc.cores = 4)
 v_socc %>%
   lapply(hglm_waic, models = models, fit_dir = NULL) %>%
   bind_rows() %>%

@@ -21,12 +21,12 @@ dt_waic_diff <- dt_waic_wide %>%
 
 waic_segment <- function(dt, text_color = '#000066') {
   return(ggplot(dt, aes(x = soc_name, y = diff, colour = model)) +
-           geom_point(size = 3, shape = 17, alpha = 0.4) +
-           geom_hline(aes(yintercept = 0), linetype = 2, size = 0.6, colour = '#6600FF') +
+           geom_hline(aes(yintercept = 0), linetype = 2, size = 0.4, alpha = 0.6, colour = '#6600FF') +
+           geom_point(size = 3, shape = 17, position = position_dodge(width = 1), alpha = 0.8) +
            scale_x_discrete(expand = c(0.02, 0.02)) +
            scale_y_continuous(expand = c(0.02, 0.02)) +
            scale_colour_manual(label = c(mixed_fixed = 'MIXED - FIXED', ar_fixed = 'AR - FIXED'),
-                               values = c('#E377C2', '#17BECF')) +
+                               values = c(mixed_fixed = '#E377C2', ar_fixed = '#17BECF')) +
            labs(x = 'SOC', y = 'WAIC difference', colour = element_blank()) +
            coord_flip() +
            theme_bw() +
