@@ -15,7 +15,7 @@ setwd('~/GoogleDrive/lab/s3_phv/')
 if(! dir.exists(img_dir <- 'output/img')) dir.create(img_dir)
 select <- dplyr::select
 
-if(file.exists(dt_rds <- 'input/rds/dt_bf_p.rds')) {
+if(file.exists(dt_rds <- 'output/rds/dt_bf_p.rds')) {
   dt_bf_p <- readRDS(file <- dt_rds)
 } else {
   append_bayes_factor <- function(dt, cl, cpp_file) {
@@ -44,7 +44,7 @@ if(file.exists(dt_rds <- 'input/rds/dt_bf_p.rds')) {
                       by = c('a', 'b', 'c', 'd')))
   }
 
-  dt_test <- setnames(data.table(matrix(sample(0:1000, size = 400000, replace = TRUE), ncol = 4)),
+  dt_test <- setnames(data.table(matrix(sample(1:1000, size = 4000000, replace = TRUE), ncol = 4)),
                       c('a', 'b', 'c', 'd'))
 
   cl <- makeCluster(parallel::detectCores(), type = 'SOCK')
@@ -55,12 +55,14 @@ if(file.exists(dt_rds <- 'input/rds/dt_bf_p.rds')) {
   saveRDS(dt_bf_p, file = dt_rds)
 }
 
-bf_scatter <- function(dt, bfmax = 400, pmax = 0.3, text_color = '#000066') {
-  return(ggplot(filter(dt, bf <= bfmax, p_val <= pmax), aes(x = bf, y = p_val, colour = or)) +
-           geom_point(shape = 18, size = 1) +
-           scale_x_continuous(limits = c(0, bfmax), breaks = c(0:8 * 50), expand = c(0, 0)) +
-           scale_y_continuous(limits = c(0, pmax), breaks = c(0:6 / 20), expand = c(0, 0)) +
-           scale_colour_gradient(low = '#AAAADD', high = '#000066') +
+bf_scatter <- function(dt, text_color = '#000066') {
+  return(ggplot(d <- filter(dt, log10(bf) <= 4), aes(x = bf, y = p_val, colour = or)) +
+           geom_point(shape = 18, size = 1.2) +
+           scale_x_log10(limits = 10 ^ c(-4, 4), breaks = 10 ^ c(-3:3), expand = c(0, 0),
+                         label = as.character(10 ^ c(-3:3))) +
+           scale_y_continuous(breaks = c(0, 0.05, 0.25, 0.5, 1), expand = c(0, 0)) +
+           scale_colour_gradient(low = '#DDDDFF', high = '#222288', trans = 'log', limits = 1000 ^ c(-1, 1),
+                                 breaks = 100 ^ (-1:1), label = as.character(100 ^ (-1:1))) +
            labs(x = 'Bayes factor', y = 'Two-sided p-value from Fisher\'s exact test', colour = 'Odds ratio') +
            theme_bw() +
            theme(legend.position = 'right',
@@ -71,12 +73,12 @@ bf_scatter <- function(dt, bfmax = 400, pmax = 0.3, text_color = '#000066') {
                  axis.title.y = element_text(colour = text_color, vjust = 3, size = 22),
                  axis.text = element_text(colour = text_color, size = 18),
                  plot.margin = unit(c(1, 1, 1, 1), 'lines'),
-                 panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                 panel.grid.minor = element_blank(),
                  panel.border = element_blank(),
                  axis.line = element_line(colour = text_color)))
 }
 
-png('output/img/bf_pval.png', width = 960, height = 720)
+png('output/img/bf_pval.png', width = 800, height = 720)
 plot(bf_scatter(dt_bf_p))
 dev.off()
 setwd('~/Dropbox/lab/phv/')

@@ -38,7 +38,7 @@ s_violin <- function(dt, text_color = '#000066') {
                  legend.text = element_text(colour = text_color, size = 18),
                  axis.title.x = element_text(colour = text_color, vjust = -3, size = 22),
                  axis.title.y = element_text(colour = text_color, vjust = 3, size = 22),
-                 axis.text = element_text(colour = text_color, size = 18),
+                 axis.text = element_text(colour = text_color, size = 15),
                  plot.margin = unit(c(1, 0.5, 1.3, 1), 'lines'),
                  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                  panel.border = element_blank(),
@@ -54,7 +54,7 @@ count_bar <- function(dt, text_color = '#000066') {
            theme_bw() +
            theme(axis.title.x = element_text(colour = text_color, vjust = -3, size = 22),
                  axis.title.y = element_blank(),
-                 axis.text.x = element_text(colour = text_color, size = 18),
+                 axis.text.x = element_text(colour = text_color, size = 15),
                  axis.text.y = element_blank(),
                  axis.ticks.y = element_blank(),
                  plot.margin = unit(c(4, 1, 1, 0), 'lines'),
@@ -68,6 +68,6 @@ bar_violin <- function(dt) {
                       ncol = 2, widths = c(9, 1)))
 }
 
-png('output/img/sigma_violin.png', width = 960, height = 720)
+png('output/img/sigma_violin.png', width = 960, height = 480)
 plot(bar_violin(dt_post))
 dev.off()

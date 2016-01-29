@@ -33,7 +33,7 @@ y_bar <- function(dt, text_color = '#000066') {
            geom_bar(stat = 'identity', alpha = 0.8) +
            scale_x_discrete() +
            scale_y_continuous(expand = c(0, 0)) +
-           labs(x = 'SOC', y = 'Case count', fill = 'Year') +
+           labs(x = 'SOC', y = 'Case count', fill = 'Fiscal year') +
            coord_flip() +
            theme_bw() +
            theme(legend.position = 'top',
@@ -42,13 +42,14 @@ y_bar <- function(dt, text_color = '#000066') {
                  legend.text = element_text(colour = text_color, size = 18),
                  axis.title.x = element_text(colour = text_color, vjust = -3, size = 22),
                  axis.title.y = element_text(colour = text_color, vjust = 3, size = 22),
-                 axis.text = element_text(colour = text_color, size = 18),
+                 axis.text.x = element_text(colour = text_color, size = 18),
+                 axis.text.y = element_text(colour = text_color, size = 16),
                  plot.margin = unit(c(1, 2, 1, 1), 'lines'),
                  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                  panel.border = element_blank(),
                  axis.line = element_line(colour = text_color)))
 }
 
-png('output/img/year_count.png', width = 960, height = 720)
+png('output/img/year_count.png', width = 960, height = 560)
 plot(y_bar(dt_bar))
 dev.off()
