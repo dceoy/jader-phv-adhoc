@@ -103,8 +103,8 @@ dt_qc <- dt_dr %>%
 
 count_line <- function(dt, dc) {
   return(ggplot(dt, aes(x = quarter, y = case_c, group = class, colour = class)) +
-           geom_point(size = 3, shape = 18) +
-           geom_line(size = 1.4, alpha = 0.5) +
+           geom_point(size = 4, shape = 18) +
+           geom_line(size = 1.6, alpha = 0.5) +
            scale_x_discrete(breaks = c('2009q4', '2010q4', '2011q4', '2012q4', '2013q4', '2014q4')) +
            scale_y_continuous(limits = c(0, 1300), breaks = c(500 * (0:2)), expand = c(0, 0)) +
            scale_colour_discrete(limits = dc) +
@@ -112,11 +112,11 @@ count_line <- function(dt, dc) {
            theme_bw() +
            theme(legend.position = c(0.02, 1), legend.justification = c(0, 1),
                  legend.background = element_blank(), legend.key = element_blank(),
-                 legend.text = element_text(colour = '#000066', size = 18),
+                 legend.text = element_text(colour = '#000066', size = 20),
                  axis.title.x = element_blank(),
-                 axis.title.y = element_text(colour = '#000066', vjust = 3.5, size = 22),
+                 axis.title.y = element_text(colour = '#000066', vjust = 3.5, size = 24),
                  axis.text.x = element_blank(),
-                 axis.text.y = element_text(colour = '#000066', size = 18),
+                 axis.text.y = element_text(colour = '#000066', size = 20),
                  plot.margin = unit(c(1, 1, 1, 1.7), 'lines'),
                  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                  panel.border = element_blank(),
@@ -132,9 +132,9 @@ count_area <- function(dt) {
            labs(x = 'Reporting period', y = 'Total', colour = element_blank()) +
            theme_bw() +
            theme(legend.position = 'none',
-                 axis.title.x = element_text(colour = '#000066', vjust = -1, size = 22),
-                 axis.title.y = element_text(colour = '#000066', vjust = 2, size = 22),
-                 axis.text = element_text(colour = '#000066', size = 18),
+                 axis.title.x = element_text(colour = '#000066', vjust = -1, size = 24),
+                 axis.title.y = element_text(colour = '#000066', vjust = 2, size = 24),
+                 axis.text = element_text(colour = '#000066', size = 20),
                  plot.margin = unit(c(0, 1, 1, 1), 'lines'),
                  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                  panel.border = element_blank(),
@@ -147,4 +147,4 @@ line_area <- function(dt, dc) {
                       nrow = 2, heights = c(5, 1)))
 }
 
-png_plot(line_area(dt_qc, v_hgdr), file = 'output/img/q_count.png', w = 900, h = 600)
+png_plot(line_area(dt_qc, v_hgdr), file = 'output/img/q_count.png', w = 1200, h = 960)

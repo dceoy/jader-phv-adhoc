@@ -15,14 +15,14 @@ forest <- function(ci, ord, ulim = 200) {
                         arrow = arrow(length = unit(2, 'mm')), colour = '#6600FF') +
            scale_y_log10(limits = c(0.5, ulim), breaks = c(10 ^ (0:2))) +
            scale_x_discrete(limits = ord) +
-           labs(x = 'MedDRA HLT', y = 'Odds ratio [ 99 % confidence interval ]', colour = '#000066') +
+           labs(x = 'MedDRA HLT', y = 'Odds ratio with 99 % confidence interval', colour = '#000066') +
            coord_flip() +
            facet_grid(. ~ class) +
            theme_bw() +
-           theme(axis.title.x = element_text(colour = '#000066', vjust = -1, size = 21),
-                 axis.title.y = element_text(colour = '#000066', vjust = 1, size = 22),
-                 axis.text = element_text(colour = '#000066', size = 18),
-                 strip.text = element_text(colour = '#6600FF', vjust = 0.6, size = 15),
+           theme(axis.title.x = element_text(colour = '#000066', vjust = -1, size = 24),
+                 axis.title.y = element_text(colour = '#000066', vjust = 1, size = 24),
+                 axis.text = element_text(colour = '#000066', size = 20),
+                 strip.text = element_text(colour = '#6600FF', vjust = 0.6, size = 20),
                  strip.background = element_rect(fill = '#EEEEFF', colour = NA),
                  plot.margin = unit(c(1, 1, 1, 1), 'lines'),
                  panel.grid.major.y = element_blank(), panel.grid.minor = element_blank()))
@@ -42,4 +42,4 @@ v_hlt <- dt_orci %>%
 
 png_plot(forest(dt_orci, v_hlt),
          file = 'output/img/mixed_or.png',
-         w = 900, h = 900)
+         w = 1080, h = 1080)

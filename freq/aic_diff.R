@@ -11,7 +11,7 @@ dt_daic <- fread('output/csv/aic_hlt.csv')[, c(1:4, 6, 8), with = FALSE] %>%
 segment <- function(dt) {
   return(ggplot(dt, aes(x = case_count, y = aic_diff, colour = favor)) +
 #          geom_text(aes(label = lab), vjust = 0, hjust = 1.04, colour = '#003366') +
-           geom_point(size = 4, shape = 18, alpha = 0.7) +
+           geom_point(size = 5, shape = 18, alpha = 0.7) +
            scale_x_log10(breaks = c(10 ^ (1:4)), expand = c(0.02, 0.02)) +
            scale_y_continuous(limits = c(-240, 10), expand = c(0.02, 0.02)) +
            scale_colour_manual(values = c('#E377C2', '#17BECF')) +
@@ -19,9 +19,9 @@ segment <- function(dt) {
            theme_bw() +
            theme(legend.position = 'none',
                  plot.margin = unit(c(0, 1, 1, 1), 'lines'),
-                 axis.title.x = element_text(colour = '#000066', vjust = -1, size = 22),
-                 axis.title.y = element_text(colour = '#000066', vjust = 2, size = 22),
-                 axis.text = element_text(colour = '#000066', size = 18),
+                 axis.title.x = element_text(colour = '#000066', vjust = -1, size = 24),
+                 axis.title.y = element_text(colour = '#000066', vjust = 2, size = 24),
+                 axis.text = element_text(colour = '#000066', size = 20),
                  panel.grid.minor = element_blank()))
 }
 
@@ -38,8 +38,8 @@ histogram <- function(dt) {
            theme_bw() +
            theme(legend.position = c(0, 0.6), legend.justification = c(0, 0),
                  legend.background = element_blank(), legend.key = element_blank(),
-                 legend.title = element_text(colour = '#000066', size = 18),
-                 legend.text = element_text(colour = '#000066', size = 18),
+                 legend.title = element_text(colour = '#000066', size = 20),
+                 legend.text = element_text(colour = '#000066', size = 20),
                  panel.background = element_blank(),
                  panel.grid.major = element_blank(),
                  panel.grid.minor = element_blank(),
@@ -48,11 +48,11 @@ histogram <- function(dt) {
                  axis.ticks = element_blank(),
                  axis.text = element_blank(),
                  axis.title.x = element_blank(),
-                 axis.title.y = element_text(colour = '#000066', vjust = 3, size = 22)))
+                 axis.title.y = element_text(colour = '#000066', vjust = 3, size = 24)))
 }
 
 hst_seg <- function(dt) {
   return(grid.arrange(histogram(dt), segment(dt), nrow = 2, heights = c(2, 3)))
 }
 
-png_plot(hst_seg(dt_daic), file = 'output/img/aic_diff.png', w = 900, h = 700)
+png_plot(hst_seg(dt_daic), file = 'output/img/aic_diff.png', w = 1200, h = 960)
