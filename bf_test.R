@@ -55,30 +55,45 @@ if(file.exists(dt_rds <- 'output/rds/dt_bf_p.rds')) {
   saveRDS(dt_bf_p, file = dt_rds)
 }
 
-bf_scatter <- function(dt, text_color = '#000066') {
-  return(ggplot(d <- filter(dt, log10(bf) <= 4), aes(x = bf, y = p_val, colour = or)) +
-           geom_point(shape = 18, size = 1.2) +
-           scale_x_log10(limits = 10 ^ c(-4, 4), breaks = 10 ^ c(-3:3), expand = c(0, 0),
-                         label = as.character(10 ^ c(-3:3))) +
-           scale_y_continuous(breaks = c(0, 0.05, 0.25, 0.5, 1), expand = c(0, 0)) +
-           scale_colour_gradient(low = '#DDDDFF', high = '#222288', trans = 'log', limits = 1000 ^ c(-1, 1),
-                                 breaks = 100 ^ (-1:1), label = as.character(100 ^ (-1:1))) +
-           labs(x = 'Bayes factor', y = 'Two-sided p-value from Fisher\'s exact test', colour = 'Odds ratio') +
-           theme_bw() +
-           theme(legend.position = 'right',
-                 legend.background = element_blank(), legend.key = element_blank(),
-                 legend.title = element_text(colour = text_color, size = 18),
-                 legend.text = element_text(colour = text_color, size = 12),
-                 axis.title.x = element_text(colour = text_color, vjust = -3, size = 22),
-                 axis.title.y = element_text(colour = text_color, vjust = 3, size = 22),
-                 axis.text = element_text(colour = text_color, size = 18),
-                 plot.margin = unit(c(1, 1, 1, 1), 'lines'),
-                 panel.grid.minor = element_blank(),
-                 panel.border = element_blank(),
-                 axis.line = element_line(colour = text_color)))
+bf_scatter <- function(dt, plain_color = TRUE, text_color = '#000066') {
+  d <- dt %>% filter(log10(bf) <= 4)
+  if(plain_color) {
+    return(ggplot(d, aes(x = bf, y = p_val)) +
+             geom_point(shape = 18, size = 1.2) +
+             scale_x_log10(limits = 10 ^ c(-4, 4), breaks = 10 ^ c(-3:3), expand = c(0, 0),
+                           label = as.character(10 ^ c(-3:3))) +
+             scale_y_continuous(breaks = c(0, 0.05, 0.25, 0.5, 1), expand = c(0, 0)) +
+             labs(x = 'Bayes factor', y = 'Two-sided p-value from Fisher\'s exact test') +
+             theme_bw() +
+             theme(axis.title.x = element_text(margin = margin(10, 0, 0, 0), size = 18),
+                   axis.title.y = element_text(margin = margin(0, 10, 0, 0), size = 18),
+                   axis.text = element_text(size = 16),
+                   plot.margin = unit(c(1, 1, 1, 1), 'lines'),
+                   panel.grid.minor = element_blank()))
+  } else {
+    return(ggplot(d, aes(x = bf, y = p_val, colour = or)) +
+             geom_point(shape = 18, size = 1.2) +
+             scale_x_log10(limits = 10 ^ c(-4, 4), breaks = 10 ^ c(-3:3), expand = c(0, 0),
+                           label = as.character(10 ^ c(-3:3))) +
+             scale_y_continuous(breaks = c(0, 0.05, 0.25, 0.5, 1), expand = c(0, 0)) +
+             scale_colour_gradient(low = '#DDDDFF', high = '#222288', trans = 'log', limits = 1000 ^ c(-1, 1),
+                                   breaks = 100 ^ (-1:1), label = as.character(100 ^ (-1:1))) +
+             labs(x = 'Bayes factor', y = 'Two-sided p-value from Fisher\'s exact test', colour = 'Odds ratio') +
+             theme_bw() +
+             theme(legend.position = 'right',
+                   legend.background = element_blank(), legend.key = element_blank(),
+                   legend.title = element_text(colour = text_color, size = 18),
+                   legend.text = element_text(colour = text_color, size = 12),
+                   axis.title.x = element_text(colour = text_color, vjust = -3, size = 22),
+                   axis.title.y = element_text(colour = text_color, vjust = 3, size = 22),
+                   axis.text = element_text(colour = text_color, size = 18),
+                   plot.margin = unit(c(1, 1, 1, 1), 'lines'),
+                   panel.grid.minor = element_blank(),
+                   panel.border = element_blank(),
+                   axis.line = element_line(colour = text_color)))
+  }
 }
 
-png('output/img/bf_pval.png', width = 800, height = 720)
+svg('output/img/bf_pval.svg', width = 10, height = 10)
 plot(bf_scatter(dt_bf_p))
 dev.off()
-setwd('~/Dropbox/lab/phv/')
