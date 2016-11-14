@@ -99,46 +99,87 @@ dt_qc <- dt_dr %>%
            rbind(dt_dr) %>%
            group_by(class, quarter) %>%
            summarize(case_c = sum(case_c)) %>%
+           ungroup() %>%
            mutate(class = v_hgdr[class])
 
-count_line <- function(dt, dc) {
-  return(ggplot(dt, aes(x = quarter, y = case_c, group = class, colour = class)) +
-           geom_point(size = 4, shape = 18) +
-           geom_line(size = 1.6, alpha = 0.5) +
-           scale_x_discrete(breaks = c('2009q4', '2010q4', '2011q4', '2012q4', '2013q4', '2014q4')) +
-           scale_y_continuous(limits = c(0, 1300), breaks = c(500 * (0:2)), expand = c(0, 0)) +
-           scale_colour_discrete(limits = dc) +
-           labs(y = 'Case count', colour = element_blank()) +
-           theme_bw() +
-           theme(legend.position = c(0.02, 1), legend.justification = c(0, 1),
-                 legend.background = element_blank(), legend.key = element_blank(),
-                 legend.text = element_text(colour = '#000066', size = 20),
-                 axis.title.x = element_blank(),
-                 axis.title.y = element_text(colour = '#000066', vjust = 3.5, size = 24),
-                 axis.text.x = element_blank(),
-                 axis.text.y = element_text(colour = '#000066', size = 20),
-                 plot.margin = unit(c(1, 1, 1, 1.7), 'lines'),
-                 panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                 panel.border = element_blank(),
-                 axis.line = element_line(colour = '#000066')))
+count_line <- function(dt, dc, plain_color = TRUE) {
+  if(plain_color) {
+    return(ggplot(dt, aes(x = quarter, y = case_c, group = class, linetype = class)) +
+             geom_line(size = 1.2) +
+             scale_x_discrete(breaks = c('2009q4', '2010q4', '2011q4', '2012q4', '2013q4', '2014q4')) +
+             scale_y_continuous(limits = c(0, 1300), breaks = c(500 * (0:2)), expand = c(0, 0)) +
+             scale_linetype_discrete(limits = dc) +
+             labs(y = 'Case count', linetype = element_blank()) +
+             theme_bw() +
+             theme(legend.position = c(0.02, 1), legend.justification = c(0, 1),
+                   legend.background = element_blank(),
+                   legend.key.width = unit(5, 'line'),
+                   legend.text = element_text(size = 16),
+                   axis.title.x = element_blank(),
+                   axis.title.y = element_text(vjust = 3.5, size = 18),
+                   axis.text.x = element_blank(),
+                   axis.text.y = element_text(size = 16),
+                   plot.margin = unit(c(1, 1, 1, 1.7), 'lines'),
+                   panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                   panel.border = element_blank(),
+                   axis.line = element_line()))
+  } else {
+    return(ggplot(dt, aes(x = quarter, y = case_c, group = class, colour = class)) +
+             geom_point(size = 4, shape = 18) +
+             geom_line(size = 1.6, alpha = 0.5) +
+             scale_x_discrete(breaks = c('2009q4', '2010q4', '2011q4', '2012q4', '2013q4', '2014q4')) +
+             scale_y_continuous(limits = c(0, 1300), breaks = c(500 * (0:2)), expand = c(0, 0)) +
+             scale_colour_discrete(limits = dc) +
+             labs(y = 'Case count', colour = element_blank()) +
+             theme_bw() +
+             theme(legend.position = c(0.02, 1), legend.justification = c(0, 1),
+                   legend.background = element_blank(), legend.key = element_blank(),
+                   legend.text = element_text(colour = '#000066', size = 20),
+                   axis.title.x = element_blank(),
+                   axis.title.y = element_text(colour = '#000066', vjust = 3.5, size = 24),
+                   axis.text.x = element_blank(),
+                   axis.text.y = element_text(colour = '#000066', size = 20),
+                   plot.margin = unit(c(1, 1, 1, 1.7), 'lines'),
+                   panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                   panel.border = element_blank(),
+                   axis.line = element_line(colour = '#000066')))
+  }
 }
 
-count_area <- function(dt) {
-  return(ggplot(dt, aes(x = quarter, y = case_c, group = class)) +
-           geom_area(fill = '#000066', alpha = 0.2) +
-           scale_x_discrete(breaks = c('2009q4', '2010q4', '2011q4', '2012q4', '2013q4', '2014q4'),
-                            labels = c(2010, 2011, 2012, 2013, 2014, 2015)) +
-           scale_y_continuous(breaks = c(0, 10000), expand = c(0, 0)) +
-           labs(x = 'Reporting period', y = 'Total', colour = element_blank()) +
-           theme_bw() +
-           theme(legend.position = 'none',
-                 axis.title.x = element_text(colour = '#000066', vjust = -1, size = 24),
-                 axis.title.y = element_text(colour = '#000066', vjust = 2, size = 24),
-                 axis.text = element_text(colour = '#000066', size = 20),
-                 plot.margin = unit(c(0, 1, 1, 1), 'lines'),
-                 panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                 panel.border = element_blank(),
-                 axis.line = element_line(colour = '#000066')))
+count_area <- function(dt, plain_color = TRUE) {
+  if(plain_color) {
+    return(ggplot(dt, aes(x = quarter, y = case_c, group = class)) +
+             geom_area(fill = '#AAAAAA') +
+             scale_x_discrete(breaks = c('2009q4', '2010q4', '2011q4', '2012q4', '2013q4', '2014q4'),
+                              labels = c(2010, 2011, 2012, 2013, 2014, 2015)) +
+             scale_y_continuous(breaks = c(0, 10000), expand = c(0, 0)) +
+             labs(x = 'Reporting period', y = 'Total', colour = element_blank()) +
+             theme_bw() +
+             theme(legend.position = 'none',
+                   axis.title.x = element_text(vjust = -1, size = 18),
+                   axis.title.y = element_text(vjust = 2, size = 18),
+                   axis.text = element_text(size = 16),
+                   plot.margin = unit(c(0, 1, 1, 1), 'lines'),
+                   panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                   panel.border = element_blank(),
+                   axis.line = element_line()))
+  } else {
+    return(ggplot(dt, aes(x = quarter, y = case_c, group = class)) +
+             geom_area(fill = '#000066', alpha = 0.2) +
+             scale_x_discrete(breaks = c('2009q4', '2010q4', '2011q4', '2012q4', '2013q4', '2014q4'),
+                              labels = c(2010, 2011, 2012, 2013, 2014, 2015)) +
+             scale_y_continuous(breaks = c(0, 10000), expand = c(0, 0)) +
+             labs(x = 'Reporting period', y = 'Total', colour = element_blank()) +
+             theme_bw() +
+             theme(legend.position = 'none',
+                   axis.title.x = element_text(colour = '#000066', vjust = -1, size = 24),
+                   axis.title.y = element_text(colour = '#000066', vjust = 2, size = 24),
+                   axis.text = element_text(colour = '#000066', size = 20),
+                   plot.margin = unit(c(0, 1, 1, 1), 'lines'),
+                   panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                   panel.border = element_blank(),
+                   axis.line = element_line(colour = '#000066')))
+  }
 }
 
 line_area <- function(dt, dc) {
@@ -147,4 +188,6 @@ line_area <- function(dt, dc) {
                       nrow = 2, heights = c(5, 1)))
 }
 
-png_plot(line_area(dt_qc, v_hgdr), file = 'output/img/q_count.png', w = 1200, h = 960)
+svg_plot(line_area(dt_qc, v_hgdr),
+         file = 'output/img/q_count.svg',
+         w = 10, h = 10)
